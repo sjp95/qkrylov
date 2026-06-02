@@ -1,8 +1,11 @@
 cff-version: 1.2.0
-title: qkrylov
-message: "If you use qkrylov in research, please cite this software."
-type: software
+message: "If you use this software, please cite it as below."
 authors:
-  - name: qkrylov contributors
+  - family-names: "Pal"
+    given-names: "Subhajyoti"
+  - family-names: "Mukhopadhyay"
+    given-names: "Aritra"
+title: "qkrylov: Matrix-free Krylov methods for quantum many-body physics"
 version: 0.1.0
-
+date-released: 2026-06-02
+url: "https://github.com/qkrylov/qkrylov"

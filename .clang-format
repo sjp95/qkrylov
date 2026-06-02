@@ -1,0 +1,8 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 88
+NamespaceIndentation: All
+PointerAlignment: Left
+DerivePointerAlignment: false
+SortIncludes: false
+

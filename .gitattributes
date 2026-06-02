@@ -1,0 +1,32 @@
+# Force progressive line endings
+* text=auto
+
+# Explicitly declare text files
+*.cpp text
+*.hpp text
+*.h text
+*.py text
+*.jl text
+*.md text
+*.toml text
+*.yml text
+*.yaml text
+*.txt text
+*.cff text
+
+# Declare files that should always use LF
+*.sh text eol=lf
+.editorconfig text eol=lf
+
+# Denote binary files
+*.o binary
+*.a binary
+*.so binary
+*.dylib binary
+*.dll binary
+*.exe binary
+*.out binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary

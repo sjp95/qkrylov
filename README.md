@@ -1,478 +1,80 @@
 # qkrylov
 
-A modern matrix-free exact diagonalization and Krylov-method framework for quantum many-body physics.
+A modern C++20 framework for matrix-free Krylov methods in quantum many-body physics.
 
-## Motivation
+## Overview
 
-Most exact diagonalization packages are either:
+`qkrylov` provides a high-performance core for performing exact diagonalization and Krylov-based calculations (like Lanczos) without explicitly constructing Hamiltonian matrices. By implementing the matrix-free action $y = Hx$, the library enables the study of much larger Hilbert spaces than traditional matrix-based methods.
 
-* difficult to extend,
-* CPU-only,
-* model-specific,
-* or not designed for modern GPU architectures.
+## Current Features
 
-The goal of **qkrylov** is to provide an ITensor-like user experience while performing matrix-free exact diagonalization, Lanczos, Davidson, Jacobi-Davidson, finite-temperature Lanczos, and dynamical correlation calculations.
+- **C++20 Core**: Leveraging modern C++ features for performance and safety.
+- **Basis Abstraction**: Generic basis management with support for symmetry sectors.
+- **Spin-Half Systems**: Complete implementation of `SpinHalfBasis` and local operators (`Sz`, `Sp`, `Sm`, `Sx`, `Sy`).
+- **Matrix-Free Hamiltonian**: Efficient application of operator sums (`OpSum`) to vectors.
+- **Lanczos Solver**: Basic ground-state Lanczos implementation.
+- **Multi-Language Scaffolding**: Prepared structures for Python and Julia bindings.
 
-The framework is designed for:
+## Build Requirements
 
-* Spin systems
-* Fermionic systems
-* Hubbard models
-* t-J models
-* Bosonic systems
-* Arbitrary many-body operator strings
+- C++20 compatible compiler (e.g., GCC 11+, Clang 13+, MSVC 19.30+)
+- CMake 3.20+
+- (Optional) `make` for convenience
 
-without constructing the Hamiltonian matrix explicitly.
+## Quick Start
 
-Instead of storing
+### Build the library and tests
 
-H(i,j)
-
-the framework only implements
-
-y = Hx
-
-which enables much larger Hilbert spaces.
-
----
-
-# Design Goals
-
-## User Friendly
-
-The user should describe physics, not implementation details.
-
-Example:
-
-```python
-from qkrylov import *
-
-N = 24
-
-sites = SpinHalf(
-    N=N,
-    conserve_sz=True,
-    sz_sector=0
-)
-
-os = OpSum()
-
-for i in range(N-1):
-    os += 1.0, "Sz", i, "Sz", i+1
-    os += 0.5, "Sp", i, "Sm", i+1
-    os += 0.5, "Sm", i, "Sp", i+1
-
-H = MatrixFreeHamiltonian(
-    os,
-    sites
-)
-
-result = lanczos(
-    H,
-    nev=4
-)
-
-print(result.eigenvalues)
+```bash
+make build
 ```
 
----
+### Run tests
 
-# Supported Site Types
-
-## Spin Systems
-
-```python
-SpinHalf(...)
-SpinOne(...)
-SpinThreeHalf(...)
-Spin(S)
+```bash
+make test
 ```
 
-Supported operators:
-
-```text
-Sz
-Sp
-Sm
-Sx
-Sy
-```
-
----
-
-## Fermionic Systems
-
-```python
-Fermion(...)
-Hubbard(...)
-```
-
-Operators:
-
-```text
-CdagUp
-CUp
-CdagDn
-CDn
-Nup
-Ndn
-Nupdn
-```
-
----
-
-## t-J Systems
-
-```python
-tJ(...)
-```
-
-Local states:
-
-```text
-|0>
-|↑>
-|↓>
-```
-
----
-
-## Bosonic Systems
-
-```python
-Boson(...)
-```
-
-Operators:
-
-```text
-Bdag
-B
-N
-```
-
----
-
-# Quantum Number Conservation
-
-A major design goal is symmetry reduction.
-
-Supported conservation laws:
-
-## Spin Systems
-
-```python
-conserve_sz=True
-```
-
-Example:
-
-```python
-SpinHalf(
-    N=24,
-    conserve_sz=True,
-    sz_sector=0
-)
-```
-
----
-
-## Hubbard Systems
-
-```python
-conserve_nup=True
-conserve_ndn=True
-```
-
-Example:
-
-```python
-Hubbard(
-    N=12,
-    nup=6,
-    ndn=6
-)
-```
-
----
-
-## Bosons
-
-```python
-conserve_particles=True
-```
-
----
-
-## No Symmetry
-
-Example:
-
-```python
-Kitaev(...)
-```
-
-or
-
-```python
-SpinHalf(
-    N=24,
-    conserve_sz=False
-)
-```
-
----
-
-# Matrix-Free Hamiltonian
-
-The Hamiltonian is never stored explicitly.
-
-Instead:
+### C++ Example
 
 ```cpp
-H.apply(x,y)
+#include <qkrylov/basis/spinhalf_basis.hpp>
+#include <qkrylov/operators/opsum.hpp>
+#include <qkrylov/sites/spinhalf_site.hpp>
+#include <qkrylov/hamiltonian/matrix_free_hamiltonian.hpp>
+#include <qkrylov/solvers/lanczos.hpp>
+#include <iostream>
+
+using namespace qkrylov;
+
+int main() {
+    int N = 4;
+    auto basis = std::make_shared<SpinHalfBasis>(N);
+    auto site = std::make_shared<SpinHalfSite>();
+
+    OpSum os;
+    for (int i = 0; i < N - 1; ++i) {
+        // Heisenberg interaction: Sz_i Sz_{i+1} + 0.5(Sp_i Sm_{i+1} + Sm_i Sp_{i+1})
+        os.add_term({1.0, {{"Sz", i}, {"Sz", i+1}}});
+        os.add_term({0.5, {{"Sp", i}, {"Sm", i+1}}});
+        os.add_term({0.5, {{"Sm", i}, {"Sp", i+1}}});
+    }
+
+    MatrixFreeHamiltonian H(basis, site, os);
+    auto result = lanczos_ground_state(H);
+
+    std::cout << "Ground state energy: " << result.energy << std::endl;
+    return 0;
+}
 ```
 
-computes
-
-```text
-y = Hx
-```
-
-directly.
-
-Advantages:
-
-* lower memory
-* larger Hilbert spaces
-* GPU friendly
-* ideal for Krylov methods
-
----
-
-# General Operator Strings
-
-The framework supports arbitrary operator products.
-
-Examples:
-
-Two-body:
-
-```python
-os += J, "Sz", i, "Sz", j
-```
-
-Three-body:
-
-```python
-os += K,
-      "Sx", i,
-      "Sy", j,
-      "Sz", k
-```
-
-Four-body:
-
-```python
-os += Jring,
-      "Sp", i,
-      "Sm", j,
-      "Sp", k,
-      "Sm", l
-```
-
-This design naturally supports:
-
-* Dzyaloshinskii-Moriya interactions
-* Scalar chirality
-* Ring exchange
-* Correlated hopping
-* Custom user-defined operators
-
----
-
-# Solvers
-
-## Lanczos
-
-Ground state and low-energy spectrum.
-
-```python
-result = lanczos(H)
-```
-
----
-
-## Davidson
-
-Many low-lying eigenstates.
-
-```python
-result = davidson(H)
-```
-
----
-
-## Jacobi-Davidson
-
-Large numbers of eigenpairs.
-
-```python
-result = jacobi_davidson(H)
-```
-
----
-
-# Dynamical Correlations
-
-Zero-temperature spectra:
-
-```python
-S = dynamical_structure_factor(
-        H,
-        psi0,
-        operator="Sz",
-        q=np.pi
-)
-```
-
-Implemented using continued-fraction Lanczos.
-
----
-
-# Finite Temperature
-
-Finite Temperature Lanczos Method (FTLM)
-
-```python
-thermal = ftlm(
-    H,
-    beta=10.0,
-    nrandom=64
-)
-```
-
-Supported observables:
-
-* Partition function
-* Energy
-* Specific heat
-* Susceptibility
-* Dynamical correlation functions
-
----
-
-# Storage
-
-All results are stored in HDF5.
-
-```python
-save("results.h5", result)
-```
-
-Stored information:
-
-```text
-basis
-sectors
-eigenvalues
-eigenvectors
-spectra
-metadata
-```
-
----
-
-# Parallelization
-
-## CPU
-
-OpenMP
-
-## GPU
-
-CUDA
-
-Future:
-
-* HIP
-* SYCL
-
----
-
-# Language Support
-
-Core:
-
-```text
-C++20
-```
-
-Interfaces:
-
-```text
-Python
-Julia
-C++
-```
-
-Python bindings:
-
-```text
-pybind11
-```
-
-Julia bindings:
-
-```text
-CxxWrap
-```
-
----
-
-# Current Status
-
-Implemented:
-
-* Basis abstraction
-* SpinHalf basis
-* Symmetry sectors
-* Operator strings
-* OpSum
-* Local spin operators
-* Matrix-free Hamiltonian action
-
-In Progress:
-
-* Lanczos solver
-
-Planned:
-
-* Davidson
-* Jacobi-Davidson
-* FTLM
-* GPU backend
-* HDF5
-* Python interface
-* Julia interface
-
----
-
-# Project Philosophy
-
-Physics first.
-
-The user specifies:
-
-* Hilbert space
-* Operators
-* Symmetries
-
-The framework handles:
-
-* Basis construction
-* Matrix-free operator application
-* Krylov methods
-* Parallelization
-* Storage
-* GPU acceleration
+## Project Status
+
+This project is in **pre-alpha**. The core C++ logic is functional for spin-half systems. We are currently working on:
+- Davidson and Jacobi-Davidson solvers.
+- Fermionic and Bosonic site types.
+- Python bindings via `nanobind` or `pybind11`.
+- Julia bindings via `CxxWrap.jl`.
+- GPU acceleration (CUDA/HIP).
+
+For the long-term vision and planned API examples, see [VISION.md](./VISION.md).

@@ -1,19 +1,35 @@
-*.sge
-*.dat
-*.pdf
-*.txt
-!CMakeLists.txt
-*.job
-*.png
-*.jpg
-*.jpeg
-*.key
-.DS_Store
-*.tar.gz
-*.tar.xz
-*.h5
-*.sge
-*.log
+# Build artifacts
 bin/
 build/
+out/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
 
+# Binaries and objects
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+
+# OS specific
+.DS_Store
+
+# Logs and temp
+*.log
+*.sge
+
+# Project specific
+*.h5

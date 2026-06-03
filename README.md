@@ -78,7 +78,3 @@ This project is in **pre-alpha**. The core C++ logic is functional for spin-half
 - GPU acceleration (CUDA/HIP).
 
 For the long-term vision and planned API examples, see [VISION.md](./VISION.md).
-
-## License
-
-MIT (Pending official confirmation).

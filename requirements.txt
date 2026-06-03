@@ -1,0 +1,5 @@
+# Requirements for building documentation with Sphinx
+sphinx
+sphinx-rtd-theme
+myst-parser
+breathe

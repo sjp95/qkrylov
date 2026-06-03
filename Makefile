@@ -15,7 +15,7 @@ test: build
 	cd build && ctest --output-on-failure
 
 docs:
-	mkdocs build
+	sphinx-build -b html docs/source docs/build
 
 clean:
-	rm -rf build site
+	rm -rf build docs/build

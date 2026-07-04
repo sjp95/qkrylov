@@ -4,77 +4,89 @@ A modern C++20 framework for matrix-free Krylov methods in quantum many-body phy
 
 ## Overview
 
-`qkrylov` provides a high-performance core for performing exact diagonalization and Krylov-based calculations (like Lanczos) without explicitly constructing Hamiltonian matrices. By implementing the matrix-free action $y = Hx$, the library enables the study of much larger Hilbert spaces than traditional matrix-based methods.
+`qkrylov` provides a high-performance core for performing exact diagonalization and Krylov-based calculations (like Lanczos and Davidson) without explicitly constructing Hamiltonian matrices. By implementing the matrix-free action $y = Hx$, the library enables the study of much larger Hilbert spaces than traditional matrix-based methods.
 
-## Current Features
+## Features Completed
 
-- **C++20 Core**: Leveraging modern C++ features for performance and safety.
-- **Basis Abstraction**: Generic basis management with support for symmetry sectors.
-- **Spin-Half Systems**: Complete implementation of `SpinHalfBasis` and local operators (`Sz`, `Sp`, `Sm`, `Sx`, `Sy`).
-- **Matrix-Free Hamiltonian**: Efficient application of operator sums (`OpSum`) to vectors.
-- **Lanczos Solver**: Basic ground-state Lanczos implementation.
-- **Multi-Language Scaffolding**: Prepared structures for Python and Julia bindings.
+- **C++20 Core**: High-performance implementation leveraging modern C++ features.
+- **Matrix-Free Hamiltonian**: Efficient application of operator sums (`OpSum`) to state vectors.
+- **Supported Models**:
+    - **Spin-Half**: Heisenberg, transverse-field Ising, etc.
+    - **Fermion**: Spinless fermions with Jordan-Wigner phases.
+    - **Hubbard**: Interacting electrons with spin conservation.
+    - **t-J Model**: Doped antiferromagnets with no-double-occupancy constraint.
+- **Symmetry Conservation**: Support for $S^z$, total particle number $N$, and spin-resolved numbers $N_{\uparrow}/N_{\downarrow}$ sectors.
+- **Advanced Solvers**:
+    - **Lanczos**: Accurate ground-state energy and Ritz vector (eigenvector) calculation.
+    - **Davidson**: Iterative solver for the lowest few eigenpairs of large matrices.
+    - **Dynamics**: Continued Fraction Lanczos for dynamical structure factor $S(\omega)$ calculations.
+- **Python Bindings**: Full library interface available in Python via `nanobind`.
 
-## Build Requirements
+## Installation
 
-- C++20 compatible compiler (e.g., GCC 11+, Clang 13+, MSVC 19.30+)
+### Prerequisites
+- C++20 compatible compiler
 - CMake 3.20+
-- (Optional) `make` for convenience
-
-## Quick Start
+- Python 3.10+ (for Python bindings)
+- `nanobind` (install via `pip install nanobind`)
 
 ### Build the library and tests
-
 ```bash
 make build
 ```
 
-### Run tests
+### Install Python package
+```bash
+pip install -e ./bindings/python
+```
 
+## Testing
+
+The library includes a comprehensive suite of tests to ensure mathematical correctness.
+
+### C++ Tests
+Run all 14 C++ unit tests:
 ```bash
 make test
 ```
 
-### C++ Example
+### Python Tests
+Run Python integration tests using `pytest`:
+```bash
+pytest bindings/python/tests/test_basic.py
+```
+There are 4 specialized Python tests verifying:
+1. Basic basis construction (`SpinHalf`).
+2. Fermion basis with particle number conservation.
+3. Hamiltonian action and diagonal calculation.
+4. t-J basis construction and constraints.
 
-```cpp
-#include <qkrylov/basis/spinhalf_basis.hpp>
-#include <qkrylov/operators/opsum.hpp>
-#include <qkrylov/sites/spinhalf_site.hpp>
-#include <qkrylov/hamiltonian/matrix_free_hamiltonian.hpp>
-#include <qkrylov/solvers/lanczos.hpp>
-#include <iostream>
+## Python Example
 
-using namespace qkrylov;
+```python
+import qkrylov
 
-int main() {
-    int N = 4;
-    auto basis = std::make_shared<SpinHalfBasis>(N);
-    auto site = std::make_shared<SpinHalfSite>();
+# 4-site Heisenberg chain
+basis = qkrylov.SpinHalfBasis(4)
+site = qkrylov.SpinHalfSite()
+os = qkrylov.OpSum()
 
-    OpSum os;
-    for (int i = 0; i < N - 1; ++i) {
-        // Heisenberg interaction: Sz_i Sz_{i+1} + 0.5(Sp_i Sm_{i+1} + Sm_i Sp_{i+1})
-        os.add_term({1.0, {{"Sz", i}, {"Sz", i+1}}});
-        os.add_term({0.5, {{"Sp", i}, {"Sm", i+1}}});
-        os.add_term({0.5, {{"Sm", i}, {"Sp", i+1}}});
-    }
+for i in range(3):
+    # Sz_i Sz_{i+1} + 0.5(Sp_i Sm_{i+1} + Sm_i Sp_{i+1})
+    os.add_term(...) # See examples/heisenberg_python.py
 
-    MatrixFreeHamiltonian H(basis, site, os);
-    auto result = lanczos_ground_state(H);
-
-    std::cout << "Ground state energy: " << result.energy << std::endl;
-    return 0;
-}
+H = qkrylov.MatrixFreeHamiltonian(basis, site, os)
+result = qkrylov.lanczos_ground_state(H)
+print(f"Ground state energy: {result.energy}")
 ```
 
-## Project Status
+## Things To Be Done (Roadmap)
 
-This project is in **pre-alpha**. The core C++ logic is functional for spin-half systems. We are currently working on:
-- Davidson and Jacobi-Davidson solvers.
-- Fermionic and Bosonic site types.
-- Python bindings via `nanobind` or `pybind11`.
-- Julia bindings via `CxxWrap.jl`.
-- GPU acceleration (CUDA/HIP).
+- **GPU Acceleration**: CUDA/HIP support for Hamiltonian application.
+- **HDF5 Integration**: Efficient storage of large eigenvectors and results.
+- **Extended Symmetries**: Support for point groups and non-abelian symmetries.
+- **Finite Temperature**: Implementation of the Finite Temperature Lanczos Method (FTLM).
 
-For the long-term vision and planned API examples, see [VISION.md](./VISION.md).
+## Documentation
+
+Full documentation is available in the `docs/` directory. See `docs/source/tutorial.md` for a comprehensive guide.

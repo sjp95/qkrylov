@@ -14,11 +14,13 @@ add_library(qkrylov
     src/basis/spinhalf_basis.cpp
     src/basis/fermion_basis.cpp
     src/basis/hubbard_basis.cpp
+    src/basis/tj_basis.cpp
     src/hamiltonian/matrix_free_hamiltonian.cpp
     src/operators/opsum.cpp
     src/sites/spinhalf_site.cpp
     src/sites/fermion_site.cpp
     src/sites/hubbard_site.cpp
+    src/sites/tj_site.cpp
     src/solvers/lanczos.cpp
     src/solvers/davidson.cpp
     src/solvers/dynamics.cpp

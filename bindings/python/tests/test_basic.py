@@ -29,3 +29,7 @@ def test_hamiltonian():
     assert H.dimension() == 4
     diag = H.diagonal()
     assert len(diag) == 4
+
+def test_tj_basis():
+    basis = qkrylov.TJBasis(2)
+    assert basis.size() == 9

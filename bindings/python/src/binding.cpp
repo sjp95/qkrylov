@@ -11,10 +11,12 @@
 #include "qkrylov/basis/spinhalf_basis.hpp"
 #include "qkrylov/basis/fermion_basis.hpp"
 #include "qkrylov/basis/hubbard_basis.hpp"
+#include "qkrylov/basis/tj_basis.hpp"
 #include "qkrylov/sites/site.hpp"
 #include "qkrylov/sites/spinhalf_site.hpp"
 #include "qkrylov/sites/fermion_site.hpp"
 #include "qkrylov/sites/hubbard_site.hpp"
+#include "qkrylov/sites/tj_site.hpp"
 #include "qkrylov/hamiltonian/matrix_free_hamiltonian.hpp"
 #include "qkrylov/solvers/lanczos.hpp"
 #include "qkrylov/solvers/davidson.hpp"
@@ -82,6 +84,14 @@ NB_MODULE(qkrylov_cpp, m) {
         .def("contains", &HubbardBasis::contains)
         .def("nsites", &HubbardBasis::nsites);
 
+    nb::class_<TJBasis, Basis>(m, "TJBasis")
+        .def(nb::init<int, const Sector&>(), "N"_a, "sector"_a = Sector())
+        .def("size", &TJBasis::size)
+        .def("state", &TJBasis::state)
+        .def("index", &TJBasis::index)
+        .def("contains", &TJBasis::contains)
+        .def("nsites", &TJBasis::nsites);
+
     nb::class_<Site>(m, "Site");
 
     nb::class_<SpinHalfSite, Site>(m, "SpinHalfSite")
@@ -91,6 +101,9 @@ NB_MODULE(qkrylov_cpp, m) {
         .def(nb::init<>());
 
     nb::class_<HubbardSite, Site>(m, "HubbardSite")
+        .def(nb::init<>());
+
+    nb::class_<TJSite, Site>(m, "TJSite")
         .def(nb::init<>());
 
     nb::class_<MatrixFreeHamiltonian>(m, "MatrixFreeHamiltonian")

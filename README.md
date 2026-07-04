@@ -87,14 +87,20 @@ int main() {
 import qkrylov
 
 # 4-site Heisenberg chain
-basis = qkrylov.SpinHalfBasis(4)
+N = 4
+basis = qkrylov.SpinHalfBasis(N)
 site = qkrylov.SpinHalfSite()
-os = qkrylov.OpSum()
 
-# ... define terms ... (see examples/heisenberg_python.py)
+os = qkrylov.OpSum()
+for i in range(N - 1):
+    # Heisenberg interaction: Sz_i Sz_{i+1} + 0.5(Sp_i Sm_{i+1} + Sm_i Sp_{i+1})
+    os += 1.0, "Sz", i, "Sz", i+1
+    os += 0.5, "Sp", i, "Sm", i+1
+    os += 0.5, "Sm", i, "Sp", i+1
 
 H = qkrylov.MatrixFreeHamiltonian(basis, site, os)
 result = qkrylov.lanczos_ground_state(H)
+
 print(f"Ground state energy: {result.energy}")
 ```
 

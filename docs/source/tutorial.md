@@ -58,10 +58,27 @@ print(f"E0 = {result.energy}")
 Once you have the ground state, you can compute the dynamical structure factor $S(\omega)$.
 
 ```python
-# S(omega) starting from a state phi0
-phi0 = list(result.eigenvector) # Simple example
+# We want to compute S_x(omega) = -1/pi Im <0 | Sx_0 (omega - H + E0 + i*eta)^-1 Sx_0 | 0 >
+
+# 1. Define the Sx operator
+op_sx = qkrylov.OpSum()
+op_sx += 0.5, "Sp", 0
+op_sx += 0.5, "Sm", 0
+
+# 2. Construct H_sx to apply Sx to the ground state
+# (We reuse the basis and site from the Hamiltonian)
+H_sx = qkrylov.MatrixFreeHamiltonian(basis, site, op_sx)
+
+# 3. Compute phi0 = Sx | gs >
+phi0 = []
+H_sx.apply(list(result.eigenvector), phi0)
+
+# 4. Compute Lanczos coefficients for continued fraction
 coeffs = qkrylov.continued_fraction_coeffs(H, phi0, n_iter=100)
 
-# Evaluate at specific frequency omega
-S_w = qkrylov.evaluate_spectral_function(coeffs, omega=1.5, E0=result.energy, eta=0.1)
+# 5. Evaluate spectral function at specific frequency omega
+omega = 1.5
+eta = 0.1
+S_w = qkrylov.evaluate_spectral_function(coeffs, omega, result.energy, eta)
+print(f"Sx(omega) at {omega} is {S_w}")
 ```

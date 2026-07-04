@@ -21,6 +21,7 @@ add_library(qkrylov
     src/sites/hubbard_site.cpp
     src/solvers/lanczos.cpp
     src/solvers/davidson.cpp
+    src/solvers/dynamics.cpp
 )
 
 add_library(qkrylov::qkrylov ALIAS qkrylov)

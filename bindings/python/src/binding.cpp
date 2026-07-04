@@ -18,6 +18,7 @@
 #include "qkrylov/hamiltonian/matrix_free_hamiltonian.hpp"
 #include "qkrylov/solvers/lanczos.hpp"
 #include "qkrylov/solvers/davidson.hpp"
+#include "qkrylov/solvers/dynamics.hpp"
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -109,4 +110,12 @@ NB_MODULE(qkrylov_cpp, m) {
         .def_rw("eigenvectors", &DavidsonResult::eigenvectors);
 
     m.def("davidson_lowest", &davidson_lowest, "H"_a, "n_eig"_a = 1, "max_subspace"_a = 20, "tol"_a = 1e-8);
+
+    nb::class_<DynamicsResult>(m, "DynamicsResult")
+        .def_rw("alphas", &DynamicsResult::alphas)
+        .def_rw("betas", &DynamicsResult::betas)
+        .def_rw("norm_phi0", &DynamicsResult::norm_phi0);
+
+    m.def("continued_fraction_coeffs", &continued_fraction_coeffs, "H"_a, "phi0"_a, "n_iter"_a = 100);
+    m.def("evaluate_spectral_function", &evaluate_spectral_function, "res"_a, "omega"_a, "E0"_a, "eta"_a = 0.1);
 }

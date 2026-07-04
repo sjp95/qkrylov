@@ -10,6 +10,7 @@ set(QKRYLOV_TESTS
     test_fermion_site
     test_davidson
     test_lanczos_ritz
+    test_dynamics
 )
 
 foreach(test_name IN LISTS QKRYLOV_TESTS)

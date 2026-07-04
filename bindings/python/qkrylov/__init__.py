@@ -18,6 +18,9 @@ from .qkrylov_cpp import (
     lanczos_ground_state,
     DavidsonResult,
     davidson_lowest,
+    DynamicsResult,
+    continued_fraction_coeffs,
+    evaluate_spectral_function,
 )
 
 __version__ = "0.1.0"
@@ -40,4 +43,7 @@ __all__ = [
     "lanczos_ground_state",
     "DavidsonResult",
     "davidson_lowest",
+    "DynamicsResult",
+    "continued_fraction_coeffs",
+    "evaluate_spectral_function",
 ]

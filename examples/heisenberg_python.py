@@ -10,23 +10,9 @@ def main():
     # Create Heisenberg Hamiltonian
     os = qkrylov.OpSum()
     for i in range(N - 1):
-        # Sz_i Sz_{i+1}
-        term1 = qkrylov.OperatorTerm()
-        term1.coeff = 1.0
-        term1.factors = [qkrylov.OperatorFactor("Sz", i), qkrylov.OperatorFactor("Sz", i+1)]
-        os.add_term(term1)
-
-        # 0.5 * Sp_i Sm_{i+1}
-        term2 = qkrylov.OperatorTerm()
-        term2.coeff = 0.5
-        term2.factors = [qkrylov.OperatorFactor("Sp", i), qkrylov.OperatorFactor("Sm", i+1)]
-        os.add_term(term2)
-
-        # 0.5 * Sm_i Sp_{i+1}
-        term3 = qkrylov.OperatorTerm()
-        term3.coeff = 0.5
-        term3.factors = [qkrylov.OperatorFactor("Sm", i), qkrylov.OperatorFactor("Sp", i+1)]
-        os.add_term(term3)
+        os += 1.0, "Sz", i, "Sz", i+1
+        os += 0.5, "Sp", i, "Sm", i+1
+        os += 0.5, "Sm", i, "Sp", i+1
 
     H = qkrylov.MatrixFreeHamiltonian(basis, site, os)
 

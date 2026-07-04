@@ -38,13 +38,7 @@ os = qkrylov.OpSum()
 
 # Example: Nearest-neighbor Sz-Sz interaction
 for i in range(N - 1):
-    term = qkrylov.OperatorTerm()
-    term.coeff = 1.0
-    term.factors = [
-        qkrylov.OperatorFactor("Sz", i),
-        qkrylov.OperatorFactor("Sz", i+1)
-    ]
-    os.add_term(term)
+    os += 1.0, "Sz", i, "Sz", i+1
 ```
 
 ## 4. Solving for the Ground State

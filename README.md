@@ -68,17 +68,9 @@ int main() {
     OpSum os;
     for (int i = 0; i < N - 1; ++i) {
         // Heisenberg interaction: Sz_i Sz_{i+1} + 0.5(Sp_i Sm_{i+1} + Sm_i Sp_{i+1})
-        OperatorTerm t1; t1.coeff = 1.0;
-        t1.factors = {{"Sz", i}, {"Sz", i+1}};
-        os.add_term(t1);
-
-        OperatorTerm t2; t2.coeff = 0.5;
-        t2.factors = {{"Sp", i}, {"Sm", i+1}};
-        os.add_term(t2);
-
-        OperatorTerm t3; t3.coeff = 0.5;
-        t3.factors = {{"Sm", i}, {"Sp", i+1}};
-        os.add_term(t3);
+        os += {1.0, {{"Sz", i}, {"Sz", i+1}}};
+        os += {0.5, {{"Sp", i}, {"Sm", i+1}}};
+        os += {0.5, {{"Sm", i}, {"Sp", i+1}}};
     }
 
     MatrixFreeHamiltonian H(basis, site, os);

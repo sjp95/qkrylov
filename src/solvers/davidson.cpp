@@ -41,9 +41,8 @@ SmallEigensystem solve_small_hermitian(const std::vector<std::vector<Complex>>& 
         Complex apq = A[p][q];
 
         double phi = 0.5 * std::atan2(2.0 * std::abs(apq), std::real(aqq - app));
-        double c = std::cos(phi);
-        Complex s = (std::abs(apq) > 0.0) ? (std::sin(phi) * apq / std::abs(apq)) : Complex(0.0, 0.0);
-        double s2 = std::norm(s);
+        Complex c = std::cos(phi);
+        Complex s = std::sin(phi) * std::conj(apq) / std::abs(apq);
 
         for (int i = 0; i < n; ++i) {
             Complex vip = V[i][p];
@@ -58,9 +57,9 @@ SmallEigensystem solve_small_hermitian(const std::vector<std::vector<Complex>>& 
                 A[i][q] = A[q][i] = s * aip + c * aiq;
             }
         }
-        A[p][p] = c * c * app + s2 * aqq - 2.0 * c * std::real(std::conj(s) * apq);
-        A[q][q] = s2 * app + c * c * aqq + 2.0 * c * std::real(std::conj(s) * apq);
-        A[p][q] = A[q][p] = 0.0
+        A[p][p] = c * c * app + s * s * aqq - 2.0 * std::real(c * s * apq);
+        A[q][q] = s * s * app + c * c * aqq + 2.0 * std::real(c * s * apq);
+        A[p][q] = A[q][p] = 0.0;
     }
 
     SmallEigensystem res;

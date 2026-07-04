@@ -26,6 +26,7 @@ add_library(qkrylov
 add_library(qkrylov::qkrylov ALIAS qkrylov)
 
 target_compile_features(qkrylov PUBLIC cxx_std_20)
+set_target_properties(qkrylov PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(qkrylov
     PUBLIC
@@ -78,3 +79,13 @@ if(QKRYLOV_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
+find_package(nanobind CONFIG REQUIRED)
+
+nanobind_add_module(
+    qkrylov_cpp
+    bindings/python/src/binding.cpp
+)
+
+target_link_libraries(qkrylov_cpp PRIVATE qkrylov::qkrylov)

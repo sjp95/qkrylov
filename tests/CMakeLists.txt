@@ -6,6 +6,10 @@ set(QKRYLOV_TESTS
     test_spinhalf_basis
     test_spinhalf_site
     test_vector_ops
+    test_fermion_basis
+    test_fermion_site
+    test_davidson
+    test_lanczos_ritz
 )
 
 foreach(test_name IN LISTS QKRYLOV_TESTS)

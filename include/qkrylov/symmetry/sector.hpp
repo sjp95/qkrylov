@@ -23,6 +23,12 @@ struct Sector
     int ndn = 0;
 
     //
+    // Fermion particle number conservation
+    //
+    bool use_n = false;
+    int n = 0;
+
+    //
     // Future boson support
     //
     bool use_nb = false;

@@ -93,4 +93,35 @@ void MatrixFreeHamiltonian::apply(
     }
 }
 
+MatrixFreeHamiltonian::Vector MatrixFreeHamiltonian::diagonal() const
+{
+    const Index dim = basis_->size();
+    Vector diag(dim, Complex(0.0, 0.0));
+
+    for (Index alpha = 0; alpha < dim; ++alpha) {
+        const StateID initial_state = basis_->state(alpha);
+
+        for (const auto& term : ops_.terms()) {
+            StateID state = initial_state;
+            Complex amp = term.coeff;
+            bool valid = true;
+
+            for (const auto& factor : term.factors) {
+                auto action = site_->apply(factor.op, factor.site, state);
+                if (!action.valid) {
+                    valid = false;
+                    break;
+                }
+                state = action.new_state;
+                amp *= action.matrix_element;
+            }
+
+            if (valid && state == initial_state) {
+                diag[alpha] += amp;
+            }
+        }
+    }
+    return diag;
+}
+
 }

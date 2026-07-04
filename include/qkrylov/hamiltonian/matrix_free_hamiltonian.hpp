@@ -28,6 +28,8 @@ public:
         Vector& y
     ) const;
 
+    Vector diagonal() const;
+
     Index dimension() const;
 
 private:

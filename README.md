@@ -8,29 +8,30 @@ A modern C++20 framework for matrix-free Krylov methods in quantum many-body phy
 
 ## Features Completed
 
-- **C++20 Core**: High-performance implementation leveraging modern C++ features.
-- **Matrix-Free Hamiltonian**: Efficient application of operator sums (`OpSum`) to state vectors.
+- **C++20 Core**: Leveraging modern C++ features for performance and safety.
+- **Basis Abstraction**: Generic basis management with support for symmetry sectors.
 - **Supported Models**:
-    - **Spin-Half**: Heisenberg, transverse-field Ising, etc.
-    - **Fermion**: Spinless fermions with Jordan-Wigner phases.
-    - **Hubbard**: Interacting electrons with spin conservation.
-    - **t-J Model**: Doped antiferromagnets with no-double-occupancy constraint.
-- **Symmetry Conservation**: Support for $S^z$, total particle number $N$, and spin-resolved numbers $N_{\uparrow}/N_{\downarrow}$ sectors.
+    - **Spin-Half Systems**: Heisenberg, transverse-field Ising, etc.
+    - **Fermionic Systems**: Spinless fermions with Jordan-Wigner phases.
+    - **Hubbard Models**: Interacting electrons with spin conservation.
+    - **t-J Models**: Doped antiferromagnets with no-double-occupancy constraint.
+- **Matrix-Free Hamiltonian**: Efficient application of operator sums (`OpSum`) to state vectors.
 - **Advanced Solvers**:
-    - **Lanczos**: Accurate ground-state energy and Ritz vector (eigenvector) calculation.
-    - **Davidson**: Iterative solver for the lowest few eigenpairs of large matrices.
+    - **Lanczos**: Accurate ground-state energy and Ritz vector calculation.
+    - **Davidson**: Iterative solver for the lowest few eigenpairs.
     - **Dynamics**: Continued Fraction Lanczos for dynamical structure factor $S(\omega)$ calculations.
-- **Python Bindings**: Full library interface available in Python via `nanobind`.
+- **Multi-Language Scaffolding**: Robust Python interface via `nanobind`.
 
-## Installation
+## Build Requirements
 
-### Prerequisites
-- C++20 compatible compiler
+- C++20 compatible compiler (e.g., GCC 11+, Clang 13+, MSVC 19.30+)
 - CMake 3.20+
-- Python 3.10+ (for Python bindings)
 - `nanobind` (install via `pip install nanobind`)
 
+## Quick Start
+
 ### Build the library and tests
+
 ```bash
 make build
 ```
@@ -40,26 +41,53 @@ make build
 pip install -e ./bindings/python
 ```
 
-## Testing
+### Run tests
 
-The library includes a comprehensive suite of tests to ensure mathematical correctness.
-
-### C++ Tests
-Run all 14 C++ unit tests:
 ```bash
 make test
-```
-
-### Python Tests
-Run Python integration tests using `pytest`:
-```bash
 pytest bindings/python/tests/test_basic.py
 ```
-There are 4 specialized Python tests verifying:
-1. Basic basis construction (`SpinHalf`).
-2. Fermion basis with particle number conservation.
-3. Hamiltonian action and diagonal calculation.
-4. t-J basis construction and constraints.
+
+### C++ Example
+
+```cpp
+#include <qkrylov/basis/spinhalf_basis.hpp>
+#include <qkrylov/operators/opsum.hpp>
+#include <qkrylov/sites/spinhalf_site.hpp>
+#include <qkrylov/hamiltonian/matrix_free_hamiltonian.hpp>
+#include <qkrylov/solvers/lanczos.hpp>
+#include <iostream>
+
+using namespace qkrylov;
+
+int main() {
+    int N = 4;
+    auto basis = std::make_shared<SpinHalfBasis>(N);
+    auto site = std::make_shared<SpinHalfSite>();
+
+    OpSum os;
+    for (int i = 0; i < N - 1; ++i) {
+        // Heisenberg interaction: Sz_i Sz_{i+1} + 0.5(Sp_i Sm_{i+1} + Sm_i Sp_{i+1})
+        OperatorTerm t1; t1.coeff = 1.0;
+        t1.factors = {{"Sz", i}, {"Sz", i+1}};
+        os.add_term(t1);
+
+        OperatorTerm t2; t2.coeff = 0.5;
+        t2.factors = {{"Sp", i}, {"Sm", i+1}};
+        os.add_term(t2);
+
+        OperatorTerm t3; t3.coeff = 0.5;
+        t3.factors = {{"Sm", i}, {"Sp", i+1}};
+        os.add_term(t3);
+    }
+
+    MatrixFreeHamiltonian H(basis, site, os);
+    auto result = lanczos_ground_state(H);
+
+    std::cout << "Ground state energy: " << result.energy << std::endl;
+    return 0;
+}
+```
 
 ## Python Example
 
@@ -71,9 +99,7 @@ basis = qkrylov.SpinHalfBasis(4)
 site = qkrylov.SpinHalfSite()
 os = qkrylov.OpSum()
 
-for i in range(3):
-    # Sz_i Sz_{i+1} + 0.5(Sp_i Sm_{i+1} + Sm_i Sp_{i+1})
-    os.add_term(...) # See examples/heisenberg_python.py
+# ... define terms ... (see examples/heisenberg_python.py)
 
 H = qkrylov.MatrixFreeHamiltonian(basis, site, os)
 result = qkrylov.lanczos_ground_state(H)
@@ -84,9 +110,9 @@ print(f"Ground state energy: {result.energy}")
 
 - **GPU Acceleration**: CUDA/HIP support for Hamiltonian application.
 - **HDF5 Integration**: Efficient storage of large eigenvectors and results.
-- **Extended Symmetries**: Support for point groups and non-abelian symmetries.
-- **Finite Temperature**: Implementation of the Finite Temperature Lanczos Method (FTLM).
+- **Julia Bindings**: Interop via `CxxWrap.jl`.
+- **Finite Temperature**: Finite Temperature Lanczos Method (FTLM).
 
 ## Documentation
 
-Full documentation is available in the `docs/` directory. See `docs/source/tutorial.md` for a comprehensive guide.
+Full documentation is available in the `docs/` directory. See `docs/source/tutorial.md` for a comprehensive guide modeled after iTensor.

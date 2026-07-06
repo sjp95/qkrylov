@@ -2,6 +2,18 @@
 
 This tutorial will guide you through the basic steps of setting up a quantum many-body simulation using `qkrylov`.
 
+## Library Capabilities and Achievements
+
+The **qkrylov** framework is a high-performance C++20 core with Python bindings designed for research-grade simulations.
+
+### Key Achievements
+
+- **Diverse Physics**: Native support for Spin-Half, spinless Fermion, Hubbard, and t-J models. Support for complex multi-site interactions like 3-spin Dzyaloshinskii–Moriya interaction (DMI).
+- **Stable Numerical Solvers**: Lanczos solver with full reorthogonalization for guaranteed convergence. Includes Davidson, Continued Fraction (Dynamics), and Finite Temperature Lanczos Method (FTLM) solvers.
+- **Advanced Spectroscopy**: Built-in tools for calculating momentum-resolved higher-order RIXS dynamical susceptibility $S(q, \omega)$.
+- **Seamless Integration**: High-performance Python bindings via `nanobind` with a concise, user-friendly syntax.
+- **Persistence**: Efficient data storage and retrieval via HDF5 integration.
+
 ## 1. Defining the Hilbert Space
 
 The first step in any simulation is defining the basis. `qkrylov` supports several pre-defined basis types.

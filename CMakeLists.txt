@@ -24,6 +24,7 @@ add_library(qkrylov
     src/solvers/lanczos.cpp
     src/solvers/davidson.cpp
     src/solvers/dynamics.cpp
+    src/solvers/ftlm.cpp
 )
 
 add_library(qkrylov::qkrylov ALIAS qkrylov)

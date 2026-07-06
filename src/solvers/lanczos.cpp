@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <vector>
 #include <iostream>
+#include <cmath>
 
 namespace qkrylov
 {
@@ -132,6 +133,11 @@ LanczosResult lanczos_ground_state(
         axpy(-alpha, v_curr, w);
         if (iter > 0) {
             axpy(-betas.back(), v_prev, w);
+        }
+
+        // Full reorthogonalization to maintain stability
+        for (const auto& bv : basis_vectors) {
+            axpy(-dot(bv, w), bv, w);
         }
 
         double beta = norm(w);

@@ -58,3 +58,53 @@ H = qkrylov.MatrixFreeHamiltonian(basis, site, os)
 res = qkrylov.davidson_lowest(H, n_eig=1)
 print(f"Ground state energy: {res.eigenvalues[0]}")
 ```
+
+## 3-Spin Dzyaloshinskii–Moriya Interaction (DMI)
+
+The 3-spin DMI interaction is given by $\vec{S}_i \cdot (\vec{S}_j \times \vec{S}_k)$. This can be expanded as:
+$S_i^x(S_j^y S_k^z - S_j^z S_k^y) + S_i^y(S_j^z S_k^x - S_j^x S_k^z) + S_i^z(S_j^x S_k^y - S_j^y S_k^x)$
+
+```python
+import qkrylov
+
+basis = qkrylov.SpinHalfBasis(3)
+site = qkrylov.SpinHalfSite()
+os = qkrylov.OpSum()
+
+i, j, k = 0, 1, 2
+
+# Terms for Sx_i (Sy_j Sz_k - Sz_j Sy_k)
+# ... using Sx = 0.5(Sp+Sm), Sy = -0.5i(Sp-Sm) ...
+
+# qkrylov handles complex coefficients and arbitrary operator strings automatically:
+os += 0.25j, "Sp", i, "Sp", j, "Sz", k   # part of Sx_i Sy_j Sz_k
+os += -0.25j, "Sp", i, "Sm", j, "Sz", k  # part of Sx_i Sy_j Sz_k
+# ... and so on for all components of the cross product ...
+
+H = qkrylov.MatrixFreeHamiltonian(basis, site, os)
+res = qkrylov.lanczos_ground_state(H)
+print(f"DMI Ground state energy: {res.energy}")
+```
+
+## Finite Temperature (FTLM) on Heisenberg Chain
+
+```python
+import qkrylov
+
+N = 8
+basis = qkrylov.SpinHalfBasis(N)
+site = qkrylov.SpinHalfSite()
+os = qkrylov.OpSum()
+
+for i in range(N - 1):
+    os += 1.0, "Sz", i, "Sz", i+1
+    os += 0.5, "Sp", i, "Sm", i+1
+    os += 0.5, "Sm", i, "Sp", i+1
+
+H = qkrylov.MatrixFreeHamiltonian(basis, site, os)
+
+betas = [0.1, 1.0, 10.0]
+for beta in betas:
+    res = qkrylov.ftlm(H, beta, n_random=100)
+    print(f"Beta: {beta}, E: {res.internal_energy}, Cv: {res.specific_heat}")
+```

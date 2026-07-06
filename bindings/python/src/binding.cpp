@@ -54,6 +54,16 @@ NB_MODULE(qkrylov_cpp, m) {
     nb::class_<OpSum>(m, "OpSum")
         .def(nb::init<>())
         .def("add_term", &OpSum::add_term)
+        .def("__iadd__", [](OpSum& os, nb::tuple tuple) {
+            if (tuple.size() < 3) throw std::runtime_error("OpSum += requires at least (coeff, op, site)");
+            OperatorTerm term;
+            term.coeff = nb::cast<Complex>(tuple[0]);
+            for (size_t i = 1; i < tuple.size(); i += 2) {
+                term.factors.push_back({nb::cast<std::string>(tuple[i]), nb::cast<int>(tuple[i+1])});
+            }
+            os.add_term(term);
+            return &os;
+        })
         .def("clear", &OpSum::clear)
         .def("size", &OpSum::size)
         .def("terms", &OpSum::terms);

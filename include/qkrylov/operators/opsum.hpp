@@ -15,6 +15,12 @@ public:
         const OperatorTerm& term
     );
 
+    OpSum& operator+=(const OperatorTerm& term)
+    {
+        add_term(term);
+        return *this;
+    }
+
     void clear();
 
     std::size_t size() const;

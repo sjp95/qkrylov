@@ -21,6 +21,7 @@
 #include "qkrylov/solvers/lanczos.hpp"
 #include "qkrylov/solvers/davidson.hpp"
 #include "qkrylov/solvers/dynamics.hpp"
+#include "qkrylov/solvers/ftlm.hpp"
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -141,4 +142,12 @@ NB_MODULE(qkrylov_cpp, m) {
 
     m.def("continued_fraction_coeffs", &continued_fraction_coeffs, "H"_a, "phi0"_a, "n_iter"_a = 100);
     m.def("evaluate_spectral_function", &evaluate_spectral_function, "res"_a, "omega"_a, "E0"_a, "eta"_a = 0.1);
+
+    nb::class_<FTLMResult>(m, "FTLMResult")
+        .def_rw("beta", &FTLMResult::beta)
+        .def_rw("partition_function", &FTLMResult::partition_function)
+        .def_rw("internal_energy", &FTLMResult::internal_energy)
+        .def_rw("specific_heat", &FTLMResult::specific_heat);
+
+    m.def("ftlm", &ftlm, "H"_a, "beta"_a, "n_random"_a = 50, "n_steps"_a = 100);
 }

@@ -58,3 +58,26 @@ H = qkrylov.MatrixFreeHamiltonian(basis, site, os)
 res = qkrylov.davidson_lowest(H, n_eig=1)
 print(f"Ground state energy: {res.eigenvalues[0]}")
 ```
+
+## Finite Temperature (FTLM) on Heisenberg Chain
+
+```python
+import qkrylov
+
+N = 8
+basis = qkrylov.SpinHalfBasis(N)
+site = qkrylov.SpinHalfSite()
+os = qkrylov.OpSum()
+
+for i in range(N - 1):
+    os += 1.0, "Sz", i, "Sz", i+1
+    os += 0.5, "Sp", i, "Sm", i+1
+    os += 0.5, "Sm", i, "Sp", i+1
+
+H = qkrylov.MatrixFreeHamiltonian(basis, site, os)
+
+betas = [0.1, 1.0, 10.0]
+for beta in betas:
+    res = qkrylov.ftlm(H, beta, n_random=100)
+    print(f"Beta: {beta}, E: {res.internal_energy}, Cv: {res.specific_heat}")
+```

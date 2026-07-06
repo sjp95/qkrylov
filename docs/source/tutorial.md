@@ -82,3 +82,28 @@ eta = 0.1
 S_w = qkrylov.evaluate_spectral_function(coeffs, omega, result.energy, eta)
 print(f"Sx(omega) at {omega} is {S_w}")
 ```
+
+## 6. Finite Temperature Simulations
+
+You can use the Finite Temperature Lanczos Method (FTLM) to compute thermodynamic properties.
+
+```python
+beta = 1.0 # Inverse temperature 1/T
+ftlm_res = qkrylov.ftlm(H, beta, n_random=50, n_steps=100)
+
+print(f"Internal Energy at beta=1: {ftlm_res.internal_energy}")
+print(f"Specific Heat at beta=1: {ftlm_res.specific_heat}")
+```
+
+## 7. Storing Results with HDF5
+
+Simulation results can be efficiently stored using the `h5py` library in Python.
+
+```python
+import h5py
+import numpy as np
+
+with h5py.File("result.h5", "w") as f:
+    f.create_dataset("energy", data=result.energy)
+    f.create_dataset("eigenvector", data=np.array(result.eigenvector))
+```

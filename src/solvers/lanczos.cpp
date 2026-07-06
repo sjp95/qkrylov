@@ -135,6 +135,11 @@ LanczosResult lanczos_ground_state(
             axpy(-betas.back(), v_prev, w);
         }
 
+        // Full reorthogonalization to maintain stability
+        for (const auto& bv : basis_vectors) {
+            axpy(-dot(bv, w), bv, w);
+        }
+
         double beta = norm(w);
 
         if (beta < 1e-15 || iter + 1 == std::min<int>(maxiter, dim)) {

@@ -34,6 +34,7 @@ void MatrixFreeHamiltonian::apply(
         Complex(0.0,0.0)
     );
 
+    #pragma omp parallel for
     for(Index alpha=0;
         alpha<dim;
         ++alpha)

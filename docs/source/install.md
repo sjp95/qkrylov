@@ -37,7 +37,15 @@ The Python bindings require the `nanobind` package.
 
 2. **Install qkrylov**:
    ```bash
-   pip install -e ./bindings/python
+pip install ./bindings/python
+```
+
+## System-wide C++ Installation
+
+To install the library and headers to your system's include and library paths (usually `/usr/local`):
+
+```bash
+cmake --build build --target install
    ```
 
 ## Running Tests

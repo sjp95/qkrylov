@@ -38,7 +38,7 @@ make build
 
 ### Install Python package
 ```bash
-pip install -e ./bindings/python
+pip install ./bindings/python
 ```
 
 ### Run tests

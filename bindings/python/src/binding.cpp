@@ -18,6 +18,9 @@
 #include "qkrylov/sites/hubbard_site.hpp"
 #include "qkrylov/sites/tj_site.hpp"
 #include "qkrylov/hamiltonian/matrix_free_hamiltonian.hpp"
+#ifdef QKRYLOV_ENABLE_CUDA
+#include "qkrylov/hamiltonian/cuda_hamiltonian.hpp"
+#endif
 #include "qkrylov/solvers/lanczos.hpp"
 #include "qkrylov/solvers/davidson.hpp"
 #include "qkrylov/solvers/dynamics.hpp"
@@ -122,6 +125,13 @@ NB_MODULE(qkrylov_cpp, m) {
         .def("apply", &MatrixFreeHamiltonian::apply)
         .def("dimension", &MatrixFreeHamiltonian::dimension)
         .def("diagonal", &MatrixFreeHamiltonian::diagonal);
+
+#ifdef QKRYLOV_ENABLE_CUDA
+    nb::class_<CUDAHamiltonian>(m, "CUDAHamiltonian")
+        .def(nb::init<std::shared_ptr<Basis>, std::shared_ptr<Site>, const OpSum&>())
+        .def("apply", &CUDAHamiltonian::apply)
+        .def("dimension", &CUDAHamiltonian::dimension);
+#endif
 
     nb::class_<LanczosResult>(m, "LanczosResult")
         .def_rw("energy", &LanczosResult::energy)

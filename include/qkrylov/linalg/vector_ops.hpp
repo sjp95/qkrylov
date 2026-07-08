@@ -16,14 +16,18 @@ inline Complex dot(
     const Vector& y
 )
 {
-    Complex s = 0.0;
+    double re = 0.0;
+    double im = 0.0;
 
+    #pragma omp parallel for reduction(+:re, im)
     for(std::size_t i=0;i<x.size();++i)
     {
-        s += std::conj(x[i]) * y[i];
+        Complex val = std::conj(x[i]) * y[i];
+        re += val.real();
+        im += val.imag();
     }
 
-    return s;
+    return Complex(re, im);
 }
 
 inline double norm(
@@ -42,9 +46,10 @@ inline void scal(
     Vector& x
 )
 {
-    for(auto& v : x)
+    #pragma omp parallel for
+    for(std::size_t i=0; i<x.size(); ++i)
     {
-        v *= a;
+        x[i] *= a;
     }
 }
 
@@ -54,6 +59,7 @@ inline void axpy(
     Vector& y
 )
 {
+    #pragma omp parallel for
     for(std::size_t i=0;i<x.size();++i)
     {
         y[i] += a*x[i];

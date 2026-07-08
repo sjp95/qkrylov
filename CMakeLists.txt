@@ -9,6 +9,11 @@ project(
 
 option(QKRYLOV_BUILD_TESTS "Build qkrylov test executables" ON)
 option(QKRYLOV_BUILD_EXAMPLES "Build qkrylov examples" OFF)
+option(QKRYLOV_ENABLE_CUDA "Enable CUDA acceleration" OFF)
+
+if(QKRYLOV_ENABLE_CUDA)
+    enable_language(CUDA)
+endif()
 
 add_library(qkrylov
     src/basis/spinhalf_basis.cpp
@@ -27,10 +32,18 @@ add_library(qkrylov
     src/solvers/ftlm.cpp
 )
 
+if(QKRYLOV_ENABLE_CUDA)
+    target_sources(qkrylov PRIVATE src/hamiltonian/cuda_hamiltonian.cu)
+    target_compile_definitions(qkrylov PUBLIC QKRYLOV_ENABLE_CUDA)
+endif()
+
 add_library(qkrylov::qkrylov ALIAS qkrylov)
 
 target_compile_features(qkrylov PUBLIC cxx_std_20)
 set_target_properties(qkrylov PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+find_package(OpenMP REQUIRED)
+target_link_libraries(qkrylov PUBLIC OpenMP::OpenMP_CXX)
 
 target_include_directories(qkrylov
     PUBLIC

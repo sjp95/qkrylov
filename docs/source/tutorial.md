@@ -156,3 +156,41 @@ with h5py.File("result.h5", "w") as f:
     f.create_dataset("energy", data=result.energy)
     f.create_dataset("eigenvector", data=np.array(result.eigenvector))
 ```
+
+## 9. Parallelization and Acceleration
+
+**qkrylov** supports high-performance parallelization to study larger system sizes.
+
+### Multi-threading (OpenMP)
+
+The library automatically uses OpenMP to parallelize linear algebra operations and Hamiltonian applications. This is enabled by default. To control the number of threads used, set the `OMP_NUM_THREADS` environment variable:
+
+```bash
+export OMP_NUM_THREADS=8
+python3 my_script.py
+```
+
+### GPU Acceleration (CUDA)
+
+CUDA support is available for the Hamiltonian application, which is typically the most expensive part of the calculation.
+
+#### Enabling CUDA
+
+To use CUDA, you must build the library with the `QKRYLOV_ENABLE_CUDA` flag:
+
+```bash
+cmake -B build -S . -DQKRYLOV_ENABLE_CUDA=ON
+cmake --build build
+```
+
+#### Using CUDA from Python
+
+Once built with CUDA support, you can use the `CUDAHamiltonian` class, which has a similar interface to `MatrixFreeHamiltonian`:
+
+```python
+# Assuming CUDA support is enabled
+H_cuda = qkrylov.CUDAHamiltonian(basis, site, os)
+result = qkrylov.lanczos_ground_state(H_cuda)
+```
+
+The `CUDAHamiltonian` handles device memory allocation and kernel execution automatically.

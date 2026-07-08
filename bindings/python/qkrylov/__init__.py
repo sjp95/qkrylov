@@ -16,6 +16,14 @@ from .qkrylov_cpp import (
     HubbardSite,
     TJSite,
     MatrixFreeHamiltonian,
+)
+
+try:
+    from .qkrylov_cpp import CUDAHamiltonian
+except ImportError:
+    CUDAHamiltonian = None
+
+from .qkrylov_cpp import (
     LanczosResult,
     lanczos_ground_state,
     DavidsonResult,
@@ -45,6 +53,7 @@ __all__ = [
     "HubbardSite",
     "TJSite",
     "MatrixFreeHamiltonian",
+    "CUDAHamiltonian",
     "LanczosResult",
     "lanczos_ground_state",
     "DavidsonResult",

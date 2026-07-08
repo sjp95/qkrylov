@@ -48,19 +48,18 @@ double HubbardSite::phase_dn(
 
 LocalAction HubbardSite::apply(
     const std::string& op,
-    int site,
-    StateID state
+    StateID local_state
 ) const
 {
     LocalAction a;
 
-    const bool up = occupied_up(state, site);
-    const bool dn = occupied_dn(state, site);
+    const bool up = local_state & 1ULL;
+    const bool dn = (local_state >> 1) & 1ULL;
 
     if(op == "Nup")
     {
         a.valid = true;
-        a.new_state = state;
+        a.new_state = local_state;
         a.matrix_element = up ? 1.0 : 0.0;
         return a;
     }
@@ -68,7 +67,7 @@ LocalAction HubbardSite::apply(
     if(op == "Ndn")
     {
         a.valid = true;
-        a.new_state = state;
+        a.new_state = local_state;
         a.matrix_element = dn ? 1.0 : 0.0;
         return a;
     }
@@ -76,7 +75,7 @@ LocalAction HubbardSite::apply(
     if(op == "Nupdn")
     {
         a.valid = true;
-        a.new_state = state;
+        a.new_state = local_state;
         a.matrix_element = (up && dn) ? 1.0 : 0.0;
         return a;
     }
@@ -85,8 +84,8 @@ LocalAction HubbardSite::apply(
     {
         if(!up) return a;
         a.valid = true;
-        a.new_state = state & ~(1ULL << (2 * site));
-        a.matrix_element = phase_up(state, site);
+        a.new_state = local_state & ~1ULL;
+        a.matrix_element = 1.0;
         return a;
     }
 
@@ -94,8 +93,8 @@ LocalAction HubbardSite::apply(
     {
         if(up) return a;
         a.valid = true;
-        a.new_state = state | (1ULL << (2 * site));
-        a.matrix_element = phase_up(state, site);
+        a.new_state = local_state | 1ULL;
+        a.matrix_element = 1.0;
         return a;
     }
 
@@ -103,8 +102,8 @@ LocalAction HubbardSite::apply(
     {
         if(!dn) return a;
         a.valid = true;
-        a.new_state = state & ~(1ULL << (2 * site + 1));
-        a.matrix_element = phase_dn(state, site);
+        a.new_state = local_state & ~2ULL;
+        a.matrix_element = 1.0;
         return a;
     }
 
@@ -112,8 +111,8 @@ LocalAction HubbardSite::apply(
     {
         if(dn) return a;
         a.valid = true;
-        a.new_state = state | (1ULL << (2 * site + 1));
-        a.matrix_element = phase_dn(state, site);
+        a.new_state = local_state | 2ULL;
+        a.matrix_element = 1.0;
         return a;
     }
 

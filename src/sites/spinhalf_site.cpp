@@ -15,14 +15,12 @@ bool SpinHalfSite::spin_up(
 
 LocalAction SpinHalfSite::apply(
     const std::string& op,
-    int site,
-    StateID state
+    StateID local_state
 ) const
 {
     LocalAction a;
 
-    const bool up =
-        spin_up(state, site);
+    const bool up = local_state & 1ULL;
 
     //
     // Sz
@@ -30,7 +28,7 @@ LocalAction SpinHalfSite::apply(
     if(op == "Sz")
     {
         a.valid = true;
-        a.new_state = state;
+        a.new_state = local_state;
 
         a.matrix_element =
             up ? 0.5 : -0.5;
@@ -48,8 +46,7 @@ LocalAction SpinHalfSite::apply(
 
         a.valid = true;
 
-        a.new_state =
-            state | (1ULL << site);
+        a.new_state = 1ULL;
 
         a.matrix_element = 1.0;
 
@@ -66,8 +63,7 @@ LocalAction SpinHalfSite::apply(
 
         a.valid = true;
 
-        a.new_state =
-            state & ~(1ULL << site);
+        a.new_state = 0ULL;
 
         a.matrix_element = 1.0;
 
@@ -81,8 +77,7 @@ LocalAction SpinHalfSite::apply(
     {
         a.valid = true;
 
-        a.new_state =
-            state ^ (1ULL << site);
+        a.new_state = local_state ^ 1ULL;
 
         a.matrix_element = 0.5;
 
@@ -96,8 +91,7 @@ LocalAction SpinHalfSite::apply(
     {
         a.valid = true;
 
-        a.new_state =
-            state ^ (1ULL << site);
+        a.new_state = local_state ^ 1ULL;
 
         if(up)
         {

@@ -5,11 +5,13 @@
 namespace qkrylov
 {
 
-class SpinHalfSite : public Site
+class SpinSSite : public Site
 {
 public:
 
-    int dimension() const override { return 2; }
+    SpinSSite(double S);
+
+    int dimension() const override { return dim_; }
 
     LocalAction apply(
         const std::string& op,
@@ -18,10 +20,8 @@ public:
 
 private:
 
-    static bool spin_up(
-        StateID state,
-        int site
-    );
+    double S_;
+    int dim_;
 };
 
 }

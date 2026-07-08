@@ -12,11 +12,15 @@
 #include "qkrylov/basis/fermion_basis.hpp"
 #include "qkrylov/basis/hubbard_basis.hpp"
 #include "qkrylov/basis/tj_basis.hpp"
+#include "qkrylov/basis/generic_basis.hpp"
 #include "qkrylov/sites/site.hpp"
 #include "qkrylov/sites/spinhalf_site.hpp"
 #include "qkrylov/sites/fermion_site.hpp"
 #include "qkrylov/sites/hubbard_site.hpp"
 #include "qkrylov/sites/tj_site.hpp"
+#include "qkrylov/sites/boson_site.hpp"
+#include "qkrylov/sites/hardcore_boson_site.hpp"
+#include "qkrylov/sites/spin_s_site.hpp"
 #include "qkrylov/hamiltonian/matrix_free_hamiltonian.hpp"
 #ifdef QKRYLOV_ENABLE_CUDA
 #include "qkrylov/hamiltonian/cuda_hamiltonian.hpp"
@@ -106,6 +110,14 @@ NB_MODULE(qkrylov_cpp, m) {
         .def("contains", &TJBasis::contains)
         .def("nsites", &TJBasis::nsites);
 
+    nb::class_<GenericBasis, Basis>(m, "GenericBasis")
+        .def(nb::init<const std::vector<int>&>(), "local_dims"_a)
+        .def("size", &GenericBasis::size)
+        .def("state", &GenericBasis::state)
+        .def("index", &GenericBasis::index)
+        .def("contains", &GenericBasis::contains)
+        .def("nsites", &GenericBasis::nsites);
+
     nb::class_<Site>(m, "Site");
 
     nb::class_<SpinHalfSite, Site>(m, "SpinHalfSite")
@@ -120,8 +132,18 @@ NB_MODULE(qkrylov_cpp, m) {
     nb::class_<TJSite, Site>(m, "TJSite")
         .def(nb::init<>());
 
+    nb::class_<BosonSite, Site>(m, "BosonSite")
+        .def(nb::init<int>(), "max_occupancy"_a);
+
+    nb::class_<HardcoreBosonSite, Site>(m, "HardcoreBosonSite")
+        .def(nb::init<>());
+
+    nb::class_<SpinSSite, Site>(m, "SpinSSite")
+        .def(nb::init<double>(), "S"_a);
+
     nb::class_<MatrixFreeHamiltonian>(m, "MatrixFreeHamiltonian")
         .def(nb::init<std::shared_ptr<Basis>, std::shared_ptr<Site>, const OpSum&>())
+        .def(nb::init<std::shared_ptr<Basis>, const std::vector<std::shared_ptr<Site>>&, const OpSum&>())
         .def("apply", &MatrixFreeHamiltonian::apply)
         .def("dimension", &MatrixFreeHamiltonian::dimension)
         .def("diagonal", &MatrixFreeHamiltonian::diagonal);

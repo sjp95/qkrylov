@@ -9,10 +9,12 @@ class HubbardSite : public Site
 {
 public:
 
+    int dimension() const override { return 4; }
+    bool is_fermionic() const override { return true; }
+
     LocalAction apply(
         const std::string& op,
-        int site,
-        StateID state
+        StateID local_state
     ) const override;
 
 private:

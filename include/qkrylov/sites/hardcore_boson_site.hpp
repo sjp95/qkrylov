@@ -5,7 +5,7 @@
 namespace qkrylov
 {
 
-class SpinHalfSite : public Site
+class HardcoreBosonSite : public Site
 {
 public:
 
@@ -15,13 +15,6 @@ public:
         const std::string& op,
         StateID local_state
     ) const override;
-
-private:
-
-    static bool spin_up(
-        StateID state,
-        int site
-    );
 };
 
 }

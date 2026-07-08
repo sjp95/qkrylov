@@ -29,19 +29,17 @@ double FermionSite::phase(
 
 LocalAction FermionSite::apply(
     const std::string& op,
-    int site,
-    StateID state
+    StateID local_state
 ) const
 {
     LocalAction a;
 
-    const bool occ =
-        occupied(state, site);
+    const bool occ = local_state & 1ULL;
 
     if(op == "N")
     {
         a.valid = true;
-        a.new_state = state;
+        a.new_state = local_state;
         a.matrix_element = occ ? 1.0 : 0.0;
         return a;
     }
@@ -49,7 +47,7 @@ LocalAction FermionSite::apply(
     if(op == "Id")
     {
         a.valid = true;
-        a.new_state = state;
+        a.new_state = local_state;
         a.matrix_element = 1.0;
         return a;
     }
@@ -60,8 +58,8 @@ LocalAction FermionSite::apply(
             return a;
 
         a.valid = true;
-        a.new_state = state & ~(1ULL << site);
-        a.matrix_element = phase(state, site);
+        a.new_state = 0ULL;
+        a.matrix_element = 1.0; // Phase must be handled globally or passed
         return a;
     }
 
@@ -71,8 +69,8 @@ LocalAction FermionSite::apply(
             return a;
 
         a.valid = true;
-        a.new_state = state | (1ULL << site);
-        a.matrix_element = phase(state, site);
+        a.new_state = 1ULL;
+        a.matrix_element = 1.0; // Phase must be handled globally or passed
         return a;
     }
 

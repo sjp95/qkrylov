@@ -17,6 +17,8 @@ public:
     virtual Index index(StateID s) const = 0;
 
     virtual bool contains(StateID s) const = 0;
+
+    virtual int nsites() const = 0;
 };
 
 }

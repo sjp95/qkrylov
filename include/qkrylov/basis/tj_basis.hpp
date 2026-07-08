@@ -29,7 +29,7 @@ public:
 
     bool contains(StateID s) const override;
 
-    int nsites() const noexcept
+    int nsites() const noexcept override
     {
         return N_;
     }

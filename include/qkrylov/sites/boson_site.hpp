@@ -5,11 +5,13 @@
 namespace qkrylov
 {
 
-class SpinHalfSite : public Site
+class BosonSite : public Site
 {
 public:
 
-    int dimension() const override { return 2; }
+    BosonSite(int max_occupancy);
+
+    int dimension() const override { return max_occ_ + 1; }
 
     LocalAction apply(
         const std::string& op,
@@ -18,10 +20,7 @@ public:
 
 private:
 
-    static bool spin_up(
-        StateID state,
-        int site
-    );
+    int max_occ_;
 };
 
 }

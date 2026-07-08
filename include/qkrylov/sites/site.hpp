@@ -13,10 +13,13 @@ public:
 
     virtual ~Site() = default;
 
+    virtual int dimension() const = 0;
+
+    virtual bool is_fermionic() const { return false; }
+
     virtual LocalAction apply(
         const std::string& op,
-        int site,
-        StateID state
+        StateID local_state
     ) const = 0;
 };
 

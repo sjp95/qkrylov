@@ -13,7 +13,6 @@ int main()
     auto sx =
         site.apply(
             "Sx",
-            0,
             state
         );
 
@@ -38,7 +37,6 @@ int main()
     auto sy =
         site.apply(
             "Sy",
-            0,
             state
         );
 
@@ -63,7 +61,6 @@ int main()
     auto sz =
         site.apply(
             "Sz",
-            0,
             state
         );
 
@@ -88,7 +85,6 @@ int main()
         auto sp =
     site.apply(
         "Sp",
-        0,
         state
     );
 
@@ -115,7 +111,6 @@ int main()
 auto sm =
     site.apply(
         "Sm",
-        0,
         up_state
     );
 

@@ -23,7 +23,7 @@ Defines local operators for a site.
 - `TJSite()`: Same as Hubbard but excludes double occupancy.
 
 ### MatrixFreeHamiltonian
-Handles the action of a Hamiltonian on a vector.
+Handles the action of a Hamiltonian on a vector. Supports both single-site type systems and heterogeneous mixed systems.
 - `apply(vin, vout)`: Computes $H|v_{in}\rangle$.
 - `diagonal()`: Returns the diagonal of the Hamiltonian.
 

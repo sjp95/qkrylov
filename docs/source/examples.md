@@ -108,3 +108,71 @@ for beta in betas:
     res = qkrylov.ftlm(H, beta, n_random=100)
     print(f"Beta: {beta}, E: {res.internal_energy}, Cv: {res.specific_heat}")
 ```
+
+## Mixed System: Fermion-Phonon Interaction (Holstein Model)
+
+```python
+import qkrylov
+
+# 2 sites: each has a Fermion and a Phonon (Boson)
+# We can use GenericBasis to define mixed local dimensions
+# Site 0: Fermion (dim 2), Site 1: Phonon (dim 4), Site 2: Fermion (dim 2), Site 3: Phonon (dim 4)
+local_dims = [2, 4, 2, 4]
+basis = qkrylov.GenericBasis(local_dims)
+
+sites = [
+    qkrylov.FermionSite(),
+    qkrylov.BosonSite(max_occupancy=3),
+    qkrylov.FermionSite(),
+    qkrylov.BosonSite(max_occupancy=3)
+]
+
+os = qkrylov.OpSum()
+# Electron hopping between site 0 and 2
+os += -1.0, "Cdag", 0, "C", 2
+os += -1.0, "Cdag", 2, "C", 0
+
+# Electron-phonon coupling (g * n_i * (b_i + bdag_i))
+g = 0.5
+os += g, "N", 0, "B", 1
+os += g, "N", 0, "Bdag", 1
+os += g, "N", 2, "B", 3
+os += g, "N", 2, "Bdag", 3
+
+# Phonon energy (omega * bdag * b)
+omega_ph = 1.0
+os += omega_ph, "N", 1
+os += omega_ph, "N", 3
+
+H = qkrylov.MatrixFreeHamiltonian(basis, sites, os)
+res = qkrylov.lanczos_ground_state(H)
+print(f"Holstein Ground state energy: {res.energy}")
+```
+
+## Mixed Spin System: Alternating Spin-1/2 and Spin-1
+
+```python
+import qkrylov
+
+# 4 sites: alternating Spin-1/2 (dim 2) and Spin-1 (dim 3)
+local_dims = [2, 3, 2, 3]
+basis = qkrylov.GenericBasis(local_dims)
+
+sites = [
+    qkrylov.SpinHalfSite(),
+    qkrylov.SpinSSite(S=1.0),
+    qkrylov.SpinHalfSite(),
+    qkrylov.SpinSSite(S=1.0)
+]
+
+os = qkrylov.OpSum()
+# Nearest-neighbor Heisenberg exchange
+for i in range(3):
+    os += 1.0, "Sz", i, "Sz", i+1
+    os += 0.5, "Sp", i, "Sm", i+1
+    os += 0.5, "Sm", i, "Sp", i+1
+
+H = qkrylov.MatrixFreeHamiltonian(basis, sites, os)
+res = qkrylov.lanczos_ground_state(H)
+print(f"Mixed Spin Ground state energy: {res.energy}")
+```

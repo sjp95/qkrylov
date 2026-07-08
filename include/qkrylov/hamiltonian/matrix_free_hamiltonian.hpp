@@ -23,6 +23,12 @@ public:
         const OpSum& ops
     );
 
+    MatrixFreeHamiltonian(
+        std::shared_ptr<Basis> basis,
+        const std::vector<std::shared_ptr<Site>>& sites,
+        const OpSum& ops
+    );
+
     void apply(
         const Vector& x,
         Vector& y
@@ -36,7 +42,7 @@ private:
 
     std::shared_ptr<Basis> basis_;
 
-    std::shared_ptr<Site> site_;
+    std::vector<std::shared_ptr<Site>> sites_;
 
     OpSum ops_;
 };

@@ -36,3 +36,7 @@ Welcome! To keep the project organized as it grows, please follow this directory
 2. **Matrix-Free**: Never implement a logic that requires storing a full $N \times N$ matrix unless it's for a small-scale benchmark/test.
 3. **No External Bloat**: Prefer standard library solutions. If a heavy dependency (like Eigen or Spectra) is needed, discuss it first.
 4. **Build System**: All C++ files must be registered in the root `CMakeLists.txt` or a subdirectory's `CMakeLists.txt`.
+5. **Race-Free Concurrency**:
+   - For all loop parallelizations using OpenMP (`#pragma omp parallel for`), ensure all loop-local variables (such as temporary states, action structs, and coefficients) are declared *inside* the loop body so they are thread-private by default.
+   - When updating shared arrays (like the destination vector `y` in `MatrixFreeHamiltonian::apply`), use `#pragma omp atomic` for all writes to prevent race conditions during concurrent updates.
+   - Use reductions (e.g. `reduction(+:re, im)`) for parallel scalar calculations like dot products.

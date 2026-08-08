@@ -1,0 +1,1586 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Matrix-free quantum exact diagonalization & dynamics engine in modern C++ and Python.">
+      
+      
+      
+        <link rel="canonical" href="https://sjp95.github.io/qkrylov/api/julia_api/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.53">
+    
+    
+      
+        <title>Julia API Documentation (QKrylov.jl) - qkrylov</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.20815dad.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.dfe2e883.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#julia-api-documentation-qkrylovjl" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="qkrylov" class="md-header__button md-logo" aria-label="qkrylov" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            qkrylov
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Julia API Documentation (QKrylov.jl)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun-moon" viewBox="0 0 24 24"><path d="M12 2v2M14.837 16.385a6 6 0 1 1-7.223-7.222c.624-.147.97.66.715 1.248a4 4 0 0 0 5.26 5.259c.589-.255 1.396.09 1.248.715M16 12a4 4 0 0 0-4-4M19 5l-1.256 1.256M20 12h2"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/sjp95/qkrylov" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    qkrylov/qkrylov
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="qkrylov" class="md-nav__button md-logo" aria-label="qkrylov" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    qkrylov
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/sjp95/qkrylov" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    qkrylov/qkrylov
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Home
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Quickstart
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../models/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Models
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Models
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/spin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Spin-1/2
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/fermion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Fermion
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../solvers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Solvers
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Solvers
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../solvers/lanczos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Lanczos
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../solvers/davidson/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Davidson
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../solvers/dynamics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Spectral Functions
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../solvers/ftlm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  FTLM
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../theory/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Theory
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Theory
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/exact_diag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Exact Diagonalization
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/krylov/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Krylov Methods
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/spectral/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Spectral Functions
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  API Reference
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Performance
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
+                  
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-module-overview-package-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        1. Module Overview &amp; Package Setup
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Module Overview &amp; Package Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shared-library-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Shared Library Loading
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-symmetry-sectors-sector" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        2. Symmetry Sectors (<code>Sector</code>)
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Symmetry Sectors (Sector)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#function-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Function Usage
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Function Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sector" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>Sector()</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#set_szsecsector-sz2integer" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>set_sz!(sec::Sector, sz2::Integer)</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#set_hubbard_particlessecsector-nupinteger-ndninteger" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>set_hubbard_particles!(sec::Sector, nup::Integer, ndn::Integer)</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-site-definitions-abstractsite" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        3. Site Definitions (<code>AbstractSite</code>)
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Site Definitions (AbstractSite)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#types-constructors" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Types &amp; Constructors
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-hilbert-space-bases-abstractbasis" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        4. Hilbert Space Bases (<code>AbstractBasis</code>)
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Hilbert Space Bases (AbstractBasis)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructors" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Constructors
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Methods
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dimensionbabstractbasisuint64" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>dimension(b::AbstractBasis)::UInt64</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nsitesbabstractbasisint" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>nsites(b::AbstractBasis)::Int</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#basesizebabstractbasis" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>Base.size(b::AbstractBasis)</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-operator-terms-opsum" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        5. Operator Terms (<code>OpSum</code>)
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Operator Terms (OpSum)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#function-usage_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Function Usage
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Function Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#opsum" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>OpSum()</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add_termopopsum-coeffnumber-op1abstractstring-site1integer" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>add_term!(op::OpSum, coeff::Number, op1::AbstractString, site1::Integer)</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add_termopopsum-coeffnumber-op1abstractstring-site1integer-op2abstractstring-site2integer" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>add_term!(op::OpSum, coeff::Number, op1::AbstractString, site1::Integer, op2::AbstractString, site2::Integer)</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clearopopsum" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>clear!(op::OpSum)</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-matrix-free-hamiltonian-matrixfreehamiltonian" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        6. Matrix-Free Hamiltonian (<code>MatrixFreeHamiltonian</code>)
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Matrix-Free Hamiltonian (MatrixFreeHamiltonian)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Constructor &amp; Methods
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Constructor &amp; Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#matrixfreehamiltonianbasisabstractbasis-siteabstractsite-opsumopsum" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>MatrixFreeHamiltonian(basis::AbstractBasis, site::AbstractSite, opsum::OpSum)</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dimensionhmatrixfreehamiltonianuint64" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>dimension(H::MatrixFreeHamiltonian)::UInt64</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#basehmatrixfreehamiltonian-xabstractvectornumbervectorcomplexf64" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>Base.:*(H::MatrixFreeHamiltonian, x::AbstractVector{&lt;:Number})::Vector{ComplexF64}</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-solvers-lanczos_ground_state" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        7. Solvers (<code>lanczos_ground_state</code>)
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Solvers (lanczos_ground_state)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#function-usage_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Function Usage
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Function Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lanczos_ground_statehmatrixfreehamiltonian-maxiterinteger100-tolreal1e-12lanczosresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>lanczos_ground_state(H::MatrixFreeHamiltonian; maxiter::Integer=100, tol::Real=1e-12)::LanczosResult</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-full-end-to-end-code-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        8. Full End-to-End Code Example
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+  
+  
+
+
+<h1 id="julia-api-documentation-qkrylovjl">Julia API Documentation (<code>QKrylov.jl</code>)<a class="headerlink" href="#julia-api-documentation-qkrylovjl" title="Permanent link">&para;</a></h1>
+<p><code>QKrylov.jl</code> provides native Julia bindings for <code>qkrylov</code> via zero-copy C ABI calls (<code>ccall</code>).</p>
+<hr />
+<h2 id="1-module-overview-package-setup">1. Module Overview &amp; Package Setup<a class="headerlink" href="#1-module-overview-package-setup" title="Permanent link">&para;</a></h2>
+<p>To use <code>QKrylov.jl</code> in your Julia environment:</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QKrylov</span>
+</span></code></pre></div>
+<h3 id="shared-library-loading">Shared Library Loading<a class="headerlink" href="#shared-library-loading" title="Permanent link">&para;</a></h3>
+<p><code>QKrylov.jl</code> automatically locates <code>libqkrylov.so</code> in your build tree. If custom library placement is used, set the environment variable:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">QKRYLOV_LIB_PATH</span><span class="o">=</span>/path/to/libqkrylov.so
+</span></code></pre></div></p>
+<hr />
+<h2 id="2-symmetry-sectors-sector">2. Symmetry Sectors (<code>Sector</code>)<a class="headerlink" href="#2-symmetry-sectors-sector" title="Permanent link">&para;</a></h2>
+<p>Symmetry sectors restrict the Hilbert space dimension to specific quantum number sectors.</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sector</span><span class="p">()</span>
+</span></code></pre></div>
+<h3 id="function-usage">Function Usage<a class="headerlink" href="#function-usage" title="Permanent link">&para;</a></h3>
+<h4 id="sector"><code>Sector()</code><a class="headerlink" href="#sector" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Allocates a new quantum symmetry sector object.</li>
+<li><strong>Returns</strong>: <code>Sector</code> object with automatic GC finalizer.</li>
+</ul>
+<h4 id="set_szsecsector-sz2integer"><code>set_sz!(sec::Sector, sz2::Integer)</code><a class="headerlink" href="#set_szsecsector-sz2integer" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Restricts to a total spin projection <span class="arithmatex">\(S_z\)</span>. Note that <code>sz2</code> represents <span class="arithmatex">\(2 \times S_z\)</span>.</li>
+<li><strong>Arguments</strong>:</li>
+<li><code>sec::Sector</code>: Sector object to modify.</li>
+<li><code>sz2::Integer</code>: Twice the <span class="arithmatex">\(S_z\)</span> quantum number (e.g. <code>0</code> for <span class="arithmatex">\(S_z=0\)</span>, <code>1</code> for <span class="arithmatex">\(S_z=1/2\)</span>, <code>-2</code> for <span class="arithmatex">\(S_z=-1\)</span>).</li>
+<li><strong>Returns</strong>: <code>sec::Sector</code></li>
+</ul>
+<h4 id="set_hubbard_particlessecsector-nupinteger-ndninteger"><code>set_hubbard_particles!(sec::Sector, nup::Integer, ndn::Integer)</code><a class="headerlink" href="#set_hubbard_particlessecsector-nupinteger-ndninteger" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Restricts particle counts for Fermi-Hubbard and <span class="arithmatex">\(t\)</span>-<span class="arithmatex">\(J\)</span> models.</li>
+<li><strong>Arguments</strong>:</li>
+<li><code>sec::Sector</code>: Sector object to modify.</li>
+<li><code>nup::Integer</code>: Number of spin-up particles (<span class="arithmatex">\(N_{\uparrow}\)</span>).</li>
+<li><code>ndn::Integer</code>: Number of spin-down particles (<span class="arithmatex">\(N_{\downarrow}\)</span>).</li>
+<li><strong>Returns</strong>: <code>sec::Sector</code></li>
+</ul>
+<hr />
+<h2 id="3-site-definitions-abstractsite">3. Site Definitions (<code>AbstractSite</code>)<a class="headerlink" href="#3-site-definitions-abstractsite" title="Permanent link">&para;</a></h2>
+<p>Site types describe local site degrees of freedom and state spaces.</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfSite</span><span class="p">()</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FermionSite</span><span class="p">()</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">s3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HubbardSite</span><span class="p">()</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">s4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TJSite</span><span class="p">()</span>
+</span></code></pre></div>
+<h3 id="types-constructors">Types &amp; Constructors<a class="headerlink" href="#types-constructors" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Parent Type</th>
+<th>Description</th>
+<th>Local Dimension</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SpinHalfSite()</code></td>
+<td><code>AbstractSite</code></td>
+<td>Spin-&frac12; local site ($</td>
+<td>\uparrow\rangle,</td>
+</tr>
+<tr>
+<td><code>FermionSite()</code></td>
+<td><code>AbstractSite</code></td>
+<td>Spinless fermion site ($</td>
+<td>0\rangle,</td>
+</tr>
+<tr>
+<td><code>HubbardSite()</code></td>
+<td><code>AbstractSite</code></td>
+<td>Spinful Fermi-Hubbard site ($</td>
+<td>0\rangle,</td>
+</tr>
+<tr>
+<td><code>TJSite()</code></td>
+<td><code>AbstractSite</code></td>
+<td><span class="arithmatex">\(t\)</span>-<span class="arithmatex">\(J\)</span> model site without double occupancy ($</td>
+<td>0\rangle,</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-hilbert-space-bases-abstractbasis">4. Hilbert Space Bases (<code>AbstractBasis</code>)<a class="headerlink" href="#4-hilbert-space-bases-abstractbasis" title="Permanent link">&para;</a></h2>
+<p>Basis classes construct quantum state representations across <span class="arithmatex">\(N\)</span> lattice sites.</p>
+<h3 id="constructors">Constructors<a class="headerlink" href="#constructors" title="Permanent link">&para;</a></h3>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">b1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="n">num_sites</span><span class="o">::</span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Sector</span><span class="p">,</span><span class="w"> </span><span class="kt">Nothing</span><span class="p">}</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FermionBasis</span><span class="p">(</span><span class="n">num_sites</span><span class="o">::</span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Sector</span><span class="p">,</span><span class="w"> </span><span class="kt">Nothing</span><span class="p">}</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">b3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HubbardBasis</span><span class="p">(</span><span class="n">num_sites</span><span class="o">::</span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Sector</span><span class="p">,</span><span class="w"> </span><span class="kt">Nothing</span><span class="p">}</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">b4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TJBasis</span><span class="p">(</span><span class="n">num_sites</span><span class="o">::</span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Sector</span><span class="p">,</span><span class="w"> </span><span class="kt">Nothing</span><span class="p">}</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h3>
+<h4 id="dimensionbabstractbasisuint64"><code>dimension(b::AbstractBasis)::UInt64</code><a class="headerlink" href="#dimensionbabstractbasisuint64" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Returns the total dimension of the Hilbert space.</li>
+<li><strong>Example</strong>:
+  <div class="language-julia highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dimension</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+</span></code></pre></div></li>
+</ul>
+<h4 id="nsitesbabstractbasisint"><code>nsites(b::AbstractBasis)::Int</code><a class="headerlink" href="#nsitesbabstractbasisint" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Returns the number of physical lattice sites.</li>
+<li><strong>Example</strong>:
+  <div class="language-julia highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">sites</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nsites</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+</span></code></pre></div></li>
+</ul>
+<h4 id="basesizebabstractbasis"><code>Base.size(b::AbstractBasis)</code><a class="headerlink" href="#basesizebabstractbasis" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Overloads Julia <code>size()</code> to return matrix dimensions <code>(dim, dim)</code>.</li>
+</ul>
+<hr />
+<h2 id="5-operator-terms-opsum">5. Operator Terms (<code>OpSum</code>)<a class="headerlink" href="#5-operator-terms-opsum" title="Permanent link">&para;</a></h2>
+<p><code>OpSum</code> constructs Hamiltonian operator expressions from 1-body and 2-body local site operators.</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span></code></pre></div>
+<h3 id="function-usage_1">Function Usage<a class="headerlink" href="#function-usage_1" title="Permanent link">&para;</a></h3>
+<h4 id="opsum"><code>OpSum()</code><a class="headerlink" href="#opsum" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Creates a new operator sum container.</li>
+</ul>
+<h4 id="add_termopopsum-coeffnumber-op1abstractstring-site1integer"><code>add_term!(op::OpSum, coeff::Number, op1::AbstractString, site1::Integer)</code><a class="headerlink" href="#add_termopopsum-coeffnumber-op1abstractstring-site1integer" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Adds a 1-body operator term <span class="arithmatex">\(\text{coeff} \cdot \hat{O}_{1, \text{site1}}\)</span>.</li>
+<li><strong>Arguments</strong>:</li>
+<li><code>op::OpSum</code>: Target operator sum object.</li>
+<li><code>coeff::Number</code>: Coupling constant (real or complex).</li>
+<li><code>op1::AbstractString</code>: Name of local site operator (e.g. <code>"Sz"</code>, <code>"Sp"</code>, <code>"Sm"</code>, <code>"n"</code>).</li>
+<li><code>site1::Integer</code>: 0-indexed site location.</li>
+</ul>
+<h4 id="add_termopopsum-coeffnumber-op1abstractstring-site1integer-op2abstractstring-site2integer"><code>add_term!(op::OpSum, coeff::Number, op1::AbstractString, site1::Integer, op2::AbstractString, site2::Integer)</code><a class="headerlink" href="#add_termopopsum-coeffnumber-op1abstractstring-site1integer-op2abstractstring-site2integer" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Adds a 2-body interaction term <span class="arithmatex">\(\text{coeff} \cdot \hat{O}_{1, \text{site1}} \hat{O}_{2, \text{site2}}\)</span>.</li>
+<li><strong>Arguments</strong>:</li>
+<li><code>op::OpSum</code>: Target operator sum object.</li>
+<li><code>coeff::Number</code>: Coupling constant.</li>
+<li><code>op1::AbstractString</code>, <code>op2::AbstractString</code>: Names of local site operators.</li>
+<li><code>site1::Integer</code>, <code>site2::Integer</code>: 0-indexed site locations.</li>
+</ul>
+<h4 id="clearopopsum"><code>clear!(op::OpSum)</code><a class="headerlink" href="#clearopopsum" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Clears all terms stored inside <code>op</code>.</li>
+</ul>
+<hr />
+<h2 id="6-matrix-free-hamiltonian-matrixfreehamiltonian">6. Matrix-Free Hamiltonian (<code>MatrixFreeHamiltonian</code>)<a class="headerlink" href="#6-matrix-free-hamiltonian-matrixfreehamiltonian" title="Permanent link">&para;</a></h2>
+<p>The <code>MatrixFreeHamiltonian</code> evaluates matrix-vector products <span class="arithmatex">\(y = H \cdot x\)</span> on-the-fly without constructing explicit matrix representations in memory.</p>
+<h3 id="constructor-methods">Constructor &amp; Methods<a class="headerlink" href="#constructor-methods" title="Permanent link">&para;</a></h3>
+<h4 id="matrixfreehamiltonianbasisabstractbasis-siteabstractsite-opsumopsum"><code>MatrixFreeHamiltonian(basis::AbstractBasis, site::AbstractSite, opsum::OpSum)</code><a class="headerlink" href="#matrixfreehamiltonianbasisabstractbasis-siteabstractsite-opsumopsum" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Constructs a matrix-free Hamiltonian wrapper. Automatically retains references to <code>basis</code>, <code>site</code>, and <code>opsum</code> to prevent GC release of dependencies while active.</li>
+</ul>
+<h4 id="dimensionhmatrixfreehamiltonianuint64"><code>dimension(H::MatrixFreeHamiltonian)::UInt64</code><a class="headerlink" href="#dimensionhmatrixfreehamiltonianuint64" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Returns matrix dimension <span class="arithmatex">\(\mathcal{D}\)</span>.</li>
+</ul>
+<h4 id="basehmatrixfreehamiltonian-xabstractvectornumbervectorcomplexf64"><code>Base.:*(H::MatrixFreeHamiltonian, x::AbstractVector{&lt;:Number})::Vector{ComplexF64}</code><a class="headerlink" href="#basehmatrixfreehamiltonian-xabstractvectornumbervectorcomplexf64" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Computes the matrix-vector multiplication <span class="arithmatex">\(y = H \cdot x\)</span> in zero-copy mode.</li>
+<li><strong>Example</strong>:
+  <div class="language-julia highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">(</span><span class="kt">ComplexF64</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span>
+</span></code></pre></div></li>
+</ul>
+<hr />
+<h2 id="7-solvers-lanczos_ground_state">7. Solvers (<code>lanczos_ground_state</code>)<a class="headerlink" href="#7-solvers-lanczos_ground_state" title="Permanent link">&para;</a></h2>
+<h3 id="function-usage_2">Function Usage<a class="headerlink" href="#function-usage_2" title="Permanent link">&para;</a></h3>
+<h4 id="lanczos_ground_statehmatrixfreehamiltonian-maxiterinteger100-tolreal1e-12lanczosresult"><code>lanczos_ground_state(H::MatrixFreeHamiltonian; maxiter::Integer=100, tol::Real=1e-12)::LanczosResult</code><a class="headerlink" href="#lanczos_ground_statehmatrixfreehamiltonian-maxiterinteger100-tolreal1e-12lanczosresult" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Description</strong>: Computes the ground state energy using Krylov-subspace Lanczos iteration.</li>
+<li><strong>Keyword Arguments</strong>:</li>
+<li><code>maxiter::Integer</code>: Maximum number of Lanczos iterations (default: <code>100</code>).</li>
+<li><code>tol::Real</code>: Residual tolerance (default: <code>1e-12</code>).</li>
+<li><strong>Returns</strong>: <code>LanczosResult(energy::Float64)</code>.</li>
+</ul>
+<hr />
+<h2 id="8-full-end-to-end-code-example">8. Full End-to-End Code Example<a class="headerlink" href="#8-full-end-to-end-code-example" title="Permanent link">&para;</a></h2>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QKrylov</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="c"># Create a 6-site Spin-1/2 Heisenberg chain with Sz=0 sector</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sector</span><span class="p">()</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">set_sz!</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">site</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfSite</span><span class="p">()</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="n">op</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="c"># Add Heisenberg terms H = \sum_i (S^z_i S^z_{i+1} + 0.5(S^+_i S^-_{i+1} + S^-_i S^+_{i+1}))</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">    </span><span class="n">next_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mod</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">)</span>
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sz&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sz&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sp&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sp&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="k">end</span>
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>
+</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">)</span>
+</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="n">println</span><span class="p">(</span><span class="s">&quot;Hamiltonian Dimension: &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>
+</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="c"># Solve for ground state energy</span>
+</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">)</span>
+</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="n">println</span><span class="p">(</span><span class="s">&quot;Calculated Ground State Energy: &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-circle-arrow-up" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4M12 16V8"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.69c251d7.min.js"></script>
+      
+    
+  </body>
+</html>

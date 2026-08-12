@@ -9,7 +9,7 @@ import argparse
 # CONFIGURATION
 # ==============================================================================
 parser = argparse.ArgumentParser(description="QKrylov Multi-Hardware Benchmark")
-parser.add_argument("--device", type=str, default="cpu", choices=["cpu", "sycl", "cuda"], help="Target device (cpu, sycl, cuda)")
+parser.add_argument("--device", type=str, default="cpu", choices=["cpu", "cuda"], help="Target device (cpu or cuda)")
 parser.add_argument("--precision", type=str, default="32", choices=["32", "64"], help="Float precision (32 or 64)")
 parser.add_argument("--L", type=int, default=4, help="System size (number of spins)")
 args = parser.parse_args()

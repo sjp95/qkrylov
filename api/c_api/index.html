@@ -1,0 +1,1899 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Matrix-free quantum exact diagonalization & dynamics engine in modern C++ and Python.">
+      
+      
+      
+        <link rel="canonical" href="https://sjp95.github.io/qkrylov/api/c_api/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.54">
+    
+    
+      
+        <title>qkrylov C API Reference (extern "C") - qkrylov</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.20815dad.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.dfe2e883.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#qkrylov-c-api-reference-extern-c" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="qkrylov" class="md-header__button md-logo" aria-label="qkrylov" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            qkrylov
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              qkrylov C API Reference (extern "C")
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun-moon" viewBox="0 0 24 24"><path d="M12 2v2M14.837 16.385a6 6 0 1 1-7.223-7.222c.624-.147.97.66.715 1.248a4 4 0 0 0 5.26 5.259c.589-.255 1.396.09 1.248.715M16 12a4 4 0 0 0-4-4M19 5l-1.256 1.256M20 12h2"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/sjp95/qkrylov" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    qkrylov/qkrylov
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="qkrylov" class="md-nav__button md-logo" aria-label="qkrylov" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    qkrylov
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/sjp95/qkrylov" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    qkrylov/qkrylov
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Home
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Quickstart
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../models/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Models
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Models
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/spin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Spin-1/2
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/fermion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Fermion
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../solvers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Solvers
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Solvers
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../solvers/lanczos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Lanczos
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../solvers/davidson/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Davidson
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../solvers/dynamics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Spectral Functions
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../solvers/ftlm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  FTLM
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../theory/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Theory
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+  Theory
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/exact_diag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Exact Diagonalization
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/krylov/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Krylov Methods
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../theory/spectral/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Spectral Functions
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  API Reference
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Performance
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Contributing
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
+                  
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Table of Contents
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview-core-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Overview &amp; Core Features
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#include-linking" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Include &amp; Linking
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#opaque-handles-data-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Opaque Handles &amp; Data Types
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Error Codes
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-function-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        API Function Reference
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Function Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-sector-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        1. Sector API
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Sector API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_sector_create" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_sector_create</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_sector_destroy" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_sector_destroy</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_sector_set_sz" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_sector_set_sz</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_sector_set_n" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_sector_set_n</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_sector_set_nb" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_sector_set_nb</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-basis-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        2. Basis API
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Basis API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_spinhalf_basis_create" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_spinhalf_basis_create</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_fermion_basis_create" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_fermion_basis_create</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_hubbard_basis_create" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_hubbard_basis_create</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_tj_basis_create" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_tj_basis_create</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_basis_destroy" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_basis_destroy</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_basis_dimension" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_basis_dimension</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_basis_nsites" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_basis_nsites</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_basis_state" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_basis_state</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_basis_index" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_basis_index</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_basis_contains" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_basis_contains</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-site-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        3. Site API
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Site API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Constructor Functions
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_site_destroy" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_site_destroy</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-opsum-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        4. OpSum API
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. OpSum API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_opsum_create" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_opsum_create</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_opsum_destroy" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_opsum_destroy</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_opsum_clear" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_opsum_clear</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_opsum_add_term_1body" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_opsum_add_term_1body</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_opsum_add_term_2body" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_opsum_add_term_2body</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_opsum_add_term_nbody" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_opsum_add_term_nbody</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-matrix-free-hamiltonian-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        5. Matrix-Free Hamiltonian API
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Matrix-Free Hamiltonian API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_hamiltonian_create" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_hamiltonian_create</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_hamiltonian_destroy" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_hamiltonian_destroy</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_hamiltonian_dimension" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_hamiltonian_dimension</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_hamiltonian_apply" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_hamiltonian_apply</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_hamiltonian_apply_complex-zero-copy" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_hamiltonian_apply_complex</code> (Zero-Copy)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_hamiltonian_diagonal" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_hamiltonian_diagonal</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-solvers-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        6. Solvers API
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Solvers API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_lanczos_ground_state-qkrylov_lanczos_ground_state_complex" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_lanczos_ground_state</code> &amp; <code>qkrylov_lanczos_ground_state_complex</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_davidson_lowest_complex" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_davidson_lowest_complex</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_continued_fraction_coeffs_complex-qkrylov_evaluate_spectral_function" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_continued_fraction_coeffs_complex</code> &amp; <code>qkrylov_evaluate_spectral_function</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_ftlm" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_ftlm</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-c-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Complete C Example
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+  
+  
+
+
+<h1 id="qkrylov-c-api-reference-extern-c"><code>qkrylov</code> C API Reference (<code>extern "C"</code>)<a class="headerlink" href="#qkrylov-c-api-reference-extern-c" title="Permanent link">&para;</a></h1>
+<p>The <strong><code>qkrylov</code> C API</strong> provides a binary-stable, unmangled <code>extern "C"</code> interface for performing matrix-free exact diagonalization and Krylov calculations in quantum many-body physics. </p>
+<p>It enables seamless zero-copy interop with languages such as <strong>C</strong>, <strong>Julia (<code>ccall</code>)</strong>, <strong>Rust (FFI)</strong>, <strong>Python (<code>ctypes</code>/<code>cffi</code>)</strong>, <strong>Fortran</strong>, and <strong>Go</strong>.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#overview--core-features">Overview &amp; Core Features</a></li>
+<li><a href="#include--linking">Include &amp; Linking</a></li>
+<li><a href="#opaque-handles--data-types">Opaque Handles &amp; Data Types</a></li>
+<li><a href="#error-codes">Error Codes</a></li>
+<li><a href="#api-function-reference">API Function Reference</a></li>
+<li><a href="#1-sector-api">Sector API</a></li>
+<li><a href="#2-basis-api">Basis API</a></li>
+<li><a href="#3-site-api">Site API</a></li>
+<li><a href="#4-opsum-api">OpSum API</a></li>
+<li><a href="#5-matrix-free-hamiltonian-api">Matrix-Free Hamiltonian API</a></li>
+<li><a href="#6-solvers-api">Solvers API</a></li>
+<li><a href="#complete-c-example">Complete C Example</a></li>
+</ol>
+<hr />
+<h2 id="overview-core-features">Overview &amp; Core Features<a class="headerlink" href="#overview-core-features" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Flat C ABI Linkage</strong>: All functions are declared inside <code>extern "C"</code> blocks without C++ name mangling or class vtable dependencies.</li>
+<li><strong>Opaque Handle Architecture</strong>: C++ class instances (<code>Basis</code>, <code>Site</code>, <code>OpSum</code>, <code>MatrixFreeHamiltonian</code>) are encapsulated behind opaque struct pointers (handles).</li>
+<li><strong>Exception Safety</strong>: Every C function catches internal C++ exceptions and returns standard integer error codes to prevent process crashes across language boundaries.</li>
+<li><strong>RAII Leak Protection</strong>: Handle allocations use RAII mechanisms internally to ensure memory is never leaked even if construction fails.</li>
+<li><strong>Zero-Copy Performance</strong>: Supports direct matrix-vector evaluation (<code>y = H * x</code>) using contiguous memory pointers without vector re-allocations or buffer copies.</li>
+</ul>
+<hr />
+<h2 id="include-linking">Include &amp; Linking<a class="headerlink" href="#include-linking" title="Permanent link">&para;</a></h2>
+<p>To use the C API in your program, include the header file:</p>
+<div class="language-c highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/c_api.h&gt;</span>
+</span></code></pre></div>
+<p>Link against the built <code>qkrylov</code> library:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Compile and link a C program</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>gcc<span class="w"> </span>-O3<span class="w"> </span>main.c<span class="w"> </span>-I/path/to/qkrylov/include<span class="w"> </span>-L/path/to/qkrylov/build<span class="w"> </span>-lqkrylov<span class="w"> </span>-lm<span class="w"> </span>-o<span class="w"> </span>main_c
+</span></code></pre></div>
+<hr />
+<h2 id="opaque-handles-data-types">Opaque Handles &amp; Data Types<a class="headerlink" href="#opaque-handles-data-types" title="Permanent link">&para;</a></h2>
+<p>The C API uses incomplete struct pointers to represent C++ object instances:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Handle Type</th>
+<th style="text-align: left;">Encapsulated C++ Object</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>qkrylov_sector_h</code></td>
+<td style="text-align: left;"><code>qkrylov::Sector</code></td>
+<td style="text-align: left;">Quantum number conservation law / symmetry sector</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>qkrylov_basis_h</code></td>
+<td style="text-align: left;"><code>std::shared_ptr&lt;qkrylov::Basis&gt;</code></td>
+<td style="text-align: left;">Basis (SpinHalf, Fermion, Hubbard, t-J)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>qkrylov_site_h</code></td>
+<td style="text-align: left;"><code>std::shared_ptr&lt;qkrylov::Site&gt;</code></td>
+<td style="text-align: left;">Site operator definition (SpinHalf, Fermion, Hubbard, t-J)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>qkrylov_opsum_h</code></td>
+<td style="text-align: left;"><code>qkrylov::OpSum</code></td>
+<td style="text-align: left;">Linear combination of local operator product terms</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>qkrylov_hamiltonian_h</code></td>
+<td style="text-align: left;"><code>std::unique_ptr&lt;MatrixFreeHamiltonian&gt;</code></td>
+<td style="text-align: left;">Matrix-free Hamiltonian evaluator (<span class="arithmatex">\(y = Hx\)</span>)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="error-codes">Error Codes<a class="headerlink" href="#error-codes" title="Permanent link">&para;</a></h2>
+<p>Functions returning an <code>int</code> status code return one of the following macros defined in <code>qkrylov/c_api.h</code>:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Constant</th>
+<th style="text-align: center;">Value</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>QKRYLOV_SUCCESS</code></td>
+<td style="text-align: center;"><code>0</code></td>
+<td style="text-align: left;">Operation completed successfully.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>QKRYLOV_ERROR_INVALID_ARG</code></td>
+<td style="text-align: center;"><code>-1</code></td>
+<td style="text-align: left;">Null pointer passed or invalid argument range.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>QKRYLOV_ERROR_EXCEPTION</code></td>
+<td style="text-align: center;"><code>-2</code></td>
+<td style="text-align: left;">An internal C++ exception was caught safely.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-function-reference">API Function Reference<a class="headerlink" href="#api-function-reference" title="Permanent link">&para;</a></h2>
+<h3 id="1-sector-api">1. Sector API<a class="headerlink" href="#1-sector-api" title="Permanent link">&para;</a></h3>
+<p>Symmetries and quantum number sectors (e.g. total <span class="arithmatex">\(S^z\)</span>, particle numbers).</p>
+<h4 id="qkrylov_sector_create"><code>qkrylov_sector_create</code><a class="headerlink" href="#qkrylov_sector_create" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="nf">qkrylov_sector_create</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span></code></pre></div>
+Creates a new default symmetry sector handle. Returns <code>NULL</code> on allocation failure.</p>
+<h4 id="qkrylov_sector_destroy"><code>qkrylov_sector_destroy</code><a class="headerlink" href="#qkrylov_sector_destroy" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">qkrylov_sector_destroy</span><span class="p">(</span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
+</span></code></pre></div>
+Frees the memory associated with a sector handle.</p>
+<h4 id="qkrylov_sector_set_sz"><code>qkrylov_sector_set_sz</code><a class="headerlink" href="#qkrylov_sector_set_sz" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_sector_set_sz</span><span class="p">(</span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">sz2</span><span class="p">);</span>
+</span></code></pre></div>
+Enforces total <span class="arithmatex">\(S^z\)</span> conservation sector where <code>sz2</code> is <span class="arithmatex">\(2 \times S^z\)</span> (e.g., <code>sz2 = 0</code> for <span class="arithmatex">\(S^z = 0\)</span>). Returns <code>QKRYLOV_SUCCESS</code> on success.</p>
+<h4 id="qkrylov_sector_set_n"><code>qkrylov_sector_set_n</code><a class="headerlink" href="#qkrylov_sector_set_n" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_sector_set_n</span><span class="p">(</span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+</span></code></pre></div>
+Enforces total particle number conservation for spinless fermion systems.</p>
+<h4 id="qkrylov_sector_set_nb"><code>qkrylov_sector_set_nb</code><a class="headerlink" href="#qkrylov_sector_set_nb" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_sector_set_nb</span><span class="p">(</span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">nb</span><span class="p">);</span>
+</span></code></pre></div>
+Enforces total boson particle number conservation.</p>
+<hr />
+<h3 id="2-basis-api">2. Basis API<a class="headerlink" href="#2-basis-api" title="Permanent link">&para;</a></h3>
+<p>Constructs many-body Hilbert space bases.</p>
+<h4 id="qkrylov_spinhalf_basis_create"><code>qkrylov_spinhalf_basis_create</code><a class="headerlink" href="#qkrylov_spinhalf_basis_create" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="nf">qkrylov_spinhalf_basis_create</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">num_sites</span><span class="p">,</span><span class="w"> </span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
+</span></code></pre></div>
+Creates a Spin-&frac12; basis for <code>num_sites</code> sites, optionally restricted by <code>sector</code> (pass <code>NULL</code> for full basis).</p>
+<h4 id="qkrylov_fermion_basis_create"><code>qkrylov_fermion_basis_create</code><a class="headerlink" href="#qkrylov_fermion_basis_create" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="nf">qkrylov_fermion_basis_create</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">num_sites</span><span class="p">,</span><span class="w"> </span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
+</span></code></pre></div>
+Creates a spinless fermion basis with Jordan-Wigner signs.</p>
+<h4 id="qkrylov_hubbard_basis_create"><code>qkrylov_hubbard_basis_create</code><a class="headerlink" href="#qkrylov_hubbard_basis_create" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="nf">qkrylov_hubbard_basis_create</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">num_sites</span><span class="p">,</span><span class="w"> </span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
+</span></code></pre></div>
+Creates an interacting Fermi-Hubbard basis (spin-<span class="arithmatex">\(\uparrow\)</span> and spin-<span class="arithmatex">\(\downarrow\)</span>).</p>
+<h4 id="qkrylov_tj_basis_create"><code>qkrylov_tj_basis_create</code><a class="headerlink" href="#qkrylov_tj_basis_create" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="nf">qkrylov_tj_basis_create</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">num_sites</span><span class="p">,</span><span class="w"> </span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
+</span></code></pre></div>
+Creates a t-J model basis enforcing the no-double-occupancy constraint.</p>
+<h4 id="qkrylov_basis_destroy"><code>qkrylov_basis_destroy</code><a class="headerlink" href="#qkrylov_basis_destroy" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">qkrylov_basis_destroy</span><span class="p">(</span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="p">);</span>
+</span></code></pre></div>
+Destroys a basis handle and frees associated resources.</p>
+<h4 id="qkrylov_basis_dimension"><code>qkrylov_basis_dimension</code><a class="headerlink" href="#qkrylov_basis_dimension" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">uint64_t</span><span class="w"> </span><span class="nf">qkrylov_basis_dimension</span><span class="p">(</span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="p">);</span>
+</span></code></pre></div>
+Returns the total dimension of the Hilbert space basis.</p>
+<h4 id="qkrylov_basis_nsites"><code>qkrylov_basis_nsites</code><a class="headerlink" href="#qkrylov_basis_nsites" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_basis_nsites</span><span class="p">(</span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="p">);</span>
+</span></code></pre></div>
+Returns the number of lattice sites in the basis.</p>
+<h4 id="qkrylov_basis_state"><code>qkrylov_basis_state</code><a class="headerlink" href="#qkrylov_basis_state" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kt">uint64_t</span><span class="w"> </span><span class="nf">qkrylov_basis_state</span><span class="p">(</span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">index</span><span class="p">);</span>
+</span></code></pre></div>
+Returns the integer bitstring representation of the basis state at zero-based <code>index</code>.</p>
+<h4 id="qkrylov_basis_index"><code>qkrylov_basis_index</code><a class="headerlink" href="#qkrylov_basis_index" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">int64_t</span><span class="w"> </span><span class="nf">qkrylov_basis_index</span><span class="p">(</span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">state_bitstring</span><span class="p">);</span>
+</span></code></pre></div>
+Returns the zero-based basis index for <code>state_bitstring</code>, or <code>-1</code> if the state does not belong to the sector basis.</p>
+<h4 id="qkrylov_basis_contains"><code>qkrylov_basis_contains</code><a class="headerlink" href="#qkrylov_basis_contains" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_basis_contains</span><span class="p">(</span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">state_bitstring</span><span class="p">);</span>
+</span></code></pre></div>
+Returns <code>1</code> if <code>state_bitstring</code> belongs to the sector basis, or <code>0</code> otherwise.</p>
+<hr />
+<h3 id="3-site-api">3. Site API<a class="headerlink" href="#3-site-api" title="Permanent link">&para;</a></h3>
+<p>Defines site operator representations.</p>
+<h4 id="constructor-functions">Constructor Functions<a class="headerlink" href="#constructor-functions" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="nf">qkrylov_spinhalf_site_create</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="nf">qkrylov_fermion_site_create</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="nf">qkrylov_hubbard_site_create</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="nf">qkrylov_tj_site_create</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span></code></pre></div>
+Creates a site handle matching the corresponding model system.</p>
+<h4 id="qkrylov_site_destroy"><code>qkrylov_site_destroy</code><a class="headerlink" href="#qkrylov_site_destroy" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">qkrylov_site_destroy</span><span class="p">(</span><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="n">site</span><span class="p">);</span>
+</span></code></pre></div>
+Frees a site handle.</p>
+<hr />
+<h3 id="4-opsum-api">4. OpSum API<a class="headerlink" href="#4-opsum-api" title="Permanent link">&para;</a></h3>
+<p>Constructs linear combinations of operator strings.</p>
+<h4 id="qkrylov_opsum_create"><code>qkrylov_opsum_create</code><a class="headerlink" href="#qkrylov_opsum_create" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="nf">qkrylov_opsum_create</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span></code></pre></div>
+Creates a new empty <code>OpSum</code> operator sum container.</p>
+<h4 id="qkrylov_opsum_destroy"><code>qkrylov_opsum_destroy</code><a class="headerlink" href="#qkrylov_opsum_destroy" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">qkrylov_opsum_destroy</span><span class="p">(</span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
+</span></code></pre></div>
+Frees an <code>OpSum</code> container.</p>
+<h4 id="qkrylov_opsum_clear"><code>qkrylov_opsum_clear</code><a class="headerlink" href="#qkrylov_opsum_clear" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_opsum_clear</span><span class="p">(</span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
+</span></code></pre></div>
+Removes all operator terms from the container.</p>
+<h4 id="qkrylov_opsum_add_term_1body"><code>qkrylov_opsum_add_term_1body</code><a class="headerlink" href="#qkrylov_opsum_add_term_1body" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_opsum_add_term_1body</span><span class="p">(</span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">coeff_real</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">coeff_imag</span><span class="p">,</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">                                 </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">op1</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">site1</span><span class="p">);</span>
+</span></code></pre></div>
+Adds a single-body operator term (e.g. <span class="arithmatex">\(h \cdot S_i^z\)</span>).</p>
+<h4 id="qkrylov_opsum_add_term_2body"><code>qkrylov_opsum_add_term_2body</code><a class="headerlink" href="#qkrylov_opsum_add_term_2body" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_opsum_add_term_2body</span><span class="p">(</span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">coeff_real</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">coeff_imag</span><span class="p">,</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">                                 </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">op1</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">site1</span><span class="p">,</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">                                 </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">op2</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">site2</span><span class="p">);</span>
+</span></code></pre></div>
+Adds a two-body operator interaction term (e.g. <span class="arithmatex">\(J \cdot S_i^z S_j^z\)</span> or <span class="arithmatex">\(\frac{J}{2} S_i^+ S_j^-\)</span>).</p>
+<h4 id="qkrylov_opsum_add_term_nbody"><code>qkrylov_opsum_add_term_nbody</code><a class="headerlink" href="#qkrylov_opsum_add_term_nbody" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_opsum_add_term_nbody</span><span class="p">(</span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">coeff_real</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">coeff_imag</span><span class="p">,</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">                                 </span><span class="kt">int</span><span class="w"> </span><span class="n">n_factors</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">**</span><span class="w"> </span><span class="n">ops</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">sites</span><span class="p">);</span>
+</span></code></pre></div>
+Adds an arbitrary <span class="arithmatex">\(N\)</span>-body operator interaction term (e.g. 3-body chiral term <span class="arithmatex">\(S_i^x S_j^y S_k^z\)</span> or 4-body ring exchange).</p>
+<hr />
+<h3 id="5-matrix-free-hamiltonian-api">5. Matrix-Free Hamiltonian API<a class="headerlink" href="#5-matrix-free-hamiltonian-api" title="Permanent link">&para;</a></h3>
+<p>Evaluates matrix-vector multiplication <span class="arithmatex">\(y = Hx\)</span> without storing the matrix.</p>
+<h4 id="qkrylov_hamiltonian_create"><code>qkrylov_hamiltonian_create</code><a class="headerlink" href="#qkrylov_hamiltonian_create" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_create</span><span class="p">(</span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="p">,</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">                                                </span><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="n">site</span><span class="p">,</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">                                                </span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
+</span></code></pre></div>
+Creates a <code>MatrixFreeHamiltonian</code> evaluator handle combining a basis, site operator rules, and operator sum terms.</p>
+<h4 id="qkrylov_hamiltonian_destroy"><code>qkrylov_hamiltonian_destroy</code><a class="headerlink" href="#qkrylov_hamiltonian_destroy" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_destroy</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">);</span>
+</span></code></pre></div>
+Frees a Hamiltonian handle.</p>
+<h4 id="qkrylov_hamiltonian_dimension"><code>qkrylov_hamiltonian_dimension</code><a class="headerlink" href="#qkrylov_hamiltonian_dimension" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kt">uint64_t</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_dimension</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">);</span>
+</span></code></pre></div>
+Returns the matrix dimension of the Hamiltonian.</p>
+<h4 id="qkrylov_hamiltonian_apply"><code>qkrylov_hamiltonian_apply</code><a class="headerlink" href="#qkrylov_hamiltonian_apply" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_apply</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">                              </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">x_real</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">x_imag</span><span class="p">,</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">y_real</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">y_imag</span><span class="p">);</span>
+</span></code></pre></div>
+Applies matrix action using separate real and imaginary arrays of size <code>dimension()</code>. <code>x_imag</code> and <code>y_imag</code> may be <code>NULL</code> if vectors are purely real.</p>
+<h4 id="qkrylov_hamiltonian_apply_complex-zero-copy"><code>qkrylov_hamiltonian_apply_complex</code> (Zero-Copy)<a class="headerlink" href="#qkrylov_hamiltonian_apply_complex-zero-copy" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_apply_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">                                        </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">x_complex</span><span class="p">,</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">                                        </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">y_complex</span><span class="p">);</span>
+</span></code></pre></div>
+Performs <strong>direct zero-copy</strong> matrix-vector multiplication where <code>x_complex</code> and <code>y_complex</code> are contiguous arrays of <span class="arithmatex">\(2 \times \text{dimension()}\)</span> floats <code>[re, im, re, im...]</code>.</p>
+<h4 id="qkrylov_hamiltonian_diagonal"><code>qkrylov_hamiltonian_diagonal</code><a class="headerlink" href="#qkrylov_hamiltonian_diagonal" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_diagonal</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">diag_out</span><span class="p">);</span>
+</span></code></pre></div>
+Extracts the matrix-free diagonal elements <span class="arithmatex">\(H_{ii}\)</span> into <code>diag_out</code> (caller-allocated array of size <code>dimension()</code>).</p>
+<hr />
+<h3 id="6-solvers-api">6. Solvers API<a class="headerlink" href="#6-solvers-api" title="Permanent link">&para;</a></h3>
+<h4 id="qkrylov_lanczos_ground_state-qkrylov_lanczos_ground_state_complex"><code>qkrylov_lanczos_ground_state</code> &amp; <code>qkrylov_lanczos_ground_state_complex</code><a class="headerlink" href="#qkrylov_lanczos_ground_state-qkrylov_lanczos_ground_state_complex" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">energy</span><span class="p">;</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="p">}</span><span class="w"> </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="p">;</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_lanczos_ground_state</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="w">                                 </span><span class="kt">int</span><span class="w"> </span><span class="n">maxiter</span><span class="p">,</span>
+</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="w">                                 </span><span class="kt">float</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span>
+</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="w">                                 </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>
+</span><span id="__span-31-10"><a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_lanczos_ground_state_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-31-11"><a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a><span class="w">                                         </span><span class="kt">int</span><span class="w"> </span><span class="n">maxiter</span><span class="p">,</span>
+</span><span id="__span-31-12"><a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span>
+</span><span id="__span-31-13"><a id="__codelineno-31-13" name="__codelineno-31-13" href="#__codelineno-31-13"></a><span class="w">                                         </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="p">,</span>
+</span><span id="__span-31-14"><a id="__codelineno-31-14" name="__codelineno-31-14" href="#__codelineno-31-14"></a><span class="w">                                         </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">eigenvector_complex</span><span class="p">);</span>
+</span></code></pre></div>
+Computes the ground state energy and optional ground state eigenvector (wavefunction) copied zero-copy into caller-allocated <code>eigenvector_complex</code> (size <span class="arithmatex">\(2 \times \text{dimension()}\)</span>).</p>
+<h4 id="qkrylov_davidson_lowest_complex"><code>qkrylov_davidson_lowest_complex</code><a class="headerlink" href="#qkrylov_davidson_lowest_complex" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_davidson_lowest_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="w">                                    </span><span class="kt">int</span><span class="w"> </span><span class="n">n_eig</span><span class="p">,</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">                                    </span><span class="kt">int</span><span class="w"> </span><span class="n">max_subspace</span><span class="p">,</span>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="w">                                    </span><span class="kt">float</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="w">                                    </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">eigenvalues_out</span><span class="p">,</span>
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="w">                                    </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">eigenvectors_complex_out</span><span class="p">);</span>
+</span></code></pre></div>
+Computes the <span class="arithmatex">\(N_{\text{eig}}\)</span> lowest eigenvalues and optional <span class="arithmatex">\(N_{\text{eig}}\)</span> orthogonal eigenvectors via Davidson iteration.</p>
+<h4 id="qkrylov_continued_fraction_coeffs_complex-qkrylov_evaluate_spectral_function"><code>qkrylov_continued_fraction_coeffs_complex</code> &amp; <code>qkrylov_evaluate_spectral_function</code><a class="headerlink" href="#qkrylov_continued_fraction_coeffs_complex-qkrylov_evaluate_spectral_function" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_continued_fraction_coeffs_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">                                              </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">phi0_complex</span><span class="p">,</span>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">                                              </span><span class="kt">int</span><span class="w"> </span><span class="n">n_iter</span><span class="p">,</span>
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">                                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">alphas_out</span><span class="p">,</span>
+</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">                                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">betas_out</span><span class="p">,</span>
+</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="w">                                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">norm_phi0_out</span><span class="p">,</span>
+</span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">                                              </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">num_coeffs_out</span><span class="p">);</span>
+</span><span id="__span-33-8"><a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a>
+</span><span id="__span-33-9"><a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="kt">float</span><span class="w"> </span><span class="nf">qkrylov_evaluate_spectral_function</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">alphas</span><span class="p">,</span>
+</span><span id="__span-33-10"><a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="w">                                         </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">betas</span><span class="p">,</span>
+</span><span id="__span-33-11"><a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="w">                                         </span><span class="kt">size_t</span><span class="w"> </span><span class="n">n</span><span class="p">,</span>
+</span><span id="__span-33-12"><a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">norm_phi0</span><span class="p">,</span>
+</span><span id="__span-33-13"><a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">omega</span><span class="p">,</span>
+</span><span id="__span-33-14"><a id="__codelineno-33-14" name="__codelineno-33-14" href="#__codelineno-33-14"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">E0</span><span class="p">,</span>
+</span><span id="__span-33-15"><a id="__codelineno-33-15" name="__codelineno-33-15" href="#__codelineno-33-15"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">eta</span><span class="p">);</span>
+</span></code></pre></div>
+Computes Lanczos tridiagonal continued-fraction coefficients (<span class="arithmatex">\(\alpha_i, \beta_i\)</span>) starting from <span class="arithmatex">\(|\phi_0\rangle\)</span> and evaluates dynamical structure factors <span class="arithmatex">\(I(\omega)\)</span>.</p>
+<h4 id="qkrylov_ftlm"><code>qkrylov_ftlm</code><a class="headerlink" href="#qkrylov_ftlm" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">beta</span><span class="p">;</span><span class="w">                </span><span class="cm">/* Inverse temperature beta = 1 / (kB * T) */</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">partition_function</span><span class="p">;</span><span class="w">  </span><span class="cm">/* Thermal partition function Z(beta) */</span>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">internal_energy</span><span class="p">;</span><span class="w">     </span><span class="cm">/* Internal energy E(beta) */</span>
+</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">specific_heat</span><span class="p">;</span><span class="w">       </span><span class="cm">/* Specific heat Cv(beta) */</span>
+</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="p">}</span><span class="w"> </span><span class="n">qkrylov_ftlm_result_c_t</span><span class="p">;</span>
+</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>
+</span><span id="__span-34-8"><a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_ftlm</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-34-9"><a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="w">                 </span><span class="kt">float</span><span class="w"> </span><span class="n">beta</span><span class="p">,</span>
+</span><span id="__span-34-10"><a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="w">                 </span><span class="kt">int</span><span class="w"> </span><span class="n">n_random</span><span class="p">,</span>
+</span><span id="__span-34-11"><a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="w">                 </span><span class="kt">int</span><span class="w"> </span><span class="n">n_steps</span><span class="p">,</span>
+</span><span id="__span-34-12"><a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a><span class="w">                 </span><span class="n">qkrylov_ftlm_result_c_t</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+</span></code></pre></div>
+Computes thermodynamic quantities (<span class="arithmatex">\(Z(\beta), E(\beta), C_v(\beta)\)</span>) using the Finite Temperature Lanczos Method.</p>
+<hr />
+<h2 id="complete-c-example">Complete C Example<a class="headerlink" href="#complete-c-example" title="Permanent link">&para;</a></h2>
+<p>Below is a complete, working C program demonstrating exact diagonalization of a 4-site 1D Heisenberg antiferromagnet (<span class="arithmatex">\(H = \sum_i S_i^z S_{i+1}^z + \frac{1}{2} (S_i^+ S_{i+1}^- + S_i^- S_{i+1}^+)\)</span>) in the <span class="arithmatex">\(S^z = 0\)</span> symmetry sector:</p>
+<div class="language-c highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/c_api.h&gt;</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span>
+</span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;math.h&gt;</span>
+</span><span id="__span-35-5"><a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;assert.h&gt;</span>
+</span><span id="__span-35-6"><a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a>
+</span><span id="__span-35-7"><a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-35-8"><a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+</span><span id="__span-35-9"><a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;--- qkrylov C API Demo: 4-site Heisenberg Chain ---</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span id="__span-35-10"><a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a>
+</span><span id="__span-35-11"><a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a><span class="w">    </span><span class="c1">// 1. Create Sz=0 sector</span>
+</span><span id="__span-35-12"><a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a><span class="w">    </span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_sector_create</span><span class="p">();</span>
+</span><span id="__span-35-13"><a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a><span class="w">    </span><span class="n">qkrylov_sector_set_sz</span><span class="p">(</span><span class="n">sector</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-35-14"><a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a>
+</span><span id="__span-35-15"><a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a><span class="w">    </span><span class="c1">// 2. Create Spin-1/2 basis in Sz=0 sector</span>
+</span><span id="__span-35-16"><a id="__codelineno-35-16" name="__codelineno-35-16" href="#__codelineno-35-16"></a><span class="w">    </span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_spinhalf_basis_create</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
+</span><span id="__span-35-17"><a id="__codelineno-35-17" name="__codelineno-35-17" href="#__codelineno-35-17"></a><span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_basis_dimension</span><span class="p">(</span><span class="n">basis</span><span class="p">);</span>
+</span><span id="__span-35-18"><a id="__codelineno-35-18" name="__codelineno-35-18" href="#__codelineno-35-18"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Basis dimension: %llu</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="p">)</span><span class="n">dim</span><span class="p">);</span>
+</span><span id="__span-35-19"><a id="__codelineno-35-19" name="__codelineno-35-19" href="#__codelineno-35-19"></a>
+</span><span id="__span-35-20"><a id="__codelineno-35-20" name="__codelineno-35-20" href="#__codelineno-35-20"></a><span class="w">    </span><span class="c1">// 3. Create SpinHalf Site operator rules</span>
+</span><span id="__span-35-21"><a id="__codelineno-35-21" name="__codelineno-35-21" href="#__codelineno-35-21"></a><span class="w">    </span><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="n">site</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_spinhalf_site_create</span><span class="p">();</span>
+</span><span id="__span-35-22"><a id="__codelineno-35-22" name="__codelineno-35-22" href="#__codelineno-35-22"></a>
+</span><span id="__span-35-23"><a id="__codelineno-35-23" name="__codelineno-35-23" href="#__codelineno-35-23"></a><span class="w">    </span><span class="c1">// 4. Construct Heisenberg OpSum</span>
+</span><span id="__span-35-24"><a id="__codelineno-35-24" name="__codelineno-35-24" href="#__codelineno-35-24"></a><span class="w">    </span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_opsum_create</span><span class="p">();</span>
+</span><span id="__span-35-25"><a id="__codelineno-35-25" name="__codelineno-35-25" href="#__codelineno-35-25"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-35-26"><a id="__codelineno-35-26" name="__codelineno-35-26" href="#__codelineno-35-26"></a><span class="w">        </span><span class="c1">// Sz_i Sz_{i+1}</span>
+</span><span id="__span-35-27"><a id="__codelineno-35-27" name="__codelineno-35-27" href="#__codelineno-35-27"></a><span class="w">        </span><span class="n">qkrylov_opsum_add_term_2body</span><span class="p">(</span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sz&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sz&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-35-28"><a id="__codelineno-35-28" name="__codelineno-35-28" href="#__codelineno-35-28"></a><span class="w">        </span><span class="c1">// 0.5 * Sp_i Sm_{i+1}</span>
+</span><span id="__span-35-29"><a id="__codelineno-35-29" name="__codelineno-35-29" href="#__codelineno-35-29"></a><span class="w">        </span><span class="n">qkrylov_opsum_add_term_2body</span><span class="p">(</span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sp&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-35-30"><a id="__codelineno-35-30" name="__codelineno-35-30" href="#__codelineno-35-30"></a><span class="w">        </span><span class="c1">// 0.5 * Sm_i Sp_{i+1}</span>
+</span><span id="__span-35-31"><a id="__codelineno-35-31" name="__codelineno-35-31" href="#__codelineno-35-31"></a><span class="w">        </span><span class="n">qkrylov_opsum_add_term_2body</span><span class="p">(</span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sp&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-35-32"><a id="__codelineno-35-32" name="__codelineno-35-32" href="#__codelineno-35-32"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-35-33"><a id="__codelineno-35-33" name="__codelineno-35-33" href="#__codelineno-35-33"></a>
+</span><span id="__span-35-34"><a id="__codelineno-35-34" name="__codelineno-35-34" href="#__codelineno-35-34"></a><span class="w">    </span><span class="c1">// 5. Create Matrix-Free Hamiltonian</span>
+</span><span id="__span-35-35"><a id="__codelineno-35-35" name="__codelineno-35-35" href="#__codelineno-35-35"></a><span class="w">    </span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_hamiltonian_create</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
+</span><span id="__span-35-36"><a id="__codelineno-35-36" name="__codelineno-35-36" href="#__codelineno-35-36"></a>
+</span><span id="__span-35-37"><a id="__codelineno-35-37" name="__codelineno-35-37" href="#__codelineno-35-37"></a><span class="w">    </span><span class="c1">// 6. Run Lanczos Solver</span>
+</span><span id="__span-35-38"><a id="__codelineno-35-38" name="__codelineno-35-38" href="#__codelineno-35-38"></a><span class="w">    </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+</span><span id="__span-35-39"><a id="__codelineno-35-39" name="__codelineno-35-39" href="#__codelineno-35-39"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-12f</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">result</span><span class="p">);</span>
+</span><span id="__span-35-40"><a id="__codelineno-35-40" name="__codelineno-35-40" href="#__codelineno-35-40"></a>
+</span><span id="__span-35-41"><a id="__codelineno-35-41" name="__codelineno-35-41" href="#__codelineno-35-41"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">QKRYLOV_SUCCESS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-35-42"><a id="__codelineno-35-42" name="__codelineno-35-42" href="#__codelineno-35-42"></a><span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Ground State Energy: %.10f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">energy</span><span class="p">);</span>
+</span><span id="__span-35-43"><a id="__codelineno-35-43" name="__codelineno-35-43" href="#__codelineno-35-43"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-35-44"><a id="__codelineno-35-44" name="__codelineno-35-44" href="#__codelineno-35-44"></a><span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Lanczos solver failed with error code: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">);</span>
+</span><span id="__span-35-45"><a id="__codelineno-35-45" name="__codelineno-35-45" href="#__codelineno-35-45"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-35-46"><a id="__codelineno-35-46" name="__codelineno-35-46" href="#__codelineno-35-46"></a>
+</span><span id="__span-35-47"><a id="__codelineno-35-47" name="__codelineno-35-47" href="#__codelineno-35-47"></a><span class="w">    </span><span class="c1">// 7. Cleanup Handles safely</span>
+</span><span id="__span-35-48"><a id="__codelineno-35-48" name="__codelineno-35-48" href="#__codelineno-35-48"></a><span class="w">    </span><span class="n">qkrylov_hamiltonian_destroy</span><span class="p">(</span><span class="n">H</span><span class="p">);</span>
+</span><span id="__span-35-49"><a id="__codelineno-35-49" name="__codelineno-35-49" href="#__codelineno-35-49"></a><span class="w">    </span><span class="n">qkrylov_opsum_destroy</span><span class="p">(</span><span class="n">opsum</span><span class="p">);</span>
+</span><span id="__span-35-50"><a id="__codelineno-35-50" name="__codelineno-35-50" href="#__codelineno-35-50"></a><span class="w">    </span><span class="n">qkrylov_site_destroy</span><span class="p">(</span><span class="n">site</span><span class="p">);</span>
+</span><span id="__span-35-51"><a id="__codelineno-35-51" name="__codelineno-35-51" href="#__codelineno-35-51"></a><span class="w">    </span><span class="n">qkrylov_basis_destroy</span><span class="p">(</span><span class="n">basis</span><span class="p">);</span>
+</span><span id="__span-35-52"><a id="__codelineno-35-52" name="__codelineno-35-52" href="#__codelineno-35-52"></a><span class="w">    </span><span class="n">qkrylov_sector_destroy</span><span class="p">(</span><span class="n">sector</span><span class="p">);</span>
+</span><span id="__span-35-53"><a id="__codelineno-35-53" name="__codelineno-35-53" href="#__codelineno-35-53"></a>
+</span><span id="__span-35-54"><a id="__codelineno-35-54" name="__codelineno-35-54" href="#__codelineno-35-54"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-35-55"><a id="__codelineno-35-55" name="__codelineno-35-55" href="#__codelineno-35-55"></a><span class="p">}</span>
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-circle-arrow-up" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4M12 16V8"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e886cdf1.min.js"></script>
+      
+    
+  </body>
+</html>

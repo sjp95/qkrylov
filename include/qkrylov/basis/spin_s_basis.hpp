@@ -1,7 +1,7 @@
 #pragma once
 
-#include "basis.hpp"
-#include "../symmetry/sector.hpp"
+#include "qkrylov/basis/basis.hpp"
+#include "qkrylov/symmetry/sector.hpp"
 
 #include <vector>
 #include <algorithm>

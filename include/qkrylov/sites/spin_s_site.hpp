@@ -1,6 +1,6 @@
 #pragma once
 
-#include "site.hpp"
+#include "qkrylov/sites/site.hpp"
 
 namespace qkrylov
 {

@@ -1,5 +1,6 @@
 import numpy as np
-from typing import List, Tuple
+import os
+from typing import List, Tuple, Union
 from . import _qkrylov_cpp as _cpp
 from .hamiltonian import MatrixFreeHamiltonian
 
@@ -14,9 +15,25 @@ class LanczosResult:
         The ground state eigenvector.
     """
     def __init__(self, energy: float, eigenvector: np.ndarray):
-        self.energy = energy
-        self.eigenvector = eigenvector
+        self.energy = float(energy)
+        self.eigenvector = np.asarray(eigenvector)
         
+    def save(self, filename: Union[str, os.PathLike]) -> None:
+        """Save LanczosResult to an HDF5 file."""
+        import h5py
+        with h5py.File(filename, "w") as f:
+            f.create_dataset("energy", data=self.energy)
+            f.create_dataset("eigenvector", data=self.eigenvector)
+
+    @classmethod
+    def load(cls, filename: Union[str, os.PathLike]) -> "LanczosResult":
+        """Load LanczosResult from an HDF5 file."""
+        import h5py
+        with h5py.File(filename, "r") as f:
+            energy = float(f["energy"][()])
+            eigenvector = np.array(f["eigenvector"])
+        return cls(energy=energy, eigenvector=eigenvector)
+
     def __repr__(self) -> str:
         return f"LanczosResult(energy={self.energy:.10f})"
 
@@ -60,9 +77,28 @@ class DavidsonResult:
         The corresponding eigenvectors.
     """
     def __init__(self, eigenvalues: np.ndarray, eigenvectors: List[np.ndarray]):
-        self.eigenvalues = eigenvalues
-        self.eigenvectors = eigenvectors
+        self.eigenvalues = np.asarray(eigenvalues, dtype=float)
+        self.eigenvectors = [np.asarray(ev) for ev in eigenvectors]
         
+    def save(self, filename: Union[str, os.PathLike]) -> None:
+        """Save DavidsonResult to an HDF5 file."""
+        import h5py
+        with h5py.File(filename, "w") as f:
+            f.create_dataset("eigenvalues", data=self.eigenvalues)
+            grp = f.create_group("eigenvectors")
+            for i, ev in enumerate(self.eigenvectors):
+                grp.create_dataset(f"vec_{i}", data=ev)
+
+    @classmethod
+    def load(cls, filename: Union[str, os.PathLike]) -> "DavidsonResult":
+        """Load DavidsonResult from an HDF5 file."""
+        import h5py
+        with h5py.File(filename, "r") as f:
+            eigenvalues = np.array(f["eigenvalues"])
+            grp = f["eigenvectors"]
+            eigenvectors = [np.array(grp[f"vec_{i}"]) for i in range(len(grp))]
+        return cls(eigenvalues=eigenvalues, eigenvectors=eigenvectors)
+
     def __repr__(self) -> str:
         return f"DavidsonResult(energies={self.eigenvalues})"
 
@@ -104,7 +140,25 @@ class DynamicsResult:
     def __init__(self, alphas, betas, norm_phi0):
         self.alphas = np.asarray(alphas)     # zero-copy view from C++
         self.betas  = np.asarray(betas)      # zero-copy view from C++
-        self.norm_phi0 = norm_phi0
+        self.norm_phi0 = float(norm_phi0)
+
+    def save(self, filename: Union[str, os.PathLike]) -> None:
+        """Save DynamicsResult to an HDF5 file."""
+        import h5py
+        with h5py.File(filename, "w") as f:
+            f.create_dataset("alphas", data=self.alphas)
+            f.create_dataset("betas", data=self.betas)
+            f.create_dataset("norm_phi0", data=self.norm_phi0)
+
+    @classmethod
+    def load(cls, filename: Union[str, os.PathLike]) -> "DynamicsResult":
+        """Load DynamicsResult from an HDF5 file."""
+        import h5py
+        with h5py.File(filename, "r") as f:
+            alphas = np.array(f["alphas"])
+            betas = np.array(f["betas"])
+            norm_phi0 = float(f["norm_phi0"][()])
+        return cls(alphas=alphas, betas=betas, norm_phi0=norm_phi0)
 
 def continued_fraction_coeffs(
     H: MatrixFreeHamiltonian,
@@ -129,10 +183,31 @@ def evaluate_spectral_function(
 class CorrectionVectorResult:
     """Result of a correction vector spectral calculation."""
     def __init__(self, correction_vector: np.ndarray, spectral_function: float, iterations: int, converged: bool):
-        self.correction_vector = correction_vector
-        self.spectral_function = spectral_function
-        self.iterations = iterations
-        self.converged = converged
+        self.correction_vector = np.asarray(correction_vector)
+        self.spectral_function = float(spectral_function)
+        self.iterations = int(iterations)
+        self.converged = bool(converged)
+
+    def save(self, filename: Union[str, os.PathLike]) -> None:
+        """Save CorrectionVectorResult to an HDF5 file."""
+        import h5py
+        with h5py.File(filename, "w") as f:
+            f.create_dataset("correction_vector", data=self.correction_vector)
+            f.create_dataset("spectral_function", data=self.spectral_function)
+            f.create_dataset("iterations", data=self.iterations)
+            f.create_dataset("converged", data=self.converged)
+
+    @classmethod
+    def load(cls, filename: Union[str, os.PathLike]) -> "CorrectionVectorResult":
+        """Load CorrectionVectorResult from an HDF5 file."""
+        import h5py
+        with h5py.File(filename, "r") as f:
+            correction_vector = np.array(f["correction_vector"])
+            spectral_function = float(f["spectral_function"][()])
+            iterations = int(f["iterations"][()])
+            converged = bool(f["converged"][()])
+        return cls(correction_vector=correction_vector, spectral_function=spectral_function,
+                   iterations=iterations, converged=converged)
 
 def correction_vector_spectral(
     H: MatrixFreeHamiltonian,

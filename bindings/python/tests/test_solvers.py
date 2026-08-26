@@ -2,6 +2,8 @@ import qkrylov as qk
 import numpy as np
 import pytest
 import math
+import os
+import os.path as os_path
 
 def test_lanczos_solver():
     N = 4
@@ -99,3 +101,36 @@ def test_correction_vector_spectral():
 
     assert cv_res.spectral_function >= 0.0
     assert len(cv_res.correction_vector) == H.dimension
+
+def test_hdf5_save_load(tmp_path):
+    N = 4
+    basis = qk.SpinHalfBasis(N, sz=0)
+    site = qk.SpinHalfSite()
+    op = qk.OpSum()
+    for i in range(N):
+        j = (i + 1) % N
+        op += 1.0, "Sz", i, "Sz", j
+
+    H = qk.MatrixFreeHamiltonian(basis, site, op)
+    l_res = qk.lanczos_ground_state(H)
+
+    # Test LanczosResult save/load
+    l_file = tmp_path / "lanczos_test.h5"
+    l_res.save(l_file)
+    assert os_path.exists(l_file)
+
+    l_loaded = qk.LanczosResult.load(l_file)
+    assert math.isclose(l_loaded.energy, l_res.energy, abs_tol=1e-12)
+    assert np.allclose(l_loaded.eigenvector, l_res.eigenvector)
+
+    # Test DavidsonResult save/load
+    d_res = qk.davidson_lowest(H, n_eig=2)
+    d_file = tmp_path / "davidson_test.h5"
+    d_res.save(d_file)
+    assert os_path.exists(d_file)
+
+    d_loaded = qk.DavidsonResult.load(d_file)
+    assert np.allclose(d_loaded.eigenvalues, d_res.eigenvalues)
+    assert len(d_loaded.eigenvectors) == len(d_res.eigenvectors)
+    for v1, v2 in zip(d_loaded.eigenvectors, d_res.eigenvectors):
+        assert np.allclose(v1, v2)

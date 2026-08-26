@@ -28,7 +28,7 @@ def _build_sector(
     sec = _cpp.Sector()
     if conserve_sz or sz != 0:
         sec.use_sz = True
-        sec.sz2 = sz * 2  # C++ uses 2*Sz
+        sec.sz2 = int(2 * sz)  # C++ uses 2*Sz
     if conserve_nup or nup != 0:
         sec.use_nup = True
         sec.nup = nup
@@ -45,29 +45,22 @@ def _build_sector(
 
 
 class SpinHalfBasis(Basis):
-    """Basis for Spin-1/2 systems.
+    """Basis for Spin-1/2 systems."""
     
-    Parameters
-    ----------
-    N : int
-        Number of spin sites.
-    conserve_sz : bool, optional
-        Whether to conserve total Sz. If True, only states with the specified `sz` are kept.
-    sz : float or int, optional
-        The target total Sz sector (default 0). Note: The underlying C++ code uses 2*Sz, 
-        so integer or half-integer values are allowed.
-    """
-    
-    def __init__(self, N: int, conserve_sz: bool = False, sz: Optional[float] = None):
-        # If sz is explicitly provided, it implies conservation
+    def __init__(self, N: int, conserve_sz: bool = False, sz: Optional[float] = None, sector: Optional[_cpp.Sector] = None):
+        if sector is not None:
+            self._cpp_obj = _cpp.SpinHalfBasis(N, sector)
+            self._conserve_sz = sector.use_sz
+            self._sz = sector.sz2 / 2.0
+            return
+
         if sz is not None:
             conserve_sz = True
         elif conserve_sz and sz is None:
-            sz = 0  # default sector when conserve_sz=True but no sz given
+            sz = 0
         else:
-            sz = 0  # no conservation, sz value doesn't matter
+            sz = 0
 
-        # C++ Sector takes sz2 (which is 2 * sz)
         sec = _cpp.Sector()
         if conserve_sz:
             sec.use_sz = True
@@ -82,19 +75,41 @@ class SpinHalfBasis(Basis):
         return f"SpinHalfBasis(N={self.nsites}, dim={self.size}{sec_str})"
 
 
+class SpinSBasis(Basis):
+    """Basis for arbitrary Spin-S systems."""
+    def __init__(self, N: int, S: float = 0.5, conserve_sz: bool = False, sz: Optional[float] = None, sector: Optional[_cpp.Sector] = None):
+        if sector is not None:
+            self._cpp_obj = _cpp.SpinSBasis(N, S, sector)
+            self._conserve_sz = sector.use_sz
+            self._sz = sector.sz2 / 2.0
+            return
+
+        if sz is not None:
+            conserve_sz = True
+        elif conserve_sz and sz is None:
+            sz = 0
+        else:
+            sz = 0
+
+        sec = _cpp.Sector()
+        if conserve_sz:
+            sec.use_sz = True
+            sec.sz2 = int(2 * sz)
+
+        self._cpp_obj = _cpp.SpinSBasis(N, S, sec)
+        self._conserve_sz = conserve_sz
+        self._sz = sz
+
+
 class FermionBasis(Basis):
-    """Basis for spinless fermions.
-    
-    Parameters
-    ----------
-    N : int
-        Number of fermion sites.
-    conserve_n : bool, optional
-        Whether to conserve total particle number.
-    n : int, optional
-        The target total particle number sector (default 0).
-    """
-    def __init__(self, N: int, conserve_n: bool = False, n: int = 0):
+    """Basis for spinless fermions."""
+    def __init__(self, N: int, conserve_n: bool = False, n: int = 0, sector: Optional[_cpp.Sector] = None):
+        if sector is not None:
+            self._cpp_obj = _cpp.FermionBasis(N, sector)
+            self._conserve_n = sector.use_n
+            self._n = sector.n
+            return
+
         if n != 0:
             conserve_n = True
         
@@ -113,23 +128,17 @@ class FermionBasis(Basis):
 
 
 class HubbardBasis(Basis):
-    """Basis for interacting electrons (Hubbard model).
-    
-    Parameters
-    ----------
-    N : int
-        Number of sites.
-    conserve_nup : bool, optional
-        Whether to conserve number of up-spin electrons.
-    nup : int, optional
-        Target number of up-spin electrons.
-    conserve_ndn : bool, optional
-        Whether to conserve number of down-spin electrons.
-    ndn : int, optional
-        Target number of down-spin electrons.
-    """
+    """Basis for interacting electrons (Hubbard model)."""
     def __init__(self, N: int, conserve_nup: bool = False, nup: int = 0, 
-                 conserve_ndn: bool = False, ndn: int = 0):
+                 conserve_ndn: bool = False, ndn: int = 0, sector: Optional[_cpp.Sector] = None):
+        if sector is not None:
+            self._cpp_obj = _cpp.HubbardBasis(N, sector)
+            self._conserve_nup = sector.use_nup
+            self._conserve_ndn = sector.use_ndn
+            self._nup = sector.nup
+            self._ndn = sector.ndn
+            return
+
         if nup != 0: conserve_nup = True
         if ndn != 0: conserve_ndn = True
 
@@ -158,7 +167,15 @@ class HubbardBasis(Basis):
 class TJBasis(Basis):
     """Basis for t-J model (doped antiferromagnet)."""
     def __init__(self, N: int, conserve_nup: bool = False, nup: int = 0, 
-                 conserve_ndn: bool = False, ndn: int = 0):
+                 conserve_ndn: bool = False, ndn: int = 0, sector: Optional[_cpp.Sector] = None):
+        if sector is not None:
+            self._cpp_obj = _cpp.TJBasis(N, sector)
+            self._conserve_nup = sector.use_nup
+            self._conserve_ndn = sector.use_ndn
+            self._nup = sector.nup
+            self._ndn = sector.ndn
+            return
+
         if nup != 0: conserve_nup = True
         if ndn != 0: conserve_ndn = True
 

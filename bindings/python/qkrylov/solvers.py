@@ -98,7 +98,6 @@ def davidson_lowest(
         eigenvectors=[np.asarray(ev) for ev in res.eigenvectors]
     )
 
-# For Dynamics and FTLM, we wrap them directly as well.
 
 class DynamicsResult:
     """Result of continued fraction Lanczos."""
@@ -125,6 +124,31 @@ def evaluate_spectral_function(
     alphas = np.ascontiguousarray(res.alphas, dtype=np.float64)
     betas  = np.ascontiguousarray(res.betas,  dtype=np.float64)
     return _cpp.evaluate_spectral_function(alphas, betas, res.norm_phi0, omega, E0, eta)
+
+
+class CorrectionVectorResult:
+    """Result of a correction vector spectral calculation."""
+    def __init__(self, correction_vector: np.ndarray, spectral_function: float, iterations: int, converged: bool):
+        self.correction_vector = correction_vector
+        self.spectral_function = spectral_function
+        self.iterations = iterations
+        self.converged = converged
+
+def correction_vector_spectral(
+    H: MatrixFreeHamiltonian,
+    Op_psi0: np.ndarray,
+    E0: float,
+    omega: float,
+    eta: float = 0.1,
+    max_iter: int = 500,
+    tol: float = 1e-8
+) -> CorrectionVectorResult:
+    Op_psi0 = np.ascontiguousarray(Op_psi0, dtype=np.complex128)
+    vector, spectral_func, iters, converged = _cpp.correction_vector_spectral(
+        H._cpp_obj, Op_psi0, E0, omega, eta, max_iter, tol
+    )
+    return CorrectionVectorResult(vector, spectral_func, iters, converged)
+
 
 class FTLMResult:
     def __init__(self, cpp_res):

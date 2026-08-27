@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.54">
+      <meta name="generator" content="zensical-0.0.57">
     
     
       
@@ -30,12 +30,12 @@
       
         
       
-      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.20815dad.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.5da3a30f.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.dfe2e883.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.812a03bb.min.css">
       
       
 
@@ -1273,15 +1273,76 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#5-matrix-free-hamiltonian-api" class="md-nav__link">
+  <a href="#5-device-hardware-query-api" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        5. Matrix-Free Hamiltonian API
+        5. Device &amp; Hardware Query API
       </span>
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Matrix-Free Hamiltonian API">
+    <nav class="md-nav" aria-label="5. Device &amp; Hardware Query API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_is_gpu_build" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_is_gpu_build</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_find_gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_find_gpu</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_gpu_count" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_gpu_count</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_initialize_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_initialize_device</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-matrix-free-hamiltonian-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        6. Matrix-Free Hamiltonian API
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Matrix-Free Hamiltonian API">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1289,6 +1350,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         <code>qkrylov_hamiltonian_create</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkrylov_hamiltonian_create_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        <code>qkrylov_hamiltonian_create_device</code>
       </span>
     </span>
   </a>
@@ -1356,15 +1428,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#6-solvers-api" class="md-nav__link">
+  <a href="#7-solvers-api" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        6. Solvers API
+        7. Solvers API
       </span>
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="6. Solvers API">
+    <nav class="md-nav" aria-label="7. Solvers API">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1473,8 +1545,9 @@
 <li><a href="#2-basis-api">Basis API</a></li>
 <li><a href="#3-site-api">Site API</a></li>
 <li><a href="#4-opsum-api">OpSum API</a></li>
-<li><a href="#5-matrix-free-hamiltonian-api">Matrix-Free Hamiltonian API</a></li>
-<li><a href="#6-solvers-api">Solvers API</a></li>
+<li><a href="#5-device--hardware-query-api">Device &amp; Hardware Query API</a></li>
+<li><a href="#6-matrix-free-hamiltonian-api">Matrix-Free Hamiltonian API</a></li>
+<li><a href="#7-solvers-api">Solvers API</a></li>
 <li><a href="#complete-c-example">Complete C Example</a></li>
 </ol>
 <hr />
@@ -1676,157 +1749,185 @@ Adds a two-body operator interaction term (e.g. <span class="arithmatex">\(J \cd
 </span></code></pre></div>
 Adds an arbitrary <span class="arithmatex">\(N\)</span>-body operator interaction term (e.g. 3-body chiral term <span class="arithmatex">\(S_i^x S_j^y S_k^z\)</span> or 4-body ring exchange).</p>
 <hr />
-<h3 id="5-matrix-free-hamiltonian-api">5. Matrix-Free Hamiltonian API<a class="headerlink" href="#5-matrix-free-hamiltonian-api" title="Permanent link">&para;</a></h3>
+<h3 id="5-device-hardware-query-api">5. Device &amp; Hardware Query API<a class="headerlink" href="#5-device-hardware-query-api" title="Permanent link">&para;</a></h3>
+<p>Inspects compiled hardware acceleration backends and configures execution targets.</p>
+<h4 id="qkrylov_is_gpu_build"><code>qkrylov_is_gpu_build</code><a class="headerlink" href="#qkrylov_is_gpu_build" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_is_gpu_build</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span></code></pre></div>
+Returns <code>1</code> if the shared library was compiled with GPU acceleration (CUDA, HIP, or SYCL), or <code>0</code> for a CPU-only build.</p>
+<h4 id="qkrylov_find_gpu"><code>qkrylov_find_gpu</code><a class="headerlink" href="#qkrylov_find_gpu" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="nf">qkrylov_find_gpu</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span></code></pre></div>
+Returns a string identifying the active GPU backend (<code>"cuda"</code>, <code>"hip"</code>, <code>"sycl"</code>), or <code>NULL</code> if the binary was built for CPU only.</p>
+<h4 id="qkrylov_gpu_count"><code>qkrylov_gpu_count</code><a class="headerlink" href="#qkrylov_gpu_count" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_gpu_count</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span></code></pre></div>
+Returns the number of available physical GPUs detected on the host system.</p>
+<h4 id="qkrylov_initialize_device"><code>qkrylov_initialize_device</code><a class="headerlink" href="#qkrylov_initialize_device" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_initialize_device</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">device_str</span><span class="p">);</span>
+</span></code></pre></div>
+Explicitly initializes the Kokkos execution spaces for a targeted device (e.g. <code>"cpu"</code>, <code>"cuda:0"</code>, <code>"hip:1"</code>). Returns <code>QKRYLOV_SUCCESS</code> on success.</p>
+<hr />
+<h3 id="6-matrix-free-hamiltonian-api">6. Matrix-Free Hamiltonian API<a class="headerlink" href="#6-matrix-free-hamiltonian-api" title="Permanent link">&para;</a></h3>
 <p>Evaluates matrix-vector multiplication <span class="arithmatex">\(y = Hx\)</span> without storing the matrix.</p>
 <h4 id="qkrylov_hamiltonian_create"><code>qkrylov_hamiltonian_create</code><a class="headerlink" href="#qkrylov_hamiltonian_create" title="Permanent link">&para;</a></h4>
-<p><div class="language-c highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_create</span><span class="p">(</span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="p">,</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">                                                </span><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="n">site</span><span class="p">,</span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">                                                </span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_create</span><span class="p">(</span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="p">,</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">                                                </span><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="n">site</span><span class="p">,</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">                                                </span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
 </span></code></pre></div>
-Creates a <code>MatrixFreeHamiltonian</code> evaluator handle combining a basis, site operator rules, and operator sum terms.</p>
+Creates a <code>MatrixFreeHamiltonian</code> evaluator handle on the default CPU device combining a basis, site operator rules, and operator sum terms.</p>
+<h4 id="qkrylov_hamiltonian_create_device"><code>qkrylov_hamiltonian_create_device</code><a class="headerlink" href="#qkrylov_hamiltonian_create_device" title="Permanent link">&para;</a></h4>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_create_device</span><span class="p">(</span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="p">,</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">                                                        </span><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="n">site</span><span class="p">,</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">                                                        </span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="p">,</span>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">                                                        </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">device_str</span><span class="p">);</span>
+</span></code></pre></div>
+Creates a <code>MatrixFreeHamiltonian</code> evaluator targeted to a specific device (e.g. <code>"cpu"</code>, <code>"cuda:0"</code>, <code>"hip"</code>, <code>"gpu"</code>). Returns <code>NULL</code> if construction fails.</p>
 <h4 id="qkrylov_hamiltonian_destroy"><code>qkrylov_hamiltonian_destroy</code><a class="headerlink" href="#qkrylov_hamiltonian_destroy" title="Permanent link">&para;</a></h4>
-<p><div class="language-c highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_destroy</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">);</span>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_destroy</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">);</span>
 </span></code></pre></div>
 Frees a Hamiltonian handle.</p>
 <h4 id="qkrylov_hamiltonian_dimension"><code>qkrylov_hamiltonian_dimension</code><a class="headerlink" href="#qkrylov_hamiltonian_dimension" title="Permanent link">&para;</a></h4>
-<p><div class="language-c highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kt">uint64_t</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_dimension</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">);</span>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kt">uint64_t</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_dimension</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">);</span>
 </span></code></pre></div>
 Returns the matrix dimension of the Hamiltonian.</p>
 <h4 id="qkrylov_hamiltonian_apply"><code>qkrylov_hamiltonian_apply</code><a class="headerlink" href="#qkrylov_hamiltonian_apply" title="Permanent link">&para;</a></h4>
-<p><div class="language-c highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_apply</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
-</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">                              </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">x_real</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">x_imag</span><span class="p">,</span>
-</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">y_real</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">y_imag</span><span class="p">);</span>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_apply</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">                              </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">x_real</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">x_imag</span><span class="p">,</span>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">y_real</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">y_imag</span><span class="p">);</span>
 </span></code></pre></div>
 Applies matrix action using separate real and imaginary arrays of size <code>dimension()</code>. <code>x_imag</code> and <code>y_imag</code> may be <code>NULL</code> if vectors are purely real.</p>
 <h4 id="qkrylov_hamiltonian_apply_complex-zero-copy"><code>qkrylov_hamiltonian_apply_complex</code> (Zero-Copy)<a class="headerlink" href="#qkrylov_hamiltonian_apply_complex-zero-copy" title="Permanent link">&para;</a></h4>
-<p><div class="language-c highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_apply_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">                                        </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">x_complex</span><span class="p">,</span>
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">                                        </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">y_complex</span><span class="p">);</span>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_apply_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">                                        </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">x_complex</span><span class="p">,</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">                                        </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">y_complex</span><span class="p">);</span>
 </span></code></pre></div>
 Performs <strong>direct zero-copy</strong> matrix-vector multiplication where <code>x_complex</code> and <code>y_complex</code> are contiguous arrays of <span class="arithmatex">\(2 \times \text{dimension()}\)</span> floats <code>[re, im, re, im...]</code>.</p>
 <h4 id="qkrylov_hamiltonian_diagonal"><code>qkrylov_hamiltonian_diagonal</code><a class="headerlink" href="#qkrylov_hamiltonian_diagonal" title="Permanent link">&para;</a></h4>
-<p><div class="language-c highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_diagonal</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">diag_out</span><span class="p">);</span>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_hamiltonian_diagonal</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">diag_out</span><span class="p">);</span>
 </span></code></pre></div>
 Extracts the matrix-free diagonal elements <span class="arithmatex">\(H_{ii}\)</span> into <code>diag_out</code> (caller-allocated array of size <code>dimension()</code>).</p>
 <hr />
-<h3 id="6-solvers-api">6. Solvers API<a class="headerlink" href="#6-solvers-api" title="Permanent link">&para;</a></h3>
+<h3 id="7-solvers-api">7. Solvers API<a class="headerlink" href="#7-solvers-api" title="Permanent link">&para;</a></h3>
 <h4 id="qkrylov_lanczos_ground_state-qkrylov_lanczos_ground_state_complex"><code>qkrylov_lanczos_ground_state</code> &amp; <code>qkrylov_lanczos_ground_state_complex</code><a class="headerlink" href="#qkrylov_lanczos_ground_state-qkrylov_lanczos_ground_state_complex" title="Permanent link">&para;</a></h4>
-<p><div class="language-c highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">energy</span><span class="p">;</span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="p">}</span><span class="w"> </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="p">;</span>
-</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>
-</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_lanczos_ground_state</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
-</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="w">                                 </span><span class="kt">int</span><span class="w"> </span><span class="n">maxiter</span><span class="p">,</span>
-</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="w">                                 </span><span class="kt">float</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span>
-</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="w">                                 </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
-</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>
-</span><span id="__span-31-10"><a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_lanczos_ground_state_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
-</span><span id="__span-31-11"><a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a><span class="w">                                         </span><span class="kt">int</span><span class="w"> </span><span class="n">maxiter</span><span class="p">,</span>
-</span><span id="__span-31-12"><a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span>
-</span><span id="__span-31-13"><a id="__codelineno-31-13" name="__codelineno-31-13" href="#__codelineno-31-13"></a><span class="w">                                         </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="p">,</span>
-</span><span id="__span-31-14"><a id="__codelineno-31-14" name="__codelineno-31-14" href="#__codelineno-31-14"></a><span class="w">                                         </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">eigenvector_complex</span><span class="p">);</span>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">energy</span><span class="p">;</span>
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">iterations</span><span class="p">;</span>
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">converged</span><span class="p">;</span>
+</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="p">}</span><span class="w"> </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="p">;</span>
+</span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a>
+</span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_lanczos_ground_state</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-36-8"><a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a><span class="w">                                 </span><span class="kt">int</span><span class="w"> </span><span class="n">maxiter</span><span class="p">,</span>
+</span><span id="__span-36-9"><a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="w">                                 </span><span class="kt">float</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span>
+</span><span id="__span-36-10"><a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a><span class="w">                                 </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+</span><span id="__span-36-11"><a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a>
+</span><span id="__span-36-12"><a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_lanczos_ground_state_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-36-13"><a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="w">                                         </span><span class="kt">int</span><span class="w"> </span><span class="n">maxiter</span><span class="p">,</span>
+</span><span id="__span-36-14"><a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span>
+</span><span id="__span-36-15"><a id="__codelineno-36-15" name="__codelineno-36-15" href="#__codelineno-36-15"></a><span class="w">                                         </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="p">,</span>
+</span><span id="__span-36-16"><a id="__codelineno-36-16" name="__codelineno-36-16" href="#__codelineno-36-16"></a><span class="w">                                         </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">eigenvector_complex</span><span class="p">);</span>
 </span></code></pre></div>
 Computes the ground state energy and optional ground state eigenvector (wavefunction) copied zero-copy into caller-allocated <code>eigenvector_complex</code> (size <span class="arithmatex">\(2 \times \text{dimension()}\)</span>).</p>
 <h4 id="qkrylov_davidson_lowest_complex"><code>qkrylov_davidson_lowest_complex</code><a class="headerlink" href="#qkrylov_davidson_lowest_complex" title="Permanent link">&para;</a></h4>
-<p><div class="language-c highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_davidson_lowest_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
-</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="w">                                    </span><span class="kt">int</span><span class="w"> </span><span class="n">n_eig</span><span class="p">,</span>
-</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">                                    </span><span class="kt">int</span><span class="w"> </span><span class="n">max_subspace</span><span class="p">,</span>
-</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="w">                                    </span><span class="kt">float</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span>
-</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="w">                                    </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">eigenvalues_out</span><span class="p">,</span>
-</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="w">                                    </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">eigenvectors_complex_out</span><span class="p">);</span>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_davidson_lowest_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="w">                                    </span><span class="kt">int</span><span class="w"> </span><span class="n">n_eig</span><span class="p">,</span>
+</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="w">                                    </span><span class="kt">int</span><span class="w"> </span><span class="n">max_subspace</span><span class="p">,</span>
+</span><span id="__span-37-4"><a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="w">                                    </span><span class="kt">float</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span>
+</span><span id="__span-37-5"><a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="w">                                    </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">eigenvalues_out</span><span class="p">,</span>
+</span><span id="__span-37-6"><a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="w">                                    </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">eigenvectors_complex_out</span><span class="p">);</span>
 </span></code></pre></div>
 Computes the <span class="arithmatex">\(N_{\text{eig}}\)</span> lowest eigenvalues and optional <span class="arithmatex">\(N_{\text{eig}}\)</span> orthogonal eigenvectors via Davidson iteration.</p>
 <h4 id="qkrylov_continued_fraction_coeffs_complex-qkrylov_evaluate_spectral_function"><code>qkrylov_continued_fraction_coeffs_complex</code> &amp; <code>qkrylov_evaluate_spectral_function</code><a class="headerlink" href="#qkrylov_continued_fraction_coeffs_complex-qkrylov_evaluate_spectral_function" title="Permanent link">&para;</a></h4>
-<p><div class="language-c highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_continued_fraction_coeffs_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
-</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">                                              </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">phi0_complex</span><span class="p">,</span>
-</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">                                              </span><span class="kt">int</span><span class="w"> </span><span class="n">n_iter</span><span class="p">,</span>
-</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">                                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">alphas_out</span><span class="p">,</span>
-</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">                                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">betas_out</span><span class="p">,</span>
-</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="w">                                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">norm_phi0_out</span><span class="p">,</span>
-</span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">                                              </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">num_coeffs_out</span><span class="p">);</span>
-</span><span id="__span-33-8"><a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a>
-</span><span id="__span-33-9"><a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="kt">float</span><span class="w"> </span><span class="nf">qkrylov_evaluate_spectral_function</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">alphas</span><span class="p">,</span>
-</span><span id="__span-33-10"><a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="w">                                         </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">betas</span><span class="p">,</span>
-</span><span id="__span-33-11"><a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="w">                                         </span><span class="kt">size_t</span><span class="w"> </span><span class="n">n</span><span class="p">,</span>
-</span><span id="__span-33-12"><a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">norm_phi0</span><span class="p">,</span>
-</span><span id="__span-33-13"><a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">omega</span><span class="p">,</span>
-</span><span id="__span-33-14"><a id="__codelineno-33-14" name="__codelineno-33-14" href="#__codelineno-33-14"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">E0</span><span class="p">,</span>
-</span><span id="__span-33-15"><a id="__codelineno-33-15" name="__codelineno-33-15" href="#__codelineno-33-15"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">eta</span><span class="p">);</span>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_continued_fraction_coeffs_complex</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="w">                                              </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">phi0_complex</span><span class="p">,</span>
+</span><span id="__span-38-3"><a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="w">                                              </span><span class="kt">int</span><span class="w"> </span><span class="n">n_iter</span><span class="p">,</span>
+</span><span id="__span-38-4"><a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="w">                                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">alphas_out</span><span class="p">,</span>
+</span><span id="__span-38-5"><a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="w">                                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">betas_out</span><span class="p">,</span>
+</span><span id="__span-38-6"><a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="w">                                              </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">norm_phi0_out</span><span class="p">,</span>
+</span><span id="__span-38-7"><a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="w">                                              </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">num_coeffs_out</span><span class="p">);</span>
+</span><span id="__span-38-8"><a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a>
+</span><span id="__span-38-9"><a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a><span class="kt">float</span><span class="w"> </span><span class="nf">qkrylov_evaluate_spectral_function</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">alphas</span><span class="p">,</span>
+</span><span id="__span-38-10"><a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a><span class="w">                                         </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">betas</span><span class="p">,</span>
+</span><span id="__span-38-11"><a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a><span class="w">                                         </span><span class="kt">size_t</span><span class="w"> </span><span class="n">n</span><span class="p">,</span>
+</span><span id="__span-38-12"><a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">norm_phi0</span><span class="p">,</span>
+</span><span id="__span-38-13"><a id="__codelineno-38-13" name="__codelineno-38-13" href="#__codelineno-38-13"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">omega</span><span class="p">,</span>
+</span><span id="__span-38-14"><a id="__codelineno-38-14" name="__codelineno-38-14" href="#__codelineno-38-14"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">E0</span><span class="p">,</span>
+</span><span id="__span-38-15"><a id="__codelineno-38-15" name="__codelineno-38-15" href="#__codelineno-38-15"></a><span class="w">                                         </span><span class="kt">float</span><span class="w"> </span><span class="n">eta</span><span class="p">);</span>
 </span></code></pre></div>
 Computes Lanczos tridiagonal continued-fraction coefficients (<span class="arithmatex">\(\alpha_i, \beta_i\)</span>) starting from <span class="arithmatex">\(|\phi_0\rangle\)</span> and evaluates dynamical structure factors <span class="arithmatex">\(I(\omega)\)</span>.</p>
 <h4 id="qkrylov_ftlm"><code>qkrylov_ftlm</code><a class="headerlink" href="#qkrylov_ftlm" title="Permanent link">&para;</a></h4>
-<p><div class="language-c highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">beta</span><span class="p">;</span><span class="w">                </span><span class="cm">/* Inverse temperature beta = 1 / (kB * T) */</span>
-</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">partition_function</span><span class="p">;</span><span class="w">  </span><span class="cm">/* Thermal partition function Z(beta) */</span>
-</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">internal_energy</span><span class="p">;</span><span class="w">     </span><span class="cm">/* Internal energy E(beta) */</span>
-</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">specific_heat</span><span class="p">;</span><span class="w">       </span><span class="cm">/* Specific heat Cv(beta) */</span>
-</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="p">}</span><span class="w"> </span><span class="n">qkrylov_ftlm_result_c_t</span><span class="p">;</span>
-</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>
-</span><span id="__span-34-8"><a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_ftlm</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
-</span><span id="__span-34-9"><a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="w">                 </span><span class="kt">float</span><span class="w"> </span><span class="n">beta</span><span class="p">,</span>
-</span><span id="__span-34-10"><a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="w">                 </span><span class="kt">int</span><span class="w"> </span><span class="n">n_random</span><span class="p">,</span>
-</span><span id="__span-34-11"><a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="w">                 </span><span class="kt">int</span><span class="w"> </span><span class="n">n_steps</span><span class="p">,</span>
-</span><span id="__span-34-12"><a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a><span class="w">                 </span><span class="n">qkrylov_ftlm_result_c_t</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<p><div class="language-c highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-39-2"><a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">beta</span><span class="p">;</span><span class="w">                </span><span class="cm">/* Inverse temperature beta = 1 / (kB * T) */</span>
+</span><span id="__span-39-3"><a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">partition_function</span><span class="p">;</span><span class="w">  </span><span class="cm">/* Thermal partition function Z(beta) */</span>
+</span><span id="__span-39-4"><a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">internal_energy</span><span class="p">;</span><span class="w">     </span><span class="cm">/* Internal energy E(beta) */</span>
+</span><span id="__span-39-5"><a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a><span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">specific_heat</span><span class="p">;</span><span class="w">       </span><span class="cm">/* Specific heat Cv(beta) */</span>
+</span><span id="__span-39-6"><a id="__codelineno-39-6" name="__codelineno-39-6" href="#__codelineno-39-6"></a><span class="p">}</span><span class="w"> </span><span class="n">qkrylov_ftlm_result_c_t</span><span class="p">;</span>
+</span><span id="__span-39-7"><a id="__codelineno-39-7" name="__codelineno-39-7" href="#__codelineno-39-7"></a>
+</span><span id="__span-39-8"><a id="__codelineno-39-8" name="__codelineno-39-8" href="#__codelineno-39-8"></a><span class="kt">int</span><span class="w"> </span><span class="nf">qkrylov_ftlm</span><span class="p">(</span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">h</span><span class="p">,</span>
+</span><span id="__span-39-9"><a id="__codelineno-39-9" name="__codelineno-39-9" href="#__codelineno-39-9"></a><span class="w">                 </span><span class="kt">float</span><span class="w"> </span><span class="n">beta</span><span class="p">,</span>
+</span><span id="__span-39-10"><a id="__codelineno-39-10" name="__codelineno-39-10" href="#__codelineno-39-10"></a><span class="w">                 </span><span class="kt">int</span><span class="w"> </span><span class="n">n_random</span><span class="p">,</span>
+</span><span id="__span-39-11"><a id="__codelineno-39-11" name="__codelineno-39-11" href="#__codelineno-39-11"></a><span class="w">                 </span><span class="kt">int</span><span class="w"> </span><span class="n">n_steps</span><span class="p">,</span>
+</span><span id="__span-39-12"><a id="__codelineno-39-12" name="__codelineno-39-12" href="#__codelineno-39-12"></a><span class="w">                 </span><span class="n">qkrylov_ftlm_result_c_t</span><span class="o">*</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
 </span></code></pre></div>
 Computes thermodynamic quantities (<span class="arithmatex">\(Z(\beta), E(\beta), C_v(\beta)\)</span>) using the Finite Temperature Lanczos Method.</p>
 <hr />
 <h2 id="complete-c-example">Complete C Example<a class="headerlink" href="#complete-c-example" title="Permanent link">&para;</a></h2>
 <p>Below is a complete, working C program demonstrating exact diagonalization of a 4-site 1D Heisenberg antiferromagnet (<span class="arithmatex">\(H = \sum_i S_i^z S_{i+1}^z + \frac{1}{2} (S_i^+ S_{i+1}^- + S_i^- S_{i+1}^+)\)</span>) in the <span class="arithmatex">\(S^z = 0\)</span> symmetry sector:</p>
-<div class="language-c highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/c_api.h&gt;</span>
-</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
-</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span>
-</span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;math.h&gt;</span>
-</span><span id="__span-35-5"><a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;assert.h&gt;</span>
-</span><span id="__span-35-6"><a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a>
-</span><span id="__span-35-7"><a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-35-8"><a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
-</span><span id="__span-35-9"><a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;--- qkrylov C API Demo: 4-site Heisenberg Chain ---</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-</span><span id="__span-35-10"><a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a>
-</span><span id="__span-35-11"><a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a><span class="w">    </span><span class="c1">// 1. Create Sz=0 sector</span>
-</span><span id="__span-35-12"><a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a><span class="w">    </span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_sector_create</span><span class="p">();</span>
-</span><span id="__span-35-13"><a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a><span class="w">    </span><span class="n">qkrylov_sector_set_sz</span><span class="p">(</span><span class="n">sector</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-</span><span id="__span-35-14"><a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a>
-</span><span id="__span-35-15"><a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a><span class="w">    </span><span class="c1">// 2. Create Spin-1/2 basis in Sz=0 sector</span>
-</span><span id="__span-35-16"><a id="__codelineno-35-16" name="__codelineno-35-16" href="#__codelineno-35-16"></a><span class="w">    </span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_spinhalf_basis_create</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
-</span><span id="__span-35-17"><a id="__codelineno-35-17" name="__codelineno-35-17" href="#__codelineno-35-17"></a><span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_basis_dimension</span><span class="p">(</span><span class="n">basis</span><span class="p">);</span>
-</span><span id="__span-35-18"><a id="__codelineno-35-18" name="__codelineno-35-18" href="#__codelineno-35-18"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Basis dimension: %llu</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="p">)</span><span class="n">dim</span><span class="p">);</span>
-</span><span id="__span-35-19"><a id="__codelineno-35-19" name="__codelineno-35-19" href="#__codelineno-35-19"></a>
-</span><span id="__span-35-20"><a id="__codelineno-35-20" name="__codelineno-35-20" href="#__codelineno-35-20"></a><span class="w">    </span><span class="c1">// 3. Create SpinHalf Site operator rules</span>
-</span><span id="__span-35-21"><a id="__codelineno-35-21" name="__codelineno-35-21" href="#__codelineno-35-21"></a><span class="w">    </span><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="n">site</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_spinhalf_site_create</span><span class="p">();</span>
-</span><span id="__span-35-22"><a id="__codelineno-35-22" name="__codelineno-35-22" href="#__codelineno-35-22"></a>
-</span><span id="__span-35-23"><a id="__codelineno-35-23" name="__codelineno-35-23" href="#__codelineno-35-23"></a><span class="w">    </span><span class="c1">// 4. Construct Heisenberg OpSum</span>
-</span><span id="__span-35-24"><a id="__codelineno-35-24" name="__codelineno-35-24" href="#__codelineno-35-24"></a><span class="w">    </span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_opsum_create</span><span class="p">();</span>
-</span><span id="__span-35-25"><a id="__codelineno-35-25" name="__codelineno-35-25" href="#__codelineno-35-25"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-35-26"><a id="__codelineno-35-26" name="__codelineno-35-26" href="#__codelineno-35-26"></a><span class="w">        </span><span class="c1">// Sz_i Sz_{i+1}</span>
-</span><span id="__span-35-27"><a id="__codelineno-35-27" name="__codelineno-35-27" href="#__codelineno-35-27"></a><span class="w">        </span><span class="n">qkrylov_opsum_add_term_2body</span><span class="p">(</span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sz&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sz&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-</span><span id="__span-35-28"><a id="__codelineno-35-28" name="__codelineno-35-28" href="#__codelineno-35-28"></a><span class="w">        </span><span class="c1">// 0.5 * Sp_i Sm_{i+1}</span>
-</span><span id="__span-35-29"><a id="__codelineno-35-29" name="__codelineno-35-29" href="#__codelineno-35-29"></a><span class="w">        </span><span class="n">qkrylov_opsum_add_term_2body</span><span class="p">(</span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sp&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-</span><span id="__span-35-30"><a id="__codelineno-35-30" name="__codelineno-35-30" href="#__codelineno-35-30"></a><span class="w">        </span><span class="c1">// 0.5 * Sm_i Sp_{i+1}</span>
-</span><span id="__span-35-31"><a id="__codelineno-35-31" name="__codelineno-35-31" href="#__codelineno-35-31"></a><span class="w">        </span><span class="n">qkrylov_opsum_add_term_2body</span><span class="p">(</span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Sp&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-</span><span id="__span-35-32"><a id="__codelineno-35-32" name="__codelineno-35-32" href="#__codelineno-35-32"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-35-33"><a id="__codelineno-35-33" name="__codelineno-35-33" href="#__codelineno-35-33"></a>
-</span><span id="__span-35-34"><a id="__codelineno-35-34" name="__codelineno-35-34" href="#__codelineno-35-34"></a><span class="w">    </span><span class="c1">// 5. Create Matrix-Free Hamiltonian</span>
-</span><span id="__span-35-35"><a id="__codelineno-35-35" name="__codelineno-35-35" href="#__codelineno-35-35"></a><span class="w">    </span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_hamiltonian_create</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
-</span><span id="__span-35-36"><a id="__codelineno-35-36" name="__codelineno-35-36" href="#__codelineno-35-36"></a>
-</span><span id="__span-35-37"><a id="__codelineno-35-37" name="__codelineno-35-37" href="#__codelineno-35-37"></a><span class="w">    </span><span class="c1">// 6. Run Lanczos Solver</span>
-</span><span id="__span-35-38"><a id="__codelineno-35-38" name="__codelineno-35-38" href="#__codelineno-35-38"></a><span class="w">    </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
-</span><span id="__span-35-39"><a id="__codelineno-35-39" name="__codelineno-35-39" href="#__codelineno-35-39"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-12f</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">result</span><span class="p">);</span>
-</span><span id="__span-35-40"><a id="__codelineno-35-40" name="__codelineno-35-40" href="#__codelineno-35-40"></a>
-</span><span id="__span-35-41"><a id="__codelineno-35-41" name="__codelineno-35-41" href="#__codelineno-35-41"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">QKRYLOV_SUCCESS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-35-42"><a id="__codelineno-35-42" name="__codelineno-35-42" href="#__codelineno-35-42"></a><span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Ground State Energy: %.10f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">energy</span><span class="p">);</span>
-</span><span id="__span-35-43"><a id="__codelineno-35-43" name="__codelineno-35-43" href="#__codelineno-35-43"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-35-44"><a id="__codelineno-35-44" name="__codelineno-35-44" href="#__codelineno-35-44"></a><span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Lanczos solver failed with error code: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">);</span>
-</span><span id="__span-35-45"><a id="__codelineno-35-45" name="__codelineno-35-45" href="#__codelineno-35-45"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-35-46"><a id="__codelineno-35-46" name="__codelineno-35-46" href="#__codelineno-35-46"></a>
-</span><span id="__span-35-47"><a id="__codelineno-35-47" name="__codelineno-35-47" href="#__codelineno-35-47"></a><span class="w">    </span><span class="c1">// 7. Cleanup Handles safely</span>
-</span><span id="__span-35-48"><a id="__codelineno-35-48" name="__codelineno-35-48" href="#__codelineno-35-48"></a><span class="w">    </span><span class="n">qkrylov_hamiltonian_destroy</span><span class="p">(</span><span class="n">H</span><span class="p">);</span>
-</span><span id="__span-35-49"><a id="__codelineno-35-49" name="__codelineno-35-49" href="#__codelineno-35-49"></a><span class="w">    </span><span class="n">qkrylov_opsum_destroy</span><span class="p">(</span><span class="n">opsum</span><span class="p">);</span>
-</span><span id="__span-35-50"><a id="__codelineno-35-50" name="__codelineno-35-50" href="#__codelineno-35-50"></a><span class="w">    </span><span class="n">qkrylov_site_destroy</span><span class="p">(</span><span class="n">site</span><span class="p">);</span>
-</span><span id="__span-35-51"><a id="__codelineno-35-51" name="__codelineno-35-51" href="#__codelineno-35-51"></a><span class="w">    </span><span class="n">qkrylov_basis_destroy</span><span class="p">(</span><span class="n">basis</span><span class="p">);</span>
-</span><span id="__span-35-52"><a id="__codelineno-35-52" name="__codelineno-35-52" href="#__codelineno-35-52"></a><span class="w">    </span><span class="n">qkrylov_sector_destroy</span><span class="p">(</span><span class="n">sector</span><span class="p">);</span>
-</span><span id="__span-35-53"><a id="__codelineno-35-53" name="__codelineno-35-53" href="#__codelineno-35-53"></a>
-</span><span id="__span-35-54"><a id="__codelineno-35-54" name="__codelineno-35-54" href="#__codelineno-35-54"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-</span><span id="__span-35-55"><a id="__codelineno-35-55" name="__codelineno-35-55" href="#__codelineno-35-55"></a><span class="p">}</span>
+<div class="language-c highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/c_api.h&gt;</span>
+</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span>
+</span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;math.h&gt;</span>
+</span><span id="__span-40-5"><a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;assert.h&gt;</span>
+</span><span id="__span-40-6"><a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a>
+</span><span id="__span-40-7"><a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-40-8"><a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+</span><span id="__span-40-9"><a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"--- qkrylov C API Demo: 4-site Heisenberg Chain ---</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+</span><span id="__span-40-10"><a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a>
+</span><span id="__span-40-11"><a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a><span class="w">    </span><span class="c1">// 1. Create Sz=0 sector</span>
+</span><span id="__span-40-12"><a id="__codelineno-40-12" name="__codelineno-40-12" href="#__codelineno-40-12"></a><span class="w">    </span><span class="n">qkrylov_sector_h</span><span class="w"> </span><span class="n">sector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_sector_create</span><span class="p">();</span>
+</span><span id="__span-40-13"><a id="__codelineno-40-13" name="__codelineno-40-13" href="#__codelineno-40-13"></a><span class="w">    </span><span class="n">qkrylov_sector_set_sz</span><span class="p">(</span><span class="n">sector</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-40-14"><a id="__codelineno-40-14" name="__codelineno-40-14" href="#__codelineno-40-14"></a>
+</span><span id="__span-40-15"><a id="__codelineno-40-15" name="__codelineno-40-15" href="#__codelineno-40-15"></a><span class="w">    </span><span class="c1">// 2. Create Spin-1/2 basis in Sz=0 sector</span>
+</span><span id="__span-40-16"><a id="__codelineno-40-16" name="__codelineno-40-16" href="#__codelineno-40-16"></a><span class="w">    </span><span class="n">qkrylov_basis_h</span><span class="w"> </span><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_spinhalf_basis_create</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
+</span><span id="__span-40-17"><a id="__codelineno-40-17" name="__codelineno-40-17" href="#__codelineno-40-17"></a><span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_basis_dimension</span><span class="p">(</span><span class="n">basis</span><span class="p">);</span>
+</span><span id="__span-40-18"><a id="__codelineno-40-18" name="__codelineno-40-18" href="#__codelineno-40-18"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"Basis dimension: %llu</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="p">)</span><span class="n">dim</span><span class="p">);</span>
+</span><span id="__span-40-19"><a id="__codelineno-40-19" name="__codelineno-40-19" href="#__codelineno-40-19"></a>
+</span><span id="__span-40-20"><a id="__codelineno-40-20" name="__codelineno-40-20" href="#__codelineno-40-20"></a><span class="w">    </span><span class="c1">// 3. Create SpinHalf Site operator rules</span>
+</span><span id="__span-40-21"><a id="__codelineno-40-21" name="__codelineno-40-21" href="#__codelineno-40-21"></a><span class="w">    </span><span class="n">qkrylov_site_h</span><span class="w"> </span><span class="n">site</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_spinhalf_site_create</span><span class="p">();</span>
+</span><span id="__span-40-22"><a id="__codelineno-40-22" name="__codelineno-40-22" href="#__codelineno-40-22"></a>
+</span><span id="__span-40-23"><a id="__codelineno-40-23" name="__codelineno-40-23" href="#__codelineno-40-23"></a><span class="w">    </span><span class="c1">// 4. Construct Heisenberg OpSum</span>
+</span><span id="__span-40-24"><a id="__codelineno-40-24" name="__codelineno-40-24" href="#__codelineno-40-24"></a><span class="w">    </span><span class="n">qkrylov_opsum_h</span><span class="w"> </span><span class="n">opsum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_opsum_create</span><span class="p">();</span>
+</span><span id="__span-40-25"><a id="__codelineno-40-25" name="__codelineno-40-25" href="#__codelineno-40-25"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-40-26"><a id="__codelineno-40-26" name="__codelineno-40-26" href="#__codelineno-40-26"></a><span class="w">        </span><span class="c1">// Sz_i Sz_{i+1}</span>
+</span><span id="__span-40-27"><a id="__codelineno-40-27" name="__codelineno-40-27" href="#__codelineno-40-27"></a><span class="w">        </span><span class="n">qkrylov_opsum_add_term_2body</span><span class="p">(</span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-40-28"><a id="__codelineno-40-28" name="__codelineno-40-28" href="#__codelineno-40-28"></a><span class="w">        </span><span class="c1">// 0.5 * Sp_i Sm_{i+1}</span>
+</span><span id="__span-40-29"><a id="__codelineno-40-29" name="__codelineno-40-29" href="#__codelineno-40-29"></a><span class="w">        </span><span class="n">qkrylov_opsum_add_term_2body</span><span class="p">(</span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-40-30"><a id="__codelineno-40-30" name="__codelineno-40-30" href="#__codelineno-40-30"></a><span class="w">        </span><span class="c1">// 0.5 * Sm_i Sp_{i+1}</span>
+</span><span id="__span-40-31"><a id="__codelineno-40-31" name="__codelineno-40-31" href="#__codelineno-40-31"></a><span class="w">        </span><span class="n">qkrylov_opsum_add_term_2body</span><span class="p">(</span><span class="n">opsum</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-40-32"><a id="__codelineno-40-32" name="__codelineno-40-32" href="#__codelineno-40-32"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-40-33"><a id="__codelineno-40-33" name="__codelineno-40-33" href="#__codelineno-40-33"></a>
+</span><span id="__span-40-34"><a id="__codelineno-40-34" name="__codelineno-40-34" href="#__codelineno-40-34"></a><span class="w">    </span><span class="c1">// 5. Create Matrix-Free Hamiltonian</span>
+</span><span id="__span-40-35"><a id="__codelineno-40-35" name="__codelineno-40-35" href="#__codelineno-40-35"></a><span class="w">    </span><span class="n">qkrylov_hamiltonian_h</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_hamiltonian_create</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
+</span><span id="__span-40-36"><a id="__codelineno-40-36" name="__codelineno-40-36" href="#__codelineno-40-36"></a>
+</span><span id="__span-40-37"><a id="__codelineno-40-37" name="__codelineno-40-37" href="#__codelineno-40-37"></a><span class="w">    </span><span class="c1">// 6. Run Lanczos Solver</span>
+</span><span id="__span-40-38"><a id="__codelineno-40-38" name="__codelineno-40-38" href="#__codelineno-40-38"></a><span class="w">    </span><span class="n">qkrylov_lanczos_result_c_t</span><span class="w"> </span><span class="n">result</span><span class="p">;</span>
+</span><span id="__span-40-39"><a id="__codelineno-40-39" name="__codelineno-40-39" href="#__codelineno-40-39"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-12f</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">result</span><span class="p">);</span>
+</span><span id="__span-40-40"><a id="__codelineno-40-40" name="__codelineno-40-40" href="#__codelineno-40-40"></a>
+</span><span id="__span-40-41"><a id="__codelineno-40-41" name="__codelineno-40-41" href="#__codelineno-40-41"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">QKRYLOV_SUCCESS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-40-42"><a id="__codelineno-40-42" name="__codelineno-40-42" href="#__codelineno-40-42"></a><span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">"Ground State Energy: %.10f</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">energy</span><span class="p">);</span>
+</span><span id="__span-40-43"><a id="__codelineno-40-43" name="__codelineno-40-43" href="#__codelineno-40-43"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-40-44"><a id="__codelineno-40-44" name="__codelineno-40-44" href="#__codelineno-40-44"></a><span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">"Lanczos solver failed with error code: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">);</span>
+</span><span id="__span-40-45"><a id="__codelineno-40-45" name="__codelineno-40-45" href="#__codelineno-40-45"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-40-46"><a id="__codelineno-40-46" name="__codelineno-40-46" href="#__codelineno-40-46"></a>
+</span><span id="__span-40-47"><a id="__codelineno-40-47" name="__codelineno-40-47" href="#__codelineno-40-47"></a><span class="w">    </span><span class="c1">// 7. Cleanup Handles safely</span>
+</span><span id="__span-40-48"><a id="__codelineno-40-48" name="__codelineno-40-48" href="#__codelineno-40-48"></a><span class="w">    </span><span class="n">qkrylov_hamiltonian_destroy</span><span class="p">(</span><span class="n">H</span><span class="p">);</span>
+</span><span id="__span-40-49"><a id="__codelineno-40-49" name="__codelineno-40-49" href="#__codelineno-40-49"></a><span class="w">    </span><span class="n">qkrylov_opsum_destroy</span><span class="p">(</span><span class="n">opsum</span><span class="p">);</span>
+</span><span id="__span-40-50"><a id="__codelineno-40-50" name="__codelineno-40-50" href="#__codelineno-40-50"></a><span class="w">    </span><span class="n">qkrylov_site_destroy</span><span class="p">(</span><span class="n">site</span><span class="p">);</span>
+</span><span id="__span-40-51"><a id="__codelineno-40-51" name="__codelineno-40-51" href="#__codelineno-40-51"></a><span class="w">    </span><span class="n">qkrylov_basis_destroy</span><span class="p">(</span><span class="n">basis</span><span class="p">);</span>
+</span><span id="__span-40-52"><a id="__codelineno-40-52" name="__codelineno-40-52" href="#__codelineno-40-52"></a><span class="w">    </span><span class="n">qkrylov_sector_destroy</span><span class="p">(</span><span class="n">sector</span><span class="p">);</span>
+</span><span id="__span-40-53"><a id="__codelineno-40-53" name="__codelineno-40-53" href="#__codelineno-40-53"></a>
+</span><span id="__span-40-54"><a id="__codelineno-40-54" name="__codelineno-40-54" href="#__codelineno-40-54"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-40-55"><a id="__codelineno-40-55" name="__codelineno-40-55" href="#__codelineno-40-55"></a><span class="p">}</span>
 </span></code></pre></div>
 
 
@@ -1892,7 +1993,7 @@ Computes thermodynamic quantities (<span class="arithmatex">\(Z(\beta), E(\beta)
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.e886cdf1.min.js"></script>
+      <script src="../../assets/javascripts/bundle.49251538.min.js"></script>
       
     
   </body>

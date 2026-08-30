@@ -208,11 +208,11 @@ NB_MODULE(_qkrylov_cpp, m) {
         .def_rw("eigenvector", &LanczosResult::eigenvector);
 
     m.def("lanczos_ground_state",
-        [](const MatrixFreeHamiltonian& H, int maxiter, double tol) {
-            auto res = lanczos_ground_state(H, maxiter, tol);
+        [](const MatrixFreeHamiltonian& H, int maxiter, double tol, bool two_pass) {
+            auto res = lanczos_ground_state(H, maxiter, tol, two_pass);
             return nb::make_tuple(res.energy, vec_to_numpy(std::move(res.eigenvector)));
         },
-        "H"_a, "maxiter"_a = 200, "tol"_a = 1e-12);
+        "H"_a, "maxiter"_a = 200, "tol"_a = 1e-12, "two_pass"_a = true);
 
     nb::class_<DavidsonResult>(m, "DavidsonResult")
         .def_rw("eigenvalues", &DavidsonResult::eigenvalues)

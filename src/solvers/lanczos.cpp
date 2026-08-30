@@ -98,15 +98,13 @@ TridiagResult tridiag_ground_state_full(const std::vector<double>& alpha, const 
 LanczosResult lanczos_ground_state(
     const MatrixFreeHamiltonian& H,
     int maxiter,
-    double tol
+    double tol,
+    bool two_pass
 )
 {
     const Index dim = H.dimension();
     if (dim == 0) return {};
 
-    // PASS 1: Memory-efficient Lanczos iteration
-    // Store ONLY 3 vectors in memory: v_prev, v_curr, w (plus 1 accumulator in Pass 2)
-    // Memory usage reduces from O(m * D) to O(D)!
     Vector v_prev(dim, 0.0);
     Vector v_curr(dim, 0.0);
     Vector w(dim, 0.0);
@@ -116,6 +114,11 @@ LanczosResult lanczos_ground_state(
     std::uniform_real_distribution<double> dist(-1.0, 1.0);
     for(Index i=0; i<dim; ++i) v_curr[i] = Complex(dist(rng), dist(rng));
     normalize(v_curr);
+
+    std::vector<Vector> basis_vectors;
+    if (!two_pass) {
+        basis_vectors.push_back(v_curr);
+    }
 
     std::vector<double> alphas;
     std::vector<double> betas;
@@ -134,6 +137,12 @@ LanczosResult lanczos_ground_state(
             axpy(-betas.back(), v_prev, w);
         }
 
+        if (!two_pass) {
+            for (const auto& bv : basis_vectors) {
+                axpy(-dot(bv, w), bv, w);
+            }
+        }
+
         double beta = norm(w);
 
         if (beta < 1e-15 || iter + 1 == std::min<int>(maxiter, dim)) {
@@ -145,6 +154,10 @@ LanczosResult lanczos_ground_state(
         v_prev = v_curr;
         v_curr = w;
         scal(1.0/beta, v_curr);
+
+        if (!two_pass) {
+            basis_vectors.push_back(v_curr);
+        }
 
         if (iter > 0) {
             auto tridiag = tridiag_ground_state_full(alphas, betas, alphas.size());
@@ -161,8 +174,17 @@ LanczosResult lanczos_ground_state(
     LanczosResult res;
     res.energy = final_tridiag.energy;
 
-    // PASS 2: Re-generate Krylov vectors with identical seed and accumulate Ritz ground state
-    // |psi_0> = sum_{i=0}^{m-1} s_i |v_i>
+    if (!two_pass) {
+        // Single-pass: reconstruct Ritz eigenvector directly from stored Krylov basis vectors
+        res.eigenvector.assign(dim, 0.0);
+        for (int i = 0; i < (int)alphas.size(); ++i) {
+            axpy(final_tridiag.eigenvector[i], basis_vectors[i], res.eigenvector);
+        }
+        normalize(res.eigenvector);
+        return res;
+    }
+
+    // Two-pass: Re-generate Krylov vectors with identical seed and accumulate Ritz ground state
     res.eigenvector.assign(dim, 0.0);
 
     rng.seed(seed);

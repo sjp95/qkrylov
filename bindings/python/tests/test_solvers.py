@@ -18,11 +18,17 @@ def test_lanczos_solver():
         os += 0.5, "Sm", i, "Sp", j
 
     H = qk.MatrixFreeHamiltonian(basis, site, os)
-    res = qk.lanczos_ground_state(H, maxiter=100, tol=1e-12)
 
-    assert math.isclose(res.energy, -2.0, abs_tol=1e-6)
-    assert len(res.eigenvector) == H.dimension
-    assert isinstance(res.eigenvector, np.ndarray)
+    # Test two-pass Lanczos
+    res_tp = qk.lanczos_ground_state(H, maxiter=100, tol=1e-12, two_pass=True)
+    assert math.isclose(res_tp.energy, -2.0, abs_tol=1e-6)
+    assert len(res_tp.eigenvector) == H.dimension
+    assert isinstance(res_tp.eigenvector, np.ndarray)
+
+    # Test single-pass Lanczos
+    res_sp = qk.lanczos_ground_state(H, maxiter=100, tol=1e-12, two_pass=False)
+    assert math.isclose(res_sp.energy, -2.0, abs_tol=1e-6)
+    assert np.allclose(res_tp.eigenvector, res_sp.eigenvector, atol=1e-6)
 
 def test_davidson_solver():
     N = 4

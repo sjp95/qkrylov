@@ -171,7 +171,7 @@ jobs:
             echo '#!/bin/bash' > /usr/bin/nvcc && echo 'args=()' >> /usr/bin/nvcc && echo 'for arg in "$@"; do if [ "$arg" != "-Os" ]; then args+=("$arg"); fi; done' >> /usr/bin/nvcc && echo '/usr/local/cuda-12.6/bin/nvcc "${args[@]}"' >> /usr/bin/nvcc && chmod +x /usr/bin/nvcc
           CIBW_ENVIRONMENT: >-
             SETUPTOOLS_SCM_PRETEND_VERSION=${{ steps.version.outputs.version }}
-            SKBUILD_CMAKE_ARGS="-DKokkos_ENABLE_CUDA=ON -DKokkos_ENABLE_OPENMP=ON -DKokkos_ARCH_AMPERE80=ON -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.6/bin/nvcc -DCMAKE_C_COMPILER=/opt/rh/gcc-toolset-12/root/usr/bin/gcc -DCMAKE_CXX_COMPILER=/opt/rh/gcc-toolset-12/root/usr/bin/g++ -DCMAKE_CUDA_HOST_COMPILER=/opt/rh/gcc-toolset-12/root/usr/bin/g++"
+            CMAKE_ARGS="-DKokkos_ENABLE_CUDA=ON -DKokkos_ENABLE_OPENMP=ON -DKokkos_ARCH_AMPERE80=ON -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.6/bin/nvcc -DCMAKE_C_COMPILER=/opt/rh/gcc-toolset-12/root/usr/bin/gcc -DCMAKE_CXX_COMPILER=/opt/rh/gcc-toolset-12/root/usr/bin/g++ -DCMAKE_CUDA_HOST_COMPILER=/opt/rh/gcc-toolset-12/root/usr/bin/g++"
           # Tell auditwheel to NOT bundle nvidia libraries (keep wheel small)
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair --exclude libcublas.so.12 --exclude libcudart.so.12 --exclude libcuda.so.1 -w {dest_dir} {wheel}"
 
@@ -212,10 +212,11 @@ jobs:
       - name: List wheels being published to PyPI
         run: ls -lh ./pypi_wheels/
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: ./pypi_wheels
+      # [TEMP DISABLED] Publish to PyPI — re-enable once GH Release + gh-pages are verified working
+      # - name: Publish to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+      #   with:
+      #     packages-dir: ./pypi_wheels
 
       - name: Upload all wheels to GitHub Release
         if: github.event_name == 'release'

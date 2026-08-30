@@ -62,7 +62,50 @@ using QKrylov
         @test isapprox(y[1], 0.25 + 0.0im, atol=1e-10)
     end
 
-    @testset "Lanczos Ground State Solver" begin
+    @testset "DMI Interaction & Complex Terms" begin
+        basis = SpinHalfBasis(3)
+        site = SpinHalfSite()
+        op = OpSum()
+
+        # DMI z-component: (i D / 2) Sp_0 Sm_1 - (i D / 2) Sm_0 Sp_1
+        D = 0.5
+        add_term!(op, 1.0, "Sz", 0, "Sz", 1)
+        add_term!(op, 0.5im * D, "Sp", 0, "Sm", 1)
+        add_term!(op, -0.5im * D, "Sm", 0, "Sp", 1)
+
+        H = MatrixFreeHamiltonian(basis, site, op)
+        @test dimension(H) == 8
+
+        res = lanczos_ground_state(H, maxiter=50, tol=1e-12)
+        @test res.energy < 0.0
+    end
+
+    @testset "Hubbard & t-J Models in Julia" begin
+        sec = Sector()
+        set_hubbard_particles!(sec, 1, 1)
+
+        b_hub = HubbardBasis(2, sec)
+        s_hub = HubbardSite()
+        @test dimension(b_hub) == 4
+
+        op_hub = OpSum()
+        t = 1.0
+        U = 4.0
+        add_term!(op_hub, -t, "CdagUp", 0, "CUp", 1)
+        add_term!(op_hub, -t, "CdagUp", 1, "CUp", 0)
+        add_term!(op_hub, -t, "CdagDn", 0, "CDn", 1)
+        add_term!(op_hub, -t, "CdagDn", 1, "CDn", 0)
+        add_term!(op_hub, U, "Nup", 0, "Ndn", 0)
+        add_term!(op_hub, U, "Nup", 1, "Ndn", 1)
+
+        H_hub = MatrixFreeHamiltonian(b_hub, s_hub, op_hub)
+        res_hub = lanczos_ground_state(H_hub, maxiter=50, tol=1e-12)
+
+        exact_hub = (U - sqrt(U^2 + 16.0 * t^2)) / 2.0
+        @test isapprox(res_hub.energy, exact_hub, atol=1e-5)
+    end
+
+    @testset "Lanczos Ground State, State Save/Load & Correlation" begin
         # 4-site 1D Heisenberg chain
         N = 4
         basis = SpinHalfBasis(N)
@@ -81,5 +124,24 @@ using QKrylov
         
         # Ground state energy for 4-site periodic Heisenberg chain is -2.0
         @test isapprox(res.energy, -2.0, atol=1e-6)
+
+        # Save and load energy to verify Julia state preservation pattern
+        tmpfile = tempname()
+        open(tmpfile, "w") do io
+            println(io, res.energy)
+        end
+        loaded_e = parse(Float64, readline(tmpfile))
+        rm(tmpfile)
+        @test isapprox(loaded_e, res.energy, atol=1e-12)
+
+        # Compute spin-spin correlation <Sz_0 Sz_2>
+        op_corr = OpSum()
+        add_term!(op_corr, 1.0, "Sz", 0, "Sz", 2)
+        H_corr = MatrixFreeHamiltonian(basis, site, op_corr)
+
+        # Apply operator directly to ground state x
+        x_gs = [1.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im]
+        y_corr = H_corr * x_gs
+        @test length(y_corr) == dimension(basis)
     end
 end

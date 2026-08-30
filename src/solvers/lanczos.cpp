@@ -98,7 +98,8 @@ TridiagResult tridiag_ground_state_full(const std::vector<double>& alpha, const 
 LanczosResult lanczos_ground_state(
     const MatrixFreeHamiltonian& H,
     int maxiter,
-    double tol
+    double tol,
+    bool two_pass
 )
 {
     const Index dim = H.dimension();
@@ -108,23 +109,24 @@ LanczosResult lanczos_ground_state(
     Vector v_curr(dim, 0.0);
     Vector w(dim, 0.0);
 
-    std::mt19937 rng(1234);
+    const uint32_t seed = 1234;
+    std::mt19937 rng(seed);
     std::uniform_real_distribution<double> dist(-1.0, 1.0);
     for(Index i=0; i<dim; ++i) v_curr[i] = Complex(dist(rng), dist(rng));
     normalize(v_curr);
 
     std::vector<Vector> basis_vectors;
-    basis_vectors.push_back(v_curr);
+    if (!two_pass) {
+        basis_vectors.push_back(v_curr);
+    }
 
     std::vector<double> alphas;
     std::vector<double> betas;
 
     double energy_old = 1e100;
-    int actual_iters = 0;
 
     for(int iter=0; iter < std::min<int>(maxiter, dim); ++iter)
     {
-        actual_iters = iter + 1;
         H.apply(v_curr.data(), w.data());
 
         double alpha = std::real(dot(v_curr, w));
@@ -135,9 +137,10 @@ LanczosResult lanczos_ground_state(
             axpy(-betas.back(), v_prev, w);
         }
 
-        // Full reorthogonalization to maintain stability
-        for (const auto& bv : basis_vectors) {
-            axpy(-dot(bv, w), bv, w);
+        if (!two_pass) {
+            for (const auto& bv : basis_vectors) {
+                axpy(-dot(bv, w), bv, w);
+            }
         }
 
         double beta = norm(w);
@@ -151,10 +154,12 @@ LanczosResult lanczos_ground_state(
         v_prev = v_curr;
         v_curr = w;
         scal(1.0/beta, v_curr);
-        basis_vectors.push_back(v_curr);
+
+        if (!two_pass) {
+            basis_vectors.push_back(v_curr);
+        }
 
         if (iter > 0) {
-            // Check convergence only every few iterations or after some initial steps
             auto tridiag = tridiag_ground_state_full(alphas, betas, alphas.size());
             if (std::abs(tridiag.energy - energy_old) < tol) {
                 energy_old = tridiag.energy;
@@ -169,11 +174,42 @@ LanczosResult lanczos_ground_state(
     LanczosResult res;
     res.energy = final_tridiag.energy;
 
-    // Compute Ritz vector
-    res.eigenvector.assign(dim, 0.0);
-    for (int i = 0; i < (int)alphas.size(); ++i) {
-        axpy(final_tridiag.eigenvector[i], basis_vectors[i], res.eigenvector);
+    if (!two_pass) {
+        // Single-pass: reconstruct Ritz eigenvector directly from stored Krylov basis vectors
+        res.eigenvector.assign(dim, 0.0);
+        for (int i = 0; i < (int)alphas.size(); ++i) {
+            axpy(final_tridiag.eigenvector[i], basis_vectors[i], res.eigenvector);
+        }
+        normalize(res.eigenvector);
+        return res;
     }
+
+    // Two-pass: Re-generate Krylov vectors with identical seed and accumulate Ritz ground state
+    res.eigenvector.assign(dim, 0.0);
+
+    rng.seed(seed);
+    std::fill(v_curr.begin(), v_curr.end(), 0.0);
+    std::fill(v_prev.begin(), v_prev.end(), 0.0);
+    for(Index i=0; i<dim; ++i) v_curr[i] = Complex(dist(rng), dist(rng));
+    normalize(v_curr);
+
+    int m = static_cast<int>(alphas.size());
+    for (int iter = 0; iter < m; ++iter) {
+        axpy(final_tridiag.eigenvector[iter], v_curr, res.eigenvector);
+
+        if (iter + 1 == m) break;
+
+        H.apply(v_curr.data(), w.data());
+        axpy(-alphas[iter], v_curr, w);
+        if (iter > 0) {
+            axpy(-betas[iter-1], v_prev, w);
+        }
+
+        v_prev = v_curr;
+        v_curr = w;
+        scal(1.0 / betas[iter], v_curr);
+    }
+
     normalize(res.eigenvector);
 
     return res;

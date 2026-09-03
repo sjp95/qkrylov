@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: [ main, master, julia-release ]
+    branches: [ main, master ]
     paths:
       - 'src/**'
       - 'include/**'
@@ -11,7 +11,7 @@ on:
       - 'CMakeLists.txt'
       - '.github/workflows/tests.yaml'
   pull_request:
-    branches: [ main, master, julia-release ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:

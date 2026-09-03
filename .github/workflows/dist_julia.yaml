@@ -220,7 +220,7 @@ jobs:
           elif [ -n "${{ inputs.release_tag }}" ]; then
             TAG_NAME="${{ inputs.release_tag }}"
           else
-            TAG_NAME="latest-binaries"
+            TAG_NAME="julia-latest"
           fi
           echo "TAG_NAME=$TAG_NAME" >> "$GITHUB_ENV"
 
@@ -229,10 +229,23 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
-          gh release upload "$TAG_NAME" qkrylov-*.tar.gz --clobber || \
+          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
+          BUILD_DATE=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          ARCHIVE_TAG="build-${SHORT_SHA}"
+
+          # 1. Create an immutable historical archive for this exact build
+          echo "Creating permanent archive release for $ARCHIVE_TAG..."
+          gh release create "$ARCHIVE_TAG" qkrylov-*.tar.gz \
+            --title "Build ${SHORT_SHA}" \
+            --notes "Permanent binary archive for commit ${GITHUB_SHA} built on ${BUILD_DATE}. To install this specific build in Julia: Pkg.add(url=\"https://github.com/${{ github.repository }}.git\", rev=\"${GITHUB_SHA}\", subdir=\"bindings/julia\")" \
+            --target "$GITHUB_SHA" || true
+
+          # 2. Recreate the rolling release tag so GitHub shows "released just now"
+          echo "Recreating rolling release $TAG_NAME to refresh release timestamp..."
+          gh release delete "$TAG_NAME" --yes || true
           gh release create "$TAG_NAME" qkrylov-*.tar.gz \
-            --title "Prebuilt Binaries ($TAG_NAME)" \
-            --notes "Automated multi-platform native binary release for QuantumKrylov Julia bindings." \
+            --title "julia-latest" \
+            --notes "Automated multi-platform native binary release for QuantumKrylov Julia bindings. Updated on ${BUILD_DATE} from commit ${SHORT_SHA}. To install the latest verified build in Julia: Pkg.add(url=\"https://github.com/${{ github.repository }}.git\", rev=\"julia-latest\", subdir=\"bindings/julia\")" \
             --target "$GITHUB_SHA"
 
       - name: Generate Artifacts.toml
@@ -252,7 +265,7 @@ jobs:
               except Exception:
                   repo = "sjp95/qkrylov"
 
-          tag = os.environ.get("TAG_NAME", "latest-binaries")
+          tag = os.environ.get("TAG_NAME", "julia-latest")
 
           meta_files = sorted(glob.glob("metadata-*.json"))
           
@@ -271,6 +284,7 @@ jobs:
 
                   out.write(f"\n[[libqkrylov]]\n")
                   out.write(f"arch = \"{arch}\"\n")
+                  out.write("lazy = true\n")
                   if cuda and cuda != "none":
                       out.write(f"cuda = \"{cuda}\"\n")
                   elif os_name == "linux" and arch == "x86_64":
@@ -323,4 +337,30 @@ jobs:
         shell: bash
         run: |
           julia --project=bindings/julia -e 'using Pkg; Pkg.test()'
+
+  promote-verified-release:
+    name: Promote Verified Release (Update julia-latest Tag)
+    needs: test-released-artifacts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout julia-release branch
+        uses: actions/checkout@v4
+        with:
+          ref: julia-release
+          fetch-depth: 0
+
+      - name: Promote julia-latest tag to verified commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          VERIFIED_COMMIT=$(git rev-parse HEAD)
+          echo "All platform tests passed! Promoting julia-latest tag to verified commit $VERIFIED_COMMIT..."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f julia-latest "$VERIFIED_COMMIT"
+          git push -f origin julia-latest
+          gh release edit julia-latest --target "$VERIFIED_COMMIT" || true
 

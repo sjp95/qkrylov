@@ -45,7 +45,14 @@ Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="julia-release", subdir=
 
 *(No C++ compiler, CMake, or extra build tools required!)*
 
-### Option 2: General Registry for stable release (Recommended)
+### Option 2: Pin to a specific historical build
+Every CI build is permanently archived with its own tagged release. To install an exact, pinned build, specify its commit SHA (e.g. `rev="1d00f75"`):
+```julia
+using Pkg
+Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="<commit-sha>", subdir="bindings/julia")
+```
+
+### Option 3: General Registry for stable release (Recommended once merged)
 ```julia
 using Pkg
 Pkg.add("QuantumKrylov")

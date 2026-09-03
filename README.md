@@ -32,13 +32,23 @@ A modern C++20 framework for matrix-free Krylov methods in quantum many-body phy
 ## Quick Start
 
 ### For Julia Users
-Install the latest release directly from GitHub:
+
+#### Option 1: Install the latest prebuilt release (`julia-latest`)
+Automatically downloads and configures the latest native prebuilt binaries (`libqkrylov.so`, `libqkrylov.dylib`, or `qkrylov.dll`). On Linux systems with an NVIDIA GPU and driver 12+, it automatically downloads the **CUDA 12 accelerated** binary with zero manual compilation:
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="julia-release", subdir="bindings/julia")
+Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="julia-latest", subdir="bindings/julia")
 ```
-Or grab it from JuliaRegistry
+
+#### Option 2: Pin to a specific historical build
+Every CI build is permanently archived with its own tagged release. To install an exact, pinned build, specify its commit SHA (e.g. `rev="1d00f75"`):
+```julia
+using Pkg
+Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="<commit-sha>", subdir="bindings/julia")
 ```
+
+#### Option 3: Julia General Registry (once registered)
+```julia
 using Pkg
 Pkg.add("QuantumKrylov")
 ```

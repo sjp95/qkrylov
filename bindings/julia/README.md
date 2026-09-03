@@ -30,22 +30,29 @@ The Julia interface is constructed directly on top of the binary-stable C ABI ex
 
 ### Option 1: Direct GitHub Installation for latest release (Prebuilt Binaries)
 
-You can install `QuantumKrylov.jl` directly from the `julia-release` branch. Julia's built-in **Artifacts** system automatically downloads and configures the native prebuilt binary (`libqkrylov.so`, `libqkrylov.dylib`, or `qkrylov.dll`) for your operating system and CPU architecture. On Linux systems with an NVIDIA GPU and driver 12+, it automatically downloads the **CUDA 12 accelerated** binary:
+You can install `QuantumKrylov.jl` directly from the `julia-latest` release tag. Julia's built-in **Artifacts** system automatically downloads and configures the native prebuilt binary (`libqkrylov.so`, `libqkrylov.dylib`, or `qkrylov.dll`) for your operating system and CPU architecture. On Linux systems with an NVIDIA GPU and driver 12+, it automatically downloads the **CUDA 12 accelerated** binary:
 
 In the Julia REPL (press `]` to open Pkg mode):
 ```julia
-pkg> add https://github.com/sjp95/qkrylov.git#julia-release:bindings/julia
+pkg> add https://github.com/sjp95/qkrylov.git#julia-latest:bindings/julia
 ```
 
 Or programmatically in Julia scripts:
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="julia-release", subdir="bindings/julia")
+Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="julia-latest", subdir="bindings/julia")
 ```
 
 *(No C++ compiler, CMake, or extra build tools required!)*
 
-### Option 2: General Registry for stable release (Recommended)
+### Option 2: Pin to a specific historical build
+Every CI build is permanently archived with its own tagged release. To install an exact, pinned build, specify its commit SHA (e.g. `rev="1d00f75"`):
+```julia
+using Pkg
+Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="<commit-sha>", subdir="bindings/julia")
+```
+
+### Option 3: General Registry for stable release (Recommended once merged)
 ```julia
 using Pkg
 Pkg.add("QuantumKrylov")

@@ -3,12 +3,12 @@
 [[libqkrylov]]
 arch = "aarch64"
 lazy = true
-git-tree-sha1 = "ea52f17e78cd00497373402dccc541856f7862ea"
+git-tree-sha1 = "37177b05559d9856c0c4e3f188347e3605e0cc80"
 os = "macos"
 
     [[libqkrylov.download]]
-    sha256 = "92cab600f9b02c363a57ace0c73c6cce42101539ad6656126996c745a96a018c"
-    url = "https://github.com/pritipriya-dasbehera/qkrylov/releases/download/julia-latest/qkrylov-aarch64-apple-darwin.tar.gz"
+    sha256 = "7c66e35cc2f6fb7cf4a590d46c348669ac7be65010a03a4c56f389aa37f155dc"
+    url = "https://github.com/sjp95/qkrylov/releases/download/julia-latest/qkrylov-aarch64-apple-darwin.tar.gz"
 
 [[libqkrylov]]
 arch = "aarch64"
@@ -17,19 +17,19 @@ git-tree-sha1 = "7fac213b7f7ce14f41fe66e321ad0b22d0a5a2b2"
 os = "linux"
 
     [[libqkrylov.download]]
-    sha256 = "6a0ad74c7488babfb92699456dcaf941bb21caf8bb20c041b57c924f935ab794"
-    url = "https://github.com/pritipriya-dasbehera/qkrylov/releases/download/julia-latest/qkrylov-aarch64-linux-gnu.tar.gz"
+    sha256 = "e4dc79fa8f3f47bcc932970f3300677d7f433f98beb8529443f2f3561eca7e58"
+    url = "https://github.com/sjp95/qkrylov/releases/download/julia-latest/qkrylov-aarch64-linux-gnu.tar.gz"
 
 [[libqkrylov]]
 arch = "x86_64"
 lazy = true
 cuda = "12.0"
-git-tree-sha1 = "8c9bfc9deff8bf6f89ad68f0c632070f48662de0"
+git-tree-sha1 = "8910acff6bcf706ff98e0c8371fdca88fefaf656"
 os = "linux"
 
     [[libqkrylov.download]]
-    sha256 = "b38e563b88d5ff3683331a43f9dd81476da963e493c1c44456277997e1e3c9eb"
-    url = "https://github.com/pritipriya-dasbehera/qkrylov/releases/download/julia-latest/qkrylov-x86_64-linux-gnu-cuda12.tar.gz"
+    sha256 = "bf4e9a3cc11fe4820b0085a0cd9ac20967e41e0d352797325dc861dde1bba325"
+    url = "https://github.com/sjp95/qkrylov/releases/download/julia-latest/qkrylov-x86_64-linux-gnu-cuda12.tar.gz"
 
 [[libqkrylov]]
 arch = "x86_64"
@@ -39,15 +39,15 @@ git-tree-sha1 = "63cc7bf464aeb6e47bb9add5e2ebe8bf6b8172d2"
 os = "linux"
 
     [[libqkrylov.download]]
-    sha256 = "15e8843ecde0839fb3cc1693022b3cc5f8e25b9121e7405adb88bfc87e2eae0e"
-    url = "https://github.com/pritipriya-dasbehera/qkrylov/releases/download/julia-latest/qkrylov-x86_64-linux-gnu.tar.gz"
+    sha256 = "81c5fb2ac554f179e48162465cba992425f5fd357dc7de17e4208779ceed3f9f"
+    url = "https://github.com/sjp95/qkrylov/releases/download/julia-latest/qkrylov-x86_64-linux-gnu.tar.gz"
 
 [[libqkrylov]]
 arch = "x86_64"
 lazy = true
-git-tree-sha1 = "63f2175c9faf7538d97c5d5f0d374531038c0289"
+git-tree-sha1 = "78288a40dc67609f54979a77132ba8d1efb563d7"
 os = "windows"
 
     [[libqkrylov.download]]
-    sha256 = "4bb6c1c73fe201c2615b34b1ecff9e12ece0843031d0892d6e8ee4e8dc52a991"
-    url = "https://github.com/pritipriya-dasbehera/qkrylov/releases/download/julia-latest/qkrylov-x86_64-w64-mingw32.tar.gz"
+    sha256 = "08f73ef85a4f1872b01ab1250794946029027759af51ac5f15b70b55b58d4e63"
+    url = "https://github.com/sjp95/qkrylov/releases/download/julia-latest/qkrylov-x86_64-w64-mingw32.tar.gz"

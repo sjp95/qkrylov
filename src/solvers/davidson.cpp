@@ -77,6 +77,16 @@ SmallEigensystem solve_small_hermitian(const std::vector<std::vector<Complex>>& 
     }
     return res;
 }
+
+// Two-Pass Modified Gram-Schmidt (MGS) to ensure full numerical orthogonality
+void orthogonalize_two_pass(Vector& t, const std::vector<Vector>& V) {
+    for (int pass = 0; pass < 2; ++pass) {
+        for (const auto& v : V) {
+            Complex proj = dot(v, t);
+            axpy(-proj, v, t);
+        }
+    }
+}
 }
 
 DavidsonResult davidson_lowest(
@@ -100,8 +110,7 @@ DavidsonResult davidson_lowest(
     std::mt19937 rng(1234);
     std::uniform_real_distribution<double> dist(-1.0, 1.0);
 
-    // Initial subspace: use some diagonal dominance if possible,
-    // or just unit vectors for the smallest diagonal elements
+    // Initial subspace generation
     std::vector<Index> diag_idx(dim);
     for(Index i=0; i<dim; ++i) diag_idx[i] = i;
     std::sort(diag_idx.begin(), diag_idx.end(), [&](Index i, Index j){
@@ -111,13 +120,11 @@ DavidsonResult davidson_lowest(
     for (int i = 0; i < n_eig; ++i) {
         Vector v(dim, 0.0);
         v[diag_idx[i]] = 1.0;
-        // Orthogonalize against previous V
-        for (const auto& v_prev : V) axpy(-dot(v_prev, v), v_prev, v);
+        orthogonalize_two_pass(v, V);
         double nrm = norm(v);
         if (nrm < 1e-10) {
-            // Fallback to random if unit vector is not linearly independent
             for (Index j = 0; j < dim; ++j) v[j] = Complex(dist(rng), dist(rng));
-            for (const auto& v_prev : V) axpy(-dot(v_prev, v), v_prev, v);
+            orthogonalize_two_pass(v, V);
             nrm = norm(v);
         }
         scal(1.0/nrm, v);
@@ -176,8 +183,8 @@ DavidsonResult davidson_lowest(
             return res;
         }
 
-        // Expansion and restart
-        if (V.size() + next_corrections.size() > (size_t)max_subspace) {
+        // Subspace contraction / restart when max_subspace is reached
+        if (V.size() + next_corrections.size() > static_cast<size_t>(max_subspace)) {
             std::vector<Vector> next_V;
             std::vector<Vector> next_HV;
             for (int k = 0; k < n_eig; ++k) {
@@ -187,6 +194,9 @@ DavidsonResult davidson_lowest(
                     axpy(eig.eigenvectors[k][i], V[i], ritz_v);
                     axpy(eig.eigenvectors[k][i], HV[i], ritz_hv);
                 }
+                double nrm = norm(ritz_v);
+                scal(1.0 / nrm, ritz_v);
+                scal(1.0 / nrm, ritz_hv);
                 next_V.push_back(ritz_v);
                 next_HV.push_back(ritz_hv);
             }
@@ -195,7 +205,7 @@ DavidsonResult davidson_lowest(
         }
 
         for (auto& t : next_corrections) {
-            for (const auto& v : V) axpy(-dot(v, t), v, t);
+            orthogonalize_two_pass(t, V);
             double nrm = norm(t);
             if (nrm > 1e-10) {
                 scal(1.0/nrm, t);

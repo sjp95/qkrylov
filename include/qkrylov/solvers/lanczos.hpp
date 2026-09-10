@@ -21,7 +21,8 @@ template <typename ExecSpace>
 LanczosResult lanczos_ground_state(
     const MatrixFreeHamiltonian<ExecSpace>& H,
     int maxiter = 200,
-    Real tol = 1.0e-12
+    Real tol = 1.0e-12,
+    bool two_pass = true
 );
 
 }

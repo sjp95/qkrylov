@@ -96,11 +96,11 @@ static void bind_backend(nb::module_& m, const std::string& suffix, const std::s
 
     std::string lgs_name = "lanczos_ground_state_" + suffix + type_suffix;
     m.def(lgs_name.c_str(),
-        [](const HType& H, int maxiter, Real tol) {
-            auto res = lanczos_ground_state<ExecSpace>(H, maxiter, tol);
+        [](const HType& H, int maxiter, Real tol, bool two_pass) {
+            auto res = lanczos_ground_state<ExecSpace>(H, maxiter, tol, two_pass);
             return nb::make_tuple(res.energy, vec_to_numpy(std::move(res.eigenvector)));
         },
-        "H"_a, "maxiter"_a = 200, "tol"_a = 1e-12);
+        "H"_a, "maxiter"_a = 200, "tol"_a = 1e-12, "two_pass"_a = true);
 
     std::string dav_name = "davidson_lowest_" + suffix + type_suffix;
     m.def(dav_name.c_str(), &davidson_lowest<ExecSpace>,

@@ -85,17 +85,37 @@ int main()
         os
     );
 
-    auto res =
+    auto res_two_pass =
         lanczos_ground_state<Kokkos::DefaultExecutionSpace>(
             H,
             200,
-            1e-12
+            1e-12,
+            true
+        );
+
+    auto res_single_pass =
+        lanczos_ground_state<Kokkos::DefaultExecutionSpace>(
+            H,
+            200,
+            1e-12,
+            false
         );
 
     std::cout
-        << "Energy = "
-        << res.energy
+        << "Two-pass energy = "
+        << res_two_pass.energy
+        << ", Single-pass energy = "
+        << res_single_pass.energy
         << "\n";
+
+    assert(std::abs(res_two_pass.energy - (-0.75)) < 1e-10);
+    assert(std::abs(res_single_pass.energy - (-0.75)) < 1e-10);
+    assert(std::abs(res_two_pass.energy - res_single_pass.energy) < 1e-12);
+
+    for (size_t i = 0; i < res_two_pass.eigenvector.size(); ++i) {
+        Complex diff = res_two_pass.eigenvector[i] - res_single_pass.eigenvector[i];
+        assert(std::abs(diff) < 1e-10);
+    }
 
     return 0;
 }

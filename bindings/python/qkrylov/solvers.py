@@ -25,7 +25,8 @@ class LanczosResult:
 def lanczos_ground_state(
     H: MatrixFreeHamiltonian, 
     maxiter: int = 200, 
-    tol: float = 1e-12
+    tol: float = 1e-12,
+    two_pass: bool = True
 ) -> LanczosResult:
     """Find the ground state of a Hamiltonian using the Lanczos algorithm.
     
@@ -37,6 +38,8 @@ def lanczos_ground_state(
         Maximum number of Lanczos iterations (default 200).
     tol : float, optional
         Convergence tolerance (default 1e-12).
+    two_pass : bool, optional
+        Whether to use two-pass Lanczos (default True).
         
     Returns
     -------
@@ -44,7 +47,7 @@ def lanczos_ground_state(
         The ground state energy and eigenvector.
     """
     s_dtype = "_FP64" if H.dtype == np.float64 else "_FP32"
-    energy, eigenvector = getattr(_cpp, f"lanczos_ground_state_{H._backend_suffix}{s_dtype}")(H._cpp_obj, maxiter, tol)
+    energy, eigenvector = getattr(_cpp, f"lanczos_ground_state_{H._backend_suffix}{s_dtype}")(H._cpp_obj, maxiter, tol, two_pass)
     return LanczosResult(
         energy=energy,
         eigenvector=eigenvector  # zero-copy NumPy array backed by C++ memory

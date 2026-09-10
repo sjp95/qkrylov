@@ -17,6 +17,7 @@ set(QKRYLOV_TESTS
     test_workflow
     test_c_api
     test_spin1_correction_vector
+    test_save_load_correlation
 )
 
 foreach(test_name IN LISTS QKRYLOV_TESTS)
@@ -24,4 +25,3 @@ foreach(test_name IN LISTS QKRYLOV_TESTS)
     target_link_libraries(${test_name} PRIVATE qkrylov::qkrylov)
     add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()
-

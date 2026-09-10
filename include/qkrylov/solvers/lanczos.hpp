@@ -17,7 +17,8 @@ struct LanczosResult
 LanczosResult lanczos_ground_state(
     const MatrixFreeHamiltonian& H,
     int maxiter = 200,
-    double tol = 1.0e-12
+    double tol = 1.0e-12,
+    bool two_pass = true
 );
 
 }

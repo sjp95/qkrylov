@@ -4,6 +4,9 @@ A modern C++20 framework for matrix-free Krylov methods in quantum many-body phy
 now with a Pythonic wrapper layer.
 """
 
+from . import _qkrylov_cpp as _cpp
+Sector = _cpp.Sector
+
 from .operators import (
     Op, OpSum,
     Sz, Sp, Sm, Sx, Sy,
@@ -11,8 +14,8 @@ from .operators import (
     Nup, Ndn, Nupdn,
     Bdag, B, N
 )
-from .site import Site, SpinHalfSite, FermionSite, HubbardSite, TJSite
-from .basis import Basis, SpinHalfBasis, FermionBasis, HubbardBasis, TJBasis
+from .site import Site, SpinHalfSite, SpinSSite, FermionSite, HubbardSite, TJSite
+from .basis import Basis, SpinHalfBasis, FermionBasis, HubbardBasis, TJBasis, SpinSBasis
 from .hamiltonian import MatrixFreeHamiltonian
 from .solvers import (
     LanczosResult,
@@ -22,6 +25,8 @@ from .solvers import (
     DynamicsResult,
     continued_fraction_coeffs,
     evaluate_spectral_function,
+    CorrectionVectorResult,
+    correction_vector_spectral,
     FTLMResult,
     ftlm,
 )
@@ -33,6 +38,9 @@ except Exception:
     __version__ = "0.0.0"
 
 __all__ = [
+    # Sector
+    "Sector",
+
     # Operators
     "Op",
     "OpSum",
@@ -46,6 +54,7 @@ __all__ = [
     # Sites
     "Site",
     "SpinHalfSite",
+    "SpinSSite",
     "FermionSite",
     "HubbardSite",
     "TJSite",
@@ -56,6 +65,7 @@ __all__ = [
     "FermionBasis",
     "HubbardBasis",
     "TJBasis",
+    "SpinSBasis",
     
     # Hamiltonian
     "MatrixFreeHamiltonian",
@@ -68,6 +78,8 @@ __all__ = [
     "DynamicsResult",
     "continued_fraction_coeffs",
     "evaluate_spectral_function",
+    "CorrectionVectorResult",
+    "correction_vector_spectral",
     "FTLMResult",
     "ftlm",
 ]

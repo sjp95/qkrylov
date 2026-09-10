@@ -10,11 +10,13 @@
 #include "qkrylov/operators/opsum.hpp"
 #include "qkrylov/basis/basis.hpp"
 #include "qkrylov/basis/spinhalf_basis.hpp"
+#include "qkrylov/basis/spin_s_basis.hpp"
 #include "qkrylov/basis/fermion_basis.hpp"
 #include "qkrylov/basis/hubbard_basis.hpp"
 #include "qkrylov/basis/tj_basis.hpp"
 #include "qkrylov/sites/site.hpp"
 #include "qkrylov/sites/spinhalf_site.hpp"
+#include "qkrylov/sites/spin_s_site.hpp"
 #include "qkrylov/sites/fermion_site.hpp"
 #include "qkrylov/sites/hubbard_site.hpp"
 #include "qkrylov/sites/tj_site.hpp"
@@ -25,6 +27,7 @@
 #include "qkrylov/solvers/lanczos.hpp"
 #include "qkrylov/solvers/davidson.hpp"
 #include "qkrylov/solvers/dynamics.hpp"
+#include "qkrylov/solvers/correction_vector.hpp"
 #include "qkrylov/solvers/ftlm.hpp"
 
 namespace nb = nanobind;
@@ -119,6 +122,14 @@ NB_MODULE(_qkrylov_cpp, m) {
         .def("contains", &SpinHalfBasis::contains)
         .def("nsites", &SpinHalfBasis::nsites);
 
+    nb::class_<SpinSBasis, Basis>(m, "SpinSBasis")
+        .def(nb::init<int, double, const Sector&>(), "N"_a, "S"_a = 0.5, "sector"_a = Sector())
+        .def("size", &SpinSBasis::size)
+        .def("state", &SpinSBasis::state)
+        .def("index", &SpinSBasis::index)
+        .def("contains", &SpinSBasis::contains)
+        .def("nsites", &SpinSBasis::nsites);
+
     nb::class_<FermionBasis, Basis>(m, "FermionBasis")
         .def(nb::init<int, const Sector&>(), "N"_a, "sector"_a = Sector())
         .def("size", &FermionBasis::size)
@@ -148,6 +159,11 @@ NB_MODULE(_qkrylov_cpp, m) {
     nb::class_<SpinHalfSite, Site>(m, "SpinHalfSite")
         .def(nb::init<>());
 
+    nb::class_<SpinSSite, Site>(m, "SpinSSite")
+        .def(nb::init<double>(), "S"_a = 0.5)
+        .def("spin", &SpinSSite::spin)
+        .def("dimension_per_site", &SpinSSite::dimension_per_site);
+
     nb::class_<FermionSite, Site>(m, "FermionSite")
         .def(nb::init<>());
 
@@ -159,8 +175,6 @@ NB_MODULE(_qkrylov_cpp, m) {
 
     nb::class_<MatrixFreeHamiltonian>(m, "MatrixFreeHamiltonian")
         .def(nb::init<std::shared_ptr<Basis>, std::shared_ptr<Site>, const OpSum&>())
-        // Zero-copy apply: accept a read-only NumPy buffer, write into a
-        // freshly-allocated NumPy array via capsule (no Python list round-trip).
         .def("apply", [](const MatrixFreeHamiltonian& H, CxArray x) {
             const Index n = H.dimension();
             if (x.shape(0) != static_cast<size_t>(n)) {
@@ -168,11 +182,10 @@ NB_MODULE(_qkrylov_cpp, m) {
                                            ") does not match Hamiltonian dimension (" + std::to_string(n) + ")");
             }
             MatrixFreeHamiltonian::Vector y_vec(n);
-            H.apply(x.data(), y_vec.data()); // C++ kernel fills y_vec directly from NumPy buffer
-            return vec_to_numpy(std::move(y_vec));   // zero-copy hand-off to NumPy
+            H.apply(x.data(), y_vec.data());
+            return vec_to_numpy(std::move(y_vec));
         })
         .def("dimension", &MatrixFreeHamiltonian::dimension)
-        // diagonal(): zero-copy hand-off of the result vector to NumPy
         .def("diagonal", [](const MatrixFreeHamiltonian& H) {
             return vec_to_numpy(H.diagonal());
         });
@@ -190,23 +203,16 @@ NB_MODULE(_qkrylov_cpp, m) {
         .def("dimension", &CUDAHamiltonian::dimension);
 #endif
 
-    // LanczosResult: keep as simple struct; wrap eigenvector at call site
     nb::class_<LanczosResult>(m, "LanczosResult")
         .def_rw("energy", &LanczosResult::energy)
         .def_rw("eigenvector", &LanczosResult::eigenvector);
 
-    // Wrap lanczos_ground_state to return eigenvector as zero-copy ndarray
     m.def("lanczos_ground_state",
-        [](const MatrixFreeHamiltonian& H, int maxiter, double tol) {
-            auto res = lanczos_ground_state(H, maxiter, tol);
-            // Wrap struct into a Python dict-like object via a small holder
-            struct Result {
-                double energy;
-                nb::ndarray<nb::numpy, Complex, nb::shape<-1>> eigenvector;
-            };
+        [](const MatrixFreeHamiltonian& H, int maxiter, double tol, bool two_pass) {
+            auto res = lanczos_ground_state(H, maxiter, tol, two_pass);
             return nb::make_tuple(res.energy, vec_to_numpy(std::move(res.eigenvector)));
         },
-        "H"_a, "maxiter"_a = 200, "tol"_a = 1e-12);
+        "H"_a, "maxiter"_a = 200, "tol"_a = 1e-12, "two_pass"_a = true);
 
     nb::class_<DavidsonResult>(m, "DavidsonResult")
         .def_rw("eigenvalues", &DavidsonResult::eigenvalues)
@@ -215,13 +221,11 @@ NB_MODULE(_qkrylov_cpp, m) {
     m.def("davidson_lowest", &davidson_lowest,
           "H"_a, "n_eig"_a = 1, "max_subspace"_a = 20, "tol"_a = 1e-8);
 
-    // DynamicsResult: expose alphas/betas as zero-copy NumPy arrays via lambda
     nb::class_<DynamicsResult>(m, "DynamicsResult")
         .def_rw("norm_phi0", &DynamicsResult::norm_phi0)
         .def_rw("alphas", &DynamicsResult::alphas)
         .def_rw("betas", &DynamicsResult::betas);
 
-    // continued_fraction_coeffs: accepts zero-copy NumPy input for phi0
     m.def("continued_fraction_coeffs",
         [](const MatrixFreeHamiltonian& H, CxArray phi0, int n_iter) {
             if (phi0.shape(0) != static_cast<size_t>(H.dimension())) {
@@ -238,8 +242,6 @@ NB_MODULE(_qkrylov_cpp, m) {
         },
         "H"_a, "phi0"_a, "n_iter"_a = 100);
 
-    // evaluate_spectral_function: accept alphas/betas as NumPy arrays directly
-    // (avoids needing the C++ DynamicsResult struct on the Python side)
     using DblArray = nb::ndarray<const double, nb::shape<-1>, nb::c_contig, nb::device::cpu>;
     m.def("evaluate_spectral_function",
         [](DblArray alphas, DblArray betas, double norm_phi0,
@@ -253,6 +255,22 @@ NB_MODULE(_qkrylov_cpp, m) {
             );
         },
         "alphas"_a, "betas"_a, "norm_phi0"_a, "omega"_a, "E0"_a, "eta"_a = 0.1);
+
+    nb::class_<CorrectionVectorResult>(m, "CorrectionVectorResult")
+        .def_rw("spectral_function", &CorrectionVectorResult::spectral_function)
+        .def_rw("iterations", &CorrectionVectorResult::iterations)
+        .def_rw("converged", &CorrectionVectorResult::converged);
+
+    m.def("correction_vector_spectral",
+        [](const MatrixFreeHamiltonian& H, CxArray Op_psi0, double E0, double omega, double eta, int max_iter, double tol) {
+            if (Op_psi0.shape(0) != static_cast<size_t>(H.dimension())) {
+                throw std::invalid_argument("Op_psi0 vector size does not match Hamiltonian dimension");
+            }
+            const Vector Op_psi0_vec(Op_psi0.data(), Op_psi0.data() + Op_psi0.shape(0));
+            auto res = correction_vector_spectral(H, Op_psi0_vec, E0, omega, eta, max_iter, tol);
+            return nb::make_tuple(vec_to_numpy(std::move(res.correction_vector)), res.spectral_function, res.iterations, res.converged);
+        },
+        "H"_a, "Op_psi0"_a, "E0"_a, "omega"_a, "eta"_a = 0.1, "max_iter"_a = 500, "tol"_a = 1e-8);
 
     nb::class_<FTLMResult>(m, "FTLMResult")
         .def_rw("beta", &FTLMResult::beta)

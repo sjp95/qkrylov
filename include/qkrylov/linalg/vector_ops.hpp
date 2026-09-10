@@ -2,9 +2,8 @@
 
 #include "qkrylov/core/types.hpp"
 
-#include <cmath>
-#include <cstddef>
 #include <vector>
+#include <cmath>
 
 namespace qkrylov
 {
@@ -17,12 +16,14 @@ inline Complex dot(
     const Vector& y
 )
 {
+    const std::ptrdiff_t n = static_cast<std::ptrdiff_t>(x.size());
     double re = 0.0;
     double im = 0.0;
 
+#if defined(_OPENMP)
     #pragma omp parallel for reduction(+:re, im)
-    for(std::ptrdiff_t i=0;i<static_cast<std::ptrdiff_t>(x.size());++i)
-    {
+#endif
+    for (std::ptrdiff_t i = 0; i < n; ++i) {
         Complex val = std::conj(x[i]) * y[i];
         re += val.real();
         im += val.imag();
@@ -35,23 +36,7 @@ inline double norm(
     const Vector& x
 )
 {
-    return std::sqrt(
-        std::real(
-            dot(x,x)
-        )
-    );
-}
-
-inline void scal(
-    Complex a,
-    Vector& x
-)
-{
-    #pragma omp parallel for
-    for(std::ptrdiff_t i=0; i<static_cast<std::ptrdiff_t>(x.size()); ++i)
-    {
-        x[i] *= a;
-    }
+    return std::sqrt(std::real(dot(x, x)));
 }
 
 inline void axpy(
@@ -60,10 +45,28 @@ inline void axpy(
     Vector& y
 )
 {
+    const std::ptrdiff_t n = static_cast<std::ptrdiff_t>(x.size());
+
+#if defined(_OPENMP)
     #pragma omp parallel for
-    for(std::ptrdiff_t i=0;i<static_cast<std::ptrdiff_t>(x.size());++i)
-    {
-        y[i] += a*x[i];
+#endif
+    for (std::ptrdiff_t i = 0; i < n; ++i) {
+        y[i] += a * x[i];
+    }
+}
+
+inline void scal(
+    Complex a,
+    Vector& x
+)
+{
+    const std::ptrdiff_t n = static_cast<std::ptrdiff_t>(x.size());
+
+#if defined(_OPENMP)
+    #pragma omp parallel for
+#endif
+    for (std::ptrdiff_t i = 0; i < n; ++i) {
+        x[i] *= a;
     }
 }
 
@@ -71,15 +74,10 @@ inline void normalize(
     Vector& x
 )
 {
-    const double n =
-        norm(x);
+    double nrm = norm(x);
 
-    if(n==0.0)
-        return;
-
-    for(auto& v : x)
-    {
-        v /= n;
+    if (nrm > 1.0e-15) {
+        scal(1.0 / nrm, x);
     }
 }
 

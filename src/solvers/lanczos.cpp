@@ -172,15 +172,17 @@ LanczosResult lanczos_ground_state(
             Kokkos::deep_copy(v_new, v_curr);
             basis_vectors.push_back(v_new);
 
-            if (iter > 0) {
-                auto tridiag = tridiag_ground_state_full(alphas, betas, alphas.size());
-                if (std::abs(tridiag.energy - energy_old) < tol) {
-                    energy_old = tridiag.energy;
-                    is_converged = true;
-                    break;
-                }
+            auto tridiag = tridiag_ground_state_full(alphas, betas, alphas.size());
+            if (iter > 0 && std::abs(tridiag.energy - energy_old) < tol) {
                 energy_old = tridiag.energy;
+                is_converged = true;
+                break;
             }
+            if (iter + 1 == dim) {
+                is_converged = true;
+                break;
+            }
+            energy_old = tridiag.energy;
         }
 
         auto final_tridiag = tridiag_ground_state_full(alphas, betas, alphas.size());
@@ -255,7 +257,7 @@ LanczosResult lanczos_ground_state(
             is_converged = true;
             break;
         }
-        if (iter + 1 == std::min<int>(maxiter, dim)) {
+        if (iter + 1 == dim) {
             is_converged = true;
             break;
         }

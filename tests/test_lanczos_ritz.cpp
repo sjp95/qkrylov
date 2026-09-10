@@ -40,21 +40,33 @@ int main() {
     }
 
     MatrixFreeHamiltonian<Kokkos::DefaultExecutionSpace> H(basis, site, os);
-    auto res = lanczos_ground_state<Kokkos::DefaultExecutionSpace>(H);
 
-    std::cout << "Lanczos Energy: " << res.energy << " (Expected -0.75)\n";
-    assert(std::abs(res.energy + 0.75) < 1e-5);
+    // Test default / two-pass
+    auto res_tp = lanczos_ground_state<Kokkos::DefaultExecutionSpace>(H, 200, 1e-12, true);
+    std::cout << "Two-Pass Lanczos Energy: " << res_tp.energy << " (Expected -0.75)\n";
+    assert(std::abs(res_tp.energy + 0.75) < 1e-5);
 
-    // Verify Ritz vector: H * v should be energy * v
+    // Test single-pass
+    auto res_sp = lanczos_ground_state<Kokkos::DefaultExecutionSpace>(H, 200, 1e-12, false);
+    std::cout << "Single-Pass Lanczos Energy: " << res_sp.energy << " (Expected -0.75)\n";
+    assert(std::abs(res_sp.energy + 0.75) < 1e-5);
+
+    // Verify Ritz vector: H * v should be energy * v for two-pass
     HostVector Hv(H.dimension());
-    H.apply(res.eigenvector.data(), Hv.data());
+    H.apply(res_tp.eigenvector.data(), Hv.data());
 
     for (Index i = 0; i < H.dimension(); ++i) {
-        Complex diff = Hv[i] - Complex(res.energy * res.eigenvector[i].real(), res.energy * res.eigenvector[i].imag());
+        Complex diff = Hv[i] - Complex(res_tp.energy * res_tp.eigenvector[i].real(), res_tp.energy * res_tp.eigenvector[i].imag());
         assert(std::abs(diff) < 1e-5);
     }
 
-    std::cout << "Ritz vector verification passed!\n";
+    // Verify two-pass and single-pass match
+    for (Index i = 0; i < H.dimension(); ++i) {
+        Complex diff = res_tp.eigenvector[i] - res_sp.eigenvector[i];
+        assert(std::abs(diff) < 1e-5);
+    }
+
+    std::cout << "Ritz vector verification passed for two-pass and single-pass!\n";
 
     return 0;
 }

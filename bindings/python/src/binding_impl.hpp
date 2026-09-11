@@ -40,6 +40,7 @@ using HostVector = std::vector<Complex>;
 
 // Convenience alias for a 1-D complex128 C-contiguous ndarray (read-only view)
 using CxArray = nb::ndarray<const Complex, nb::shape<-1>, nb::c_contig, nb::device::cpu>;
+using DblArray = nb::ndarray<const Real, nb::shape<-1>, nb::c_contig, nb::device::cpu>;
 
 // Helper: wrap an existing std::vector<Complex> as a zero-copy NumPy array.
 // The returned ndarray keeps the vector alive via a capsule.
@@ -76,7 +77,8 @@ dvec_to_numpy(std::vector<Real>&& v)
 template <typename ExecSpace>
 static void bind_backend(nb::module_& m, const std::string& suffix, const std::string& type_suffix) {
     using HType = MatrixFreeHamiltonian<ExecSpace>;
-    
+    using FTLMRes = FTLMResult<ExecSpace>;
+
     std::string h_name = "MatrixFreeHamiltonian" + suffix + type_suffix;
     nb::class_<HType>(m, h_name.c_str())
         .def(nb::init<std::shared_ptr<Basis>, std::shared_ptr<Site>, const OpSum&, Device>(),
@@ -94,6 +96,19 @@ static void bind_backend(nb::module_& m, const std::string& suffix, const std::s
         .def("diagonal", [](const HType& H) {
             return vec_to_numpy(H.diagonal_host());
         });
+
+    std::string ftlm_res_name = "FTLMResult" + suffix + type_suffix;
+    nb::class_<FTLMRes>(m, ftlm_res_name.c_str())
+        .def_rw("beta", &FTLMRes::beta)
+        .def_rw("partition_function", &FTLMRes::partition_function_val)
+        .def_rw("internal_energy", &FTLMRes::internal_energy_val)
+        .def_rw("specific_heat", &FTLMRes::specific_heat_val)
+        .def("partition_function_at", nb::overload_cast<Real>(&FTLMRes::partition_function, nb::const_), "beta"_a)
+        .def("partition_functions", nb::overload_cast<const std::vector<Real>&>(&FTLMRes::partition_function, nb::const_), "betas"_a)
+        .def("internal_energy_at", nb::overload_cast<Real>(&FTLMRes::internal_energy, nb::const_), "beta"_a)
+        .def("internal_energies", nb::overload_cast<const std::vector<Real>&>(&FTLMRes::internal_energy, nb::const_), "betas"_a)
+        .def("expectation_value", nb::overload_cast<const HType&, Real>(&FTLMRes::expectation_value, nb::const_), "A"_a, "beta"_a)
+        .def("expectation_values", nb::overload_cast<const HType&, const std::vector<Real>&>(&FTLMRes::expectation_value, nb::const_), "A"_a, "betas"_a);
 
     std::string lgs_name = "lanczos_ground_state_" + suffix + type_suffix;
     m.def(lgs_name.c_str(),
@@ -133,7 +148,16 @@ static void bind_backend(nb::module_& m, const std::string& suffix, const std::s
 
     std::string ftlm_name = "ftlm_" + suffix + type_suffix;
     m.def(ftlm_name.c_str(), &ftlm<ExecSpace>,
-          "H"_a, "beta"_a, "n_random"_a = 50, "n_steps"_a = 100);
+          "H"_a, "beta"_a = 1.0, "n_random"_a = 50, "n_steps"_a = 100);
+
+    std::string ftlm_dyn_name = "ftlm_dynamical_correlation_" + suffix + type_suffix;
+    m.def(ftlm_dyn_name.c_str(),
+        [](const HType& H, const HType& A, const HType& B, Real beta, int n_random, int n_steps_thermal, int n_steps_dyn, DblArray omegas, Real eta) {
+            std::vector<Real> omegas_vec(omegas.data(), omegas.data() + omegas.shape(0));
+            auto res = ftlm_dynamical_correlation<ExecSpace>(H, A, B, beta, n_random, n_steps_thermal, n_steps_dyn, omegas_vec, eta);
+            return dvec_to_numpy(std::move(res));
+        },
+        "H"_a, "A"_a, "B"_a, "beta"_a, "n_random"_a = 50, "n_steps_thermal"_a = 100, "n_steps_dyn"_a = 100, "omegas"_a, "eta"_a = static_cast<Real>(0.1));
 
     std::string cv_name = "correction_vector_spectral_" + suffix + type_suffix;
     m.def(cv_name.c_str(),
@@ -282,13 +306,6 @@ static void bind_impl(nb::module_& m, const std::string& type_suffix) {
         .def_rw("eigenvalues", &DavidsonResult::eigenvalues)
         .def_rw("eigenvectors", &DavidsonResult::eigenvectors);
 
-    nb::class_<FTLMResult>(m, ("FTLMResult" + type_suffix).c_str())
-        .def_rw("beta", &FTLMResult::beta)
-        .def_rw("partition_function", &FTLMResult::partition_function)
-        .def_rw("internal_energy", &FTLMResult::internal_energy)
-        .def_rw("specific_heat", &FTLMResult::specific_heat);
-
-    using DblArray = nb::ndarray<const Real, nb::shape<-1>, nb::c_contig, nb::device::cpu>;
     m.def(("evaluate_spectral_function" + type_suffix).c_str(),
         [](DblArray alphas, DblArray betas, Real norm_phi0,
            Real omega, Real E0, Real eta) {

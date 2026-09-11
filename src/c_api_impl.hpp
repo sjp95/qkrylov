@@ -772,9 +772,9 @@ int SUFFIX(qkrylov_ftlm)(
         auto* H = static_cast<MatrixFreeHamiltonian<Kokkos::DefaultExecutionSpace>*>(h->impl.get());
         auto res = ftlm(*H, static_cast<Real>(beta), n_random, n_steps);
         result->beta               = static_cast<Scalar>(res.beta);
-        result->partition_function = static_cast<Scalar>(res.partition_function);
-        result->internal_energy    = static_cast<Scalar>(res.internal_energy);
-        result->specific_heat      = static_cast<Scalar>(res.specific_heat);
+        result->partition_function = static_cast<Scalar>(res.partition_function_val);
+        result->internal_energy    = static_cast<Scalar>(res.internal_energy_val);
+        result->specific_heat      = static_cast<Scalar>(res.specific_heat_val);
         return QKRYLOV_SUCCESS;
     } catch (const std::exception& e) {
         set_last_error(e.what());

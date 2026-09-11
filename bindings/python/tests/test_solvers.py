@@ -143,20 +143,6 @@ def test_result_tuple_protocols():
     assert len(b) == 1
     assert norm == 1.0
 
-    # FTLMResult protocol
-    class DummyCppFTLM:
-        beta = 1.5
-        partition_function = 10.0
-        internal_energy = -3.2
-        specific_heat = 0.8
-    ft = FTLMResult(DummyCppFTLM())
-    assert len(ft) == 4
-    beta, Z, E, C = ft
-    assert beta == 1.5
-    assert Z == 10.0
-    assert E == -3.2
-    assert C == 0.8
-
 
 def test_hamiltonian_2arg_inference():
     # Test qk.Hamiltonian(basis, ops) where site is omitted
@@ -221,3 +207,55 @@ def test_correction_vector_oop_solver():
     assert len(res.correction_vector) == H.dimension
     corr_vec, spec, iters, conv = solver.solve(H, op_psi0)
     assert math.isclose(spec, res.spectral_function, abs_tol=1e-12)
+
+
+def test_ftlm_expectation_value_and_dynamics():
+    N = 4
+    basis = qk.basis.SpinHalf(N=N)
+    site = qk.site.SpinHalf()
+
+    # H = Heisenberg 4-site periodic chain
+    os_H = qk.OpSum()
+    os_Mz2 = qk.OpSum()
+    for i in range(N):
+        j = (i + 1) % N
+        os_H += 1.0 * qk.Sz(i) * qk.Sz(j) + 0.5 * (qk.Sp(i) * qk.Sm(j) + qk.Sm(i) * qk.Sp(j))
+        for k in range(N):
+            os_Mz2 += 1.0 * qk.Sz(i) * qk.Sz(k)
+
+    H = qk.MatrixFreeHamiltonian(basis, site, os_H)
+    Mz2 = qk.MatrixFreeHamiltonian(basis, site, os_Mz2)
+
+    # 1. FTLM sampling
+    ftlm_res = qk.ftlm(H, beta=1.0, n_random=150, n_steps=16)
+    assert isinstance(ftlm_res, FTLMResult)
+
+    # Evaluate <Mz^2> across multiple betas without re-running Lanczos
+    betas = [0.1, 0.5, 1.0, 2.0]
+    vals = ftlm_res.expectation_value(Mz2, betas)
+    assert isinstance(vals, np.ndarray)
+    assert len(vals) == 4
+
+    exact_mz2 = [0.950042, 0.755081, 0.537883, 0.238406]
+    for k in range(4):
+        rel_err = abs(vals[k] - exact_mz2[k]) / exact_mz2[k]
+        assert rel_err < 0.05
+
+    # Single beta query
+    v1 = ftlm_res.expectation_value(Mz2, beta=0.5)
+    assert isinstance(v1, float)
+    assert abs(v1 - exact_mz2[1]) / exact_mz2[1] < 0.05
+
+    # 2. Finite-temperature dynamical correlation S_{ZZ}(omega)
+    os_A = qk.OpSum()
+    os_A += 1.0 * qk.Sz(0)
+    A = qk.MatrixFreeHamiltonian(basis, site, os_A)
+
+    omegas = np.linspace(-2.0, 4.0, 30)
+    spec = qk.ftlm_dynamical_correlation(
+        H, A, A, beta=1.0, n_random=50, n_steps_thermal=12, n_steps_dyn=12, omegas=omegas, eta=0.1
+    )
+    assert isinstance(spec, np.ndarray)
+    assert len(spec) == len(omegas)
+    # Integrated spectral weight should be positive and non-zero
+    assert np.trapezoid(spec, omegas) > 0.0

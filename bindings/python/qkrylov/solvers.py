@@ -1,6 +1,6 @@
 import numpy as np
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Optional, Any, Union
+from typing import List, Tuple, Optional, Any, Union, Sequence
 from dataclasses import dataclass
 from . import _qkrylov_cpp as _cpp
 from .hamiltonian import MatrixFreeHamiltonian
@@ -305,11 +305,56 @@ def evaluate_spectral_function(
 
 class FTLMResult:
     """Result of a Finite-Temperature Lanczos Method calculation."""
-    def __init__(self, cpp_res):
-        self.beta = cpp_res.beta
-        self.partition_function = cpp_res.partition_function
-        self.internal_energy = cpp_res.internal_energy
-        self.specific_heat = cpp_res.specific_heat
+    def __init__(self, cpp_res, H: MatrixFreeHamiltonian):
+        self._cpp_res = cpp_res
+        self._H = H
+        self.beta = float(cpp_res.beta)
+        self.partition_function = float(cpp_res.partition_function)
+        self.internal_energy = float(cpp_res.internal_energy)
+        self.specific_heat = float(cpp_res.specific_heat)
+
+    def partition_function_at(self, beta: float) -> float:
+        """Compute partition function Z(beta) at a given beta without re-running Lanczos."""
+        return float(self._cpp_res.partition_function_at(float(beta)))
+
+    def partition_functions(self, betas: Sequence[float]) -> np.ndarray:
+        """Compute partition functions Z(beta) across multiple betas."""
+        b_vec = [float(b) for b in betas]
+        return np.array(self._cpp_res.partition_functions(b_vec), dtype=np.float64)
+
+    def internal_energy_at(self, beta: float) -> float:
+        """Compute internal energy <H>_beta at a given beta without re-running Lanczos."""
+        return float(self._cpp_res.internal_energy_at(float(beta)))
+
+    def internal_energies(self, betas: Sequence[float]) -> np.ndarray:
+        """Compute internal energy <H>_beta across multiple betas."""
+        b_vec = [float(b) for b in betas]
+        return np.array(self._cpp_res.internal_energies(b_vec), dtype=np.float64)
+
+    def expectation_value(self, A: MatrixFreeHamiltonian, beta: Union[float, Sequence[float]] = None) -> Union[float, np.ndarray]:
+        """Compute thermal expectation value <A>_beta for an observable A.
+
+        Parameters
+        ----------
+        A : MatrixFreeHamiltonian
+            The observable operator Hamiltonian.
+        beta : float or sequence of floats, optional
+            The inverse temperature(s) beta. If None, uses the beta supplied at FTLM initialization.
+
+        Returns
+        -------
+        float or np.ndarray
+            The expectation value <A>_beta or array of expectation values across betas.
+        """
+        if beta is None:
+            beta = self.beta
+
+        if isinstance(beta, (list, tuple, np.ndarray)):
+            b_vec = [float(b) for b in beta]
+            res = self._cpp_res.expectation_values(A._cpp_obj, b_vec)
+            return np.array(res, dtype=np.float64)
+        else:
+            return float(self._cpp_res.expectation_value(A._cpp_obj, float(beta)))
 
     def __iter__(self):
         return iter((self.beta, self.partition_function, self.internal_energy, self.specific_heat))
@@ -349,7 +394,7 @@ class FTLM(Solver):
         s_dtype = "_FP64" if getattr(H, "dtype", np.float32) == np.float64 else "_FP32"
         fn = getattr(_cpp, f"ftlm_{H._backend_suffix}{s_dtype}")
         res = fn(H._cpp_obj, self.beta, self.n_random, self.n_steps)
-        return FTLMResult(res)
+        return FTLMResult(res, H)
 
 
 def ftlm(
@@ -360,6 +405,59 @@ def ftlm(
 ) -> FTLMResult:
     """Compute finite-temperature thermodynamic observables using FTLM."""
     return FTLM(beta=beta, n_random=n_random, n_steps=n_steps).solve(H)
+
+
+def ftlm_dynamical_correlation(
+    H: MatrixFreeHamiltonian,
+    A: MatrixFreeHamiltonian,
+    B: MatrixFreeHamiltonian,
+    beta: float,
+    n_random: int = 50,
+    n_steps_thermal: int = 100,
+    n_steps_dyn: int = 100,
+    omegas: Union[Sequence[float], np.ndarray] = None,
+    eta: float = 0.1
+) -> np.ndarray:
+    """Compute finite-temperature dynamical correlation function S_{AB}(omega, beta).
+
+    Parameters
+    ----------
+    H : MatrixFreeHamiltonian
+        System Hamiltonian.
+    A : MatrixFreeHamiltonian
+        First observable operator A.
+    B : MatrixFreeHamiltonian
+        Second observable operator B.
+    beta : float
+        Inverse temperature.
+    n_random : int, optional
+        Number of random starting vectors (default 50).
+    n_steps_thermal : int, optional
+        Lanczos steps for thermalization (default 100).
+    n_steps_dyn : int, optional
+        Lanczos steps for dynamics (default 100).
+    omegas : sequence of floats or np.ndarray
+        Frequency grid omegas.
+    eta : float, optional
+        Broadening parameter (default 0.1).
+
+    Returns
+    -------
+    np.ndarray
+        Dynamical correlation function values across frequency grid omegas.
+    """
+    if omegas is None:
+        raise ValueError("omegas frequency grid must be provided to ftlm_dynamical_correlation")
+
+    omegas_arr = np.ascontiguousarray(omegas, dtype=np.float64)
+    s_dtype = "_FP64" if getattr(H, "dtype", np.float32) == np.float64 else "_FP32"
+    fn = getattr(_cpp, f"ftlm_dynamical_correlation_{H._backend_suffix}{s_dtype}")
+    res = fn(
+        H._cpp_obj, A._cpp_obj, B._cpp_obj,
+        float(beta), int(n_random), int(n_steps_thermal), int(n_steps_dyn),
+        omegas_arr, float(eta)
+    )
+    return np.asarray(res, dtype=np.float64)
 
 
 @dataclass
@@ -474,4 +572,3 @@ def correction_vector(
 
 
 correction_vector_spectral = correction_vector
-

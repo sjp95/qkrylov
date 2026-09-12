@@ -7,46 +7,13 @@
         <loc>https://sjp95.github.io/qkrylov/quickstart/</loc>
       </url>
       <url>
-        <loc>https://sjp95.github.io/qkrylov/models/</loc>
+        <loc>https://sjp95.github.io/qkrylov/getting_started/tutorial_hamiltonian/</loc>
       </url>
       <url>
-        <loc>https://sjp95.github.io/qkrylov/models/spin/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/models/fermion/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/solvers/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/solvers/lanczos/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/solvers/davidson/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/solvers/dynamics/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/solvers/ftlm/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/theory/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/theory/exact_diag/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/theory/krylov/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/theory/spectral/</loc>
+        <loc>https://sjp95.github.io/qkrylov/benchmarks/</loc>
       </url>
       <url>
         <loc>https://sjp95.github.io/qkrylov/api/</loc>
-      </url>
-      <url>
-        <loc>https://sjp95.github.io/qkrylov/performance/</loc>
       </url>
       <url>
         <loc>https://sjp95.github.io/qkrylov/contributing/</loc>

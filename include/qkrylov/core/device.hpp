@@ -8,9 +8,9 @@
 #include <cstdlib>
 
 #if defined(KOKKOS_ENABLE_CUDA)
-#include <cuda_runtime.h>
+extern "C" int cudaGetDeviceCount(int* count);
 #elif defined(KOKKOS_ENABLE_HIP)
-#include <hip/hip_runtime.h>
+extern "C" int hipGetDeviceCount(int* count);
 #endif
 
 namespace qkrylov {
@@ -27,10 +27,6 @@ struct hip { int id = 0; };
 struct sycl { int id = 0; };
 
 } // namespace device
-
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
-namespace device = qkrylov::device;
 
 /// Selects which device to target.
 ///
@@ -140,6 +136,11 @@ inline void initialize_kokkos(const Device& dev = Device()) {
 
 } // namespace detail
 
+namespace QKRYLOV_PRECISION_NAMESPACE {
+
+namespace device = qkrylov::device;
+using qkrylov::Device;
+namespace detail = qkrylov::detail;
 
 } // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

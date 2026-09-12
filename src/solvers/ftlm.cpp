@@ -1,228 +1,324 @@
 #include "qkrylov/core/types.hpp"
 #include "qkrylov/solvers/ftlm.hpp"
+#include "qkrylov/solvers/policy.hpp"
+#include "qkrylov/linalg/tridiag_qr.hpp"
 #include "qkrylov/linalg/vector_ops.hpp"
 
 #include <random>
 #include <cmath>
 #include <algorithm>
-#include <iostream>
 #include <limits>
-#include <Kokkos_Core.hpp>
 
 namespace qkrylov {
 namespace QKRYLOV_PRECISION_NAMESPACE {
 
-
-namespace
-{
-// Helper for tridiagonalization (simple version without Ritz vector storage)
-struct Tridiag
-{
-    std::vector<Real> alphas;
-    std::vector<Real> betas;
-};
-
-template <typename ExecSpace>
-Tridiag compute_tridiag(const MatrixFreeHamiltonian<ExecSpace>& H, const VectorView<ExecSpace>& v_start, int n_steps)
+template <typename ExecSpace, typename Policy>
+std::vector<FTLMKrylovSample> ftlm_sample(
+    const MatrixFreeHamiltonian<ExecSpace>& H,
+    const std::vector<MatrixFreeHamiltonian<ExecSpace>>& observables,
+    int n_random,
+    int n_steps,
+    uint64_t seed
+)
 {
     const Index dim = H.dimension();
-    VectorView<ExecSpace> v_curr("v_curr", dim);
-    Kokkos::deep_copy(v_curr, v_start);
-    normalize(v_curr);
+    if (dim == 0 || n_random <= 0 || n_steps <= 0) return {};
 
-    VectorView<ExecSpace> v_prev("v_prev", dim);
-    VectorView<ExecSpace> w("w", dim);
-    Tridiag res;
+    std::mt19937_64 rng(seed);
+    std::normal_distribution<Real> dist(Real(0.0), Real(1.0));
 
     const Real mach_eps = std::numeric_limits<Real>::epsilon() * Real(4.0);
+    const int max_steps = std::min<int>(n_steps, static_cast<int>(dim));
 
-    for (int i = 0; i < n_steps; ++i) {
-        H.apply(v_curr, w);
-        Real alpha = dot(v_curr, w).real();
-        res.alphas.push_back(alpha);
+    std::vector<FTLMKrylovSample> samples(n_random);
 
-        axpy(-alpha, v_curr, w);
-        if (i > 0) axpy(-res.betas.back(), v_prev, w);
+    for (int r = 0; r < n_random; ++r) {
+        HostVector r_vec_host(dim);
+        Real sum_sq = Real(0.0);
+        for (Index i = 0; i < dim; ++i) {
+            Complex c(dist(rng), dist(rng));
+            r_vec_host[i] = c;
+            sum_sq += std::norm(c);
+        }
+        Real nrm = std::sqrt(sum_sq);
+        if (nrm < mach_eps) nrm = Real(1.0);
 
-        Real beta = norm(w);
-        if (beta < mach_eps) break;
-        res.betas.push_back(beta);
+        VectorView<ExecSpace> v_prev("v_prev", dim);
+        VectorView<ExecSpace> v_curr("v_curr", dim);
+        VectorView<ExecSpace> w("w", dim);
 
-        Kokkos::deep_copy(v_prev, v_curr);
-        Kokkos::deep_copy(v_curr, w);
-        scal(1.0/beta, v_curr);
+        copy_host_to_device(r_vec_host, v_curr);
+        scal(Real(1.0) / nrm, v_curr);
+        zero_fill(v_prev);
+
+        std::vector<VectorView<ExecSpace>> basis_vectors;
+        basis_vectors.reserve(max_steps);
+
+        std::vector<Real> alphas;
+        std::vector<Real> betas;
+        alphas.reserve(max_steps);
+        betas.reserve(max_steps);
+
+        for (int j = 0; j < max_steps; ++j) {
+            VectorView<ExecSpace> v_saved("basis_v", dim);
+            Kokkos::deep_copy(v_saved, v_curr);
+            basis_vectors.push_back(v_saved);
+
+            H.apply(v_curr, w);
+            Real alpha = dot(v_curr, w).real();
+            alphas.push_back(alpha);
+
+            axpy(KComplex(-alpha, 0.0), v_curr, w);
+            if (j > 0) {
+                axpy(KComplex(-betas.back(), 0.0), v_prev, w);
+            }
+
+            Real beta_val = norm(w);
+            if (beta_val < mach_eps) {
+                break;
+            }
+            if (j + 1 == max_steps) {
+                break;
+            }
+            betas.push_back(beta_val);
+
+            Kokkos::deep_copy(v_prev, v_curr);
+            Kokkos::deep_copy(v_curr, w);
+            scal(Real(1.0) / beta_val, v_curr);
+        }
+
+        const int M = static_cast<int>(alphas.size());
+        auto eig = linalg::tridiag_eigensystem_full(alphas, betas, M);
+
+        samples[r].norm = nrm;
+        samples[r].eigenvalues = eig.eigenvalues;
+        samples[r].first_components.resize(M);
+        for (int m = 0; m < M; ++m) {
+            samples[r].first_components[m] = eig.eigenvectors[m][0];
+        }
+        samples[r].eigenvectors = std::move(eig.eigenvectors);
+
+        // Project observables onto the Krylov subspace: O_jk = <v_j | O | v_k>
+        if (!observables.empty()) {
+            samples[r].projected_operators.resize(observables.size());
+            for (size_t oi = 0; oi < observables.size(); ++oi) {
+                const auto& obs = observables[oi];
+                ProjectedOperator proj;
+                proj.matrix.resize(M * M);
+
+                for (int k = 0; k < M; ++k) {
+                    obs.apply(basis_vectors[k], w);
+                    for (int j = 0; j < M; ++j) {
+                        KComplex val = dot(basis_vectors[j], w);
+                        proj.matrix[j * M + k] = Complex(val.real(), val.imag());
+                    }
+                }
+                samples[r].projected_operators[oi] = std::move(proj);
+            }
+        }
     }
-    return res;
+
+    return samples;
 }
 
-// Simple tridiagonal diagonalization to get all eigenvalues and first components of eigenvectors
-struct FullTridiagResult {
-    std::vector<Real> eigenvalues;
-    std::vector<Real> first_components;
-};
-
-FullTridiagResult diagonalize_tridiag_components(const std::vector<Real>& alpha, const std::vector<Real>& beta)
+FTLMSweepResult ftlm_evaluate_sweep(
+    const std::vector<FTLMKrylovSample>& samples,
+    const std::vector<Real>& beta_grid
+)
 {
-    int n = alpha.size();
-    if (n == 0) return {};
-    if (n == 1) return { {alpha[0]}, {1.0} };
+    if (samples.empty() || beta_grid.empty()) return {};
 
-    std::vector<Real> d = alpha;
-    std::vector<Real> e = beta;
-    std::vector<std::vector<Real>> z(n, std::vector<Real>(n, 0.0));
-    for (int i = 0; i < n; ++i) z[i][i] = 1.0;
+    const size_t R = samples.size();
+    const size_t num_betas = beta_grid.size();
 
-    const Real eps = std::numeric_limits<Real>::epsilon() * Real(4.0);
-
-    for (int iter = 0; iter < 1000; ++iter) {
-        for (int i = 0; i < n - 1; ++i) {
-            if (std::abs(e[i]) <= eps * (std::abs(d[i]) + std::abs(d[i+1]))) e[i] = Real(0.0);
+    Real E_min = std::numeric_limits<Real>::infinity();
+    size_t num_obs = 0;
+    for (const auto& s : samples) {
+        if (!s.eigenvalues.empty() && s.eigenvalues[0] < E_min) {
+            E_min = s.eigenvalues[0];
         }
-        int m = n - 1;
-        while (m > 0 && e[m-1] == 0.0) m--;
-        if (m == 0) break;
-        int l = m - 1;
-        while (l > 0 && e[l-1] != 0.0) l--;
-        Real b = (d[m-1] - d[m]) / 2.0;
-        Real c = e[m-1] * e[m-1];
-        Real s = std::sqrt(b*b + c);
-        Real shift = (b > 0) ? d[m] - c / (b + s) : d[m] - c / (b - s);
-        Real p = d[l] - shift;
-        Real g = e[l];
-        for (int i = l; i < m; ++i) {
-            Real r = std::hypot(p, g);
-            Real cos_theta = p / r;
-            Real sin_theta = g / r;
-            if (i > l) e[i-1] = r;
-            Real f = cos_theta * d[i] + sin_theta * e[i];
-            Real g_next = cos_theta * e[i] + sin_theta * d[i+1];
-            Real h = sin_theta * d[i] - cos_theta * e[i];
-            Real k = sin_theta * e[i] - cos_theta * d[i+1];
-            d[i] = cos_theta * f + sin_theta * g_next;
-            e[i] = cos_theta * h + sin_theta * k;
-            d[i+1] = sin_theta * h - cos_theta * k;
-            for (int j = 0; j < n; ++j) {
-                Real z1 = z[j][i];
-                Real z2 = z[j][i+1];
-                z[j][i] = cos_theta * z1 + sin_theta * z2;
-                z[j][i+1] = sin_theta * z1 - cos_theta * z2;
+        if (s.projected_operators.size() > num_obs) {
+            num_obs = s.projected_operators.size();
+        }
+    }
+
+    if (std::isinf(E_min)) return {};
+
+    FTLMSweepResult res;
+    res.beta_grid = beta_grid;
+    res.partition_functions.resize(num_betas, Real(0.0));
+    res.free_energies.resize(num_betas, Real(0.0));
+    res.internal_energies.resize(num_betas, Real(0.0));
+    res.specific_heats.resize(num_betas, Real(0.0));
+    res.entropies.resize(num_betas, Real(0.0));
+    res.observable_expectations.resize(num_obs, std::vector<Real>(num_betas, Real(0.0)));
+    res.observable_errors.resize(num_obs, std::vector<Real>(num_betas, Real(0.0)));
+
+    const Real max_exp = (sizeof(Real) > 4) ? Real(700.0) : Real(85.0);
+
+    for (size_t bi = 0; bi < num_betas; ++bi) {
+        const Real beta = beta_grid[bi];
+
+        Real Z_shifted = Real(0.0);
+        Real E_shifted = Real(0.0);
+        Real E2_shifted = Real(0.0);
+
+        std::vector<Real> A_shifted(num_obs, Real(0.0));
+        std::vector<std::vector<Real>> sample_obs(num_obs, std::vector<Real>(R, Real(0.0)));
+
+        for (size_t r = 0; r < R; ++r) {
+            const auto& s = samples[r];
+            const Real nrm = s.norm;
+            const int M = static_cast<int>(s.eigenvalues.size());
+            if (M == 0) continue;
+
+            Real sample_Z = Real(0.0);
+            std::vector<Real> c(M, Real(0.0));
+
+            for (int m = 0; m < M; ++m) {
+                Real exp_arg = -beta * (s.eigenvalues[m] - E_min);
+                Real exp_val = (exp_arg < -Real(80.0)) ? Real(0.0) : std::exp(exp_arg);
+                Real v0 = s.first_components[m];
+                Real weight = nrm * nrm * v0 * v0 * exp_val;
+
+                sample_Z += weight;
+                Z_shifted += weight;
+                E_shifted += s.eigenvalues[m] * weight;
+                E2_shifted += s.eigenvalues[m] * s.eigenvalues[m] * weight;
+
+                Real half_exp_arg = -beta * (s.eigenvalues[m] - E_min) * Real(0.5);
+                Real half_exp_val = (half_exp_arg < -Real(80.0)) ? Real(0.0) : std::exp(half_exp_arg);
+                Real factor = nrm * v0 * half_exp_val;
+                for (int j = 0; j < M; ++j) {
+                    c[j] += factor * s.eigenvectors[m][j];
+                }
             }
-            if (i < m - 1) {
-                p = e[i];
-                g = sin_theta * e[i+1];
-                e[i+1] = -cos_theta * e[i+1];
+
+            // Project observables for this sample: c^T * Re(O) * c
+            for (size_t oi = 0; oi < num_obs; ++oi) {
+                if (oi >= s.projected_operators.size()) continue;
+                const auto& mat = s.projected_operators[oi].matrix;
+                Real obs_val = Real(0.0);
+                for (int j = 0; j < M; ++j) {
+                    for (int k = 0; k < M; ++k) {
+                        obs_val += c[j] * c[k] * mat[j * M + k].real();
+                    }
+                }
+                A_shifted[oi] += obs_val;
+                sample_obs[oi][r] = (sample_Z > Real(0.0)) ? (obs_val / sample_Z) : Real(0.0);
+            }
+        }
+
+        Z_shifted /= Real(R);
+        E_shifted /= Real(R);
+        E2_shifted /= Real(R);
+
+        if (Z_shifted > Real(0.0)) {
+            Real log_Z = std::log(Z_shifted) - beta * E_min;
+            res.partition_functions[bi] = (log_Z < max_exp) ? std::exp(log_Z) : std::numeric_limits<Real>::infinity();
+            Real mean_E = E_shifted / Z_shifted;
+            res.internal_energies[bi] = mean_E;
+            res.free_energies[bi] = (beta > Real(0.0)) ? (E_min - std::log(Z_shifted) / beta) : Real(0.0);
+            Real var_E = E2_shifted / Z_shifted - mean_E * mean_E;
+            if (var_E < Real(0.0)) var_E = Real(0.0);
+            res.specific_heats[bi] = (beta * beta) * var_E;
+            Real s_val = (beta > Real(0.0)) ? (beta * (mean_E - res.free_energies[bi])) : std::log(Z_shifted);
+            if (s_val < Real(0.0)) s_val = Real(0.0);
+            res.entropies[bi] = s_val;
+
+            for (size_t oi = 0; oi < num_obs; ++oi) {
+                Real mean_obs = (A_shifted[oi] / Real(R)) / Z_shifted;
+                res.observable_expectations[oi][bi] = mean_obs;
+
+                if (R > 1) {
+                    Real var = Real(0.0);
+                    for (size_t r = 0; r < R; ++r) {
+                        Real diff = sample_obs[oi][r] - mean_obs;
+                        var += diff * diff;
+                    }
+                    var /= Real(R - 1);
+                    res.observable_errors[oi][bi] = std::sqrt(var / Real(R));
+                } else {
+                    res.observable_errors[oi][bi] = Real(0.0);
+                }
             }
         }
     }
 
-    FullTridiagResult res;
-    for (int i = 0; i < n; ++i) {
-        res.eigenvalues.push_back(d[i]);
-        res.first_components.push_back(z[0][i]);
-    }
     return res;
 }
+
+template <typename ExecSpace, typename Policy>
+FTLMSweepResult ftlm_sweep(
+    const MatrixFreeHamiltonian<ExecSpace>& H,
+    const std::vector<Real>& beta_grid,
+    const std::vector<MatrixFreeHamiltonian<ExecSpace>>& observables,
+    int n_random,
+    int n_steps,
+    uint64_t seed
+)
+{
+    auto samples = ftlm_sample<ExecSpace, Policy>(H, observables, n_random, n_steps, seed);
+    return ftlm_evaluate_sweep(samples, beta_grid);
 }
 
-template <typename ExecSpace>
+template <typename ExecSpace, typename Policy>
 FTLMResult ftlm(
     const MatrixFreeHamiltonian<ExecSpace>& H,
     Real beta,
     int n_random,
-    int n_steps
+    int n_steps,
+    uint64_t seed
 )
 {
-    const Index dim = H.dimension();
-    if (dim == 0) return {beta};
-
-    std::mt19937 rng(42);
-    std::normal_distribution<Real> dist(0.0, 1.0);
-
-    struct SampleData {
-        Real nrm = 0.0;
-        FullTridiagResult eig;
-    };
-    std::vector<SampleData> samples(n_random);
-
-    Real E_min = std::numeric_limits<Real>::infinity();
-
-    for (int r = 0; r < n_random; ++r) {
-        VectorView<ExecSpace> r_vec("r_vec", dim);
-        auto r_vec_host = Kokkos::create_mirror_view(r_vec);
-        for (Index i = 0; i < dim; ++i) r_vec_host(i) = KComplex(dist(rng), dist(rng));
-        Kokkos::deep_copy(r_vec, r_vec_host);
-
-        Real nrm = norm(r_vec);
-
-        auto tridiag = compute_tridiag(H, r_vec, n_steps);
-        auto eig = diagonalize_tridiag_components(tridiag.alphas, tridiag.betas);
-
-        for (Real eval : eig.eigenvalues) {
-            if (eval < E_min) E_min = eval;
-        }
-
-        samples[r].nrm = nrm;
-        samples[r].eig = std::move(eig);
-    }
-
-    if (std::isinf(E_min)) return {beta};
-
-    Real Z_shifted = 0.0;
-    Real E_shifted = 0.0;
-    Real E2_shifted = 0.0;
-
-    for (int r = 0; r < n_random; ++r) {
-        Real nrm = samples[r].nrm;
-        const auto& eig = samples[r].eig;
-
-        for (size_t i = 0; i < eig.eigenvalues.size(); ++i) {
-            Real exponent = -beta * (eig.eigenvalues[i] - E_min);
-            Real exp_val = (exponent < -Real(80.0)) ? Real(0.0) : std::exp(exponent);
-            Real weight = nrm * nrm * eig.first_components[i] * eig.first_components[i] * exp_val;
-            Z_shifted += weight;
-            E_shifted += eig.eigenvalues[i] * weight;
-            E2_shifted += eig.eigenvalues[i] * eig.eigenvalues[i] * weight;
-        }
-    }
-
-    Z_shifted /= n_random;
-    E_shifted /= n_random;
-    E2_shifted /= n_random;
-
+    auto sweep = ftlm_sweep<ExecSpace, Policy>(H, {beta}, {}, n_random, n_steps, seed);
     FTLMResult res;
     res.beta = beta;
-
-    if (Z_shifted > Real(0.0)) {
-        Real log_Z = std::log(Z_shifted) - beta * E_min;
-        const Real max_exp = (sizeof(Real) > 4) ? Real(700.0) : Real(85.0);
-        res.partition_function = (log_Z < max_exp) ? std::exp(log_Z) : std::numeric_limits<Real>::infinity();
-        res.internal_energy = E_shifted / Z_shifted;
-        res.specific_heat = (beta * beta) * (E2_shifted / Z_shifted - (E_shifted / Z_shifted) * (E_shifted / Z_shifted));
+    if (!sweep.partition_functions.empty()) {
+        res.partition_function = sweep.partition_functions[0];
+        res.free_energy = sweep.free_energies[0];
+        res.internal_energy = sweep.internal_energies[0];
+        res.specific_heat = sweep.specific_heats[0];
+        res.entropy = sweep.entropies[0];
     }
-
     return res;
 }
 
-
 // Explicit instantiations
+#define INSTANTIATE_FTLM(EXEC_SPACE) \
+template std::vector<FTLMKrylovSample> ftlm_sample<EXEC_SPACE, solvers::policy::OnePass_full>( \
+    const MatrixFreeHamiltonian<EXEC_SPACE>&, \
+    const std::vector<MatrixFreeHamiltonian<EXEC_SPACE>>&, \
+    int, int, uint64_t); \
+template FTLMSweepResult ftlm_sweep<EXEC_SPACE, solvers::policy::OnePass_full>( \
+    const MatrixFreeHamiltonian<EXEC_SPACE>&, \
+    const std::vector<Real>&, \
+    const std::vector<MatrixFreeHamiltonian<EXEC_SPACE>>&, \
+    int, int, uint64_t); \
+template FTLMResult ftlm<EXEC_SPACE, solvers::policy::OnePass_full>( \
+    const MatrixFreeHamiltonian<EXEC_SPACE>&, \
+    Real, int, int, uint64_t);
+
 #ifdef KOKKOS_ENABLE_SERIAL
-template FTLMResult ftlm<Kokkos::Serial>(const MatrixFreeHamiltonian<Kokkos::Serial>&, Real, int, int);
+INSTANTIATE_FTLM(Kokkos::Serial)
 #endif
 #ifdef KOKKOS_ENABLE_OPENMP
-template FTLMResult ftlm<Kokkos::OpenMP>(const MatrixFreeHamiltonian<Kokkos::OpenMP>&, Real, int, int);
+INSTANTIATE_FTLM(Kokkos::OpenMP)
 #endif
 #ifdef KOKKOS_ENABLE_THREADS
-template FTLMResult ftlm<Kokkos::Threads>(const MatrixFreeHamiltonian<Kokkos::Threads>&, Real, int, int);
+INSTANTIATE_FTLM(Kokkos::Threads)
 #endif
 #ifdef KOKKOS_ENABLE_CUDA
-template FTLMResult ftlm<Kokkos::Cuda>(const MatrixFreeHamiltonian<Kokkos::Cuda>&, Real, int, int);
+INSTANTIATE_FTLM(Kokkos::Cuda)
 #endif
 #ifdef KOKKOS_ENABLE_HIP
-template FTLMResult ftlm<Kokkos::HIP>(const MatrixFreeHamiltonian<Kokkos::HIP>&, Real, int, int);
+INSTANTIATE_FTLM(Kokkos::HIP)
 #endif
 #ifdef KOKKOS_ENABLE_SYCL
-template FTLMResult ftlm<Kokkos::Experimental::SYCL>(const MatrixFreeHamiltonian<Kokkos::Experimental::SYCL>&, Real, int, int);
+INSTANTIATE_FTLM(Kokkos::Experimental::SYCL)
 #endif
-}
 
-}
+#undef INSTANTIATE_FTLM
+
+} // namespace QKRYLOV_PRECISION_NAMESPACE
+} // namespace qkrylov

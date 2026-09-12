@@ -9,8 +9,6 @@
 #include <memory>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
 
 class FermionBasis : public Basis
 {
@@ -66,10 +64,12 @@ private:
     std::vector<StateID> states_;
 };
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
+namespace QKRYLOV_PRECISION_NAMESPACE {
+using qkrylov::FermionBasis;
+}
 
 namespace basis {
-    using Fermion = QKRYLOV_PRECISION_NAMESPACE::FermionBasis;
+    using Fermion = qkrylov::FermionBasis;
     namespace sector = qkrylov::sector;
 }
 

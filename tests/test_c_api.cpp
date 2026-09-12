@@ -385,6 +385,18 @@ int main() {
     assert(ftlm_status == QKRYLOV_SUCCESS);
     assert(ftlm_res.partition_function > 0.0);
 
+    // Test FTLM Sweep & Observables (FP64)
+    double betas_sweep[3] = {0.5, 1.0, 2.0};
+    qkrylov_hamiltonian_h obs_arr[1] = {H};
+    qkrylov_ftlm_sweep_result_fp64_t sweep_res64;
+    int sweep_status = qkrylov_ftlm_sweep_fp64(H, betas_sweep, 3, obs_arr, 1, 20, 10, 42, &sweep_res64);
+    assert(sweep_status == QKRYLOV_SUCCESS);
+    assert(sweep_res64.num_betas == 3);
+    assert(sweep_res64.num_observables == 1);
+    assert(sweep_res64.partition_functions[0] > 0.0);
+    assert(std::abs(sweep_res64.observable_expectations[0] - sweep_res64.internal_energies[0]) < 1e-4);
+    qkrylov_ftlm_sweep_result_free_fp64(&sweep_res64);
+
     // =========================================================================
     // PART B: Single Precision (FP32) C API Verification
     // =========================================================================
@@ -441,6 +453,17 @@ int main() {
     // Test Precision Mismatch Protection
     assert(qkrylov_hamiltonian_apply_fp32(H, x_real32.data(), x_imag32.data(), y_real32.data(), y_imag32.data()) == QKRYLOV_ERROR_INVALID_ARG);
     assert(qkrylov_hamiltonian_apply_fp64(H32, x_real.data(), x_imag.data(), y_real.data(), y_imag.data()) == QKRYLOV_ERROR_INVALID_ARG);
+
+    // Test FTLM Sweep & Observables (FP32)
+    float betas_sweep32[2] = {1.0f, 2.0f};
+    qkrylov_hamiltonian_h obs_arr32[1] = {H32};
+    qkrylov_ftlm_sweep_result_fp32_t sweep_res32;
+    int sweep32_status = qkrylov_ftlm_sweep_fp32(H32, betas_sweep32, 2, obs_arr32, 1, 20, 10, 42, &sweep_res32);
+    assert(sweep32_status == QKRYLOV_SUCCESS);
+    assert(sweep_res32.num_betas == 2);
+    assert(sweep_res32.num_observables == 1);
+    assert(sweep_res32.partition_functions[0] > 0.0f);
+    qkrylov_ftlm_sweep_result_free_fp32(&sweep_res32);
 
     // Cleanup Hamiltonians
     qkrylov_hamiltonian_destroy(H);

@@ -6,7 +6,6 @@
 #include <cmath>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
 
 SpinSBasis::SpinSBasis(
     int N,
@@ -105,5 +104,4 @@ void SpinSBasis::build_sz_basis()
     states_.shrink_to_fit();
 }
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

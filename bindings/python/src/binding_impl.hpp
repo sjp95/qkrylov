@@ -97,16 +97,22 @@ static void bind_backend(nb::module_& m, const std::string& suffix, const std::s
 
     std::string lgs_name = "lanczos_ground_state_" + suffix + type_suffix;
     m.def(lgs_name.c_str(),
-        [](const HType& H, int maxiter, Real tol) {
-            auto res = solvers::lanczos<solvers::policy::SinglePass>(H, {maxiter, tol});
+        [](const HType& H, int maxiter, Real tol) -> nb::tuple {
+            LanczosConfig cfg;
+            cfg.maxiter = maxiter;
+            cfg.tol = tol;
+            auto res = solvers::lanczos<solvers::policy::OnePass_full>(H, cfg);
             return nb::make_tuple(res.energy, vec_to_numpy(std::move(res.eigenvector)));
         },
         "H"_a, "maxiter"_a = 200, "tol"_a = 1e-12);
 
     std::string ltp_name = "lanczos_two_pass_" + suffix + type_suffix;
     m.def(ltp_name.c_str(),
-        [](const HType& H, int maxiter, Real tol) {
-            auto res = solvers::lanczos<solvers::policy::TwoPass>(H, {maxiter, tol});
+        [](const HType& H, int maxiter, Real tol) -> nb::tuple {
+            LanczosConfig cfg;
+            cfg.maxiter = maxiter;
+            cfg.tol = tol;
+            auto res = solvers::lanczos<solvers::policy::TwoPass>(H, cfg);
             return nb::make_tuple(res.energy, vec_to_numpy(std::move(res.eigenvector)));
         },
         "H"_a, "maxiter"_a = 200, "tol"_a = 1e-12);
@@ -132,8 +138,19 @@ static void bind_backend(nb::module_& m, const std::string& suffix, const std::s
         "H"_a, "phi0"_a, "n_iter"_a = 100);
 
     std::string ftlm_name = "ftlm_" + suffix + type_suffix;
-    m.def(ftlm_name.c_str(), &ftlm<ExecSpace>,
-          "H"_a, "beta"_a, "n_random"_a = 50, "n_steps"_a = 100);
+    m.def(ftlm_name.c_str(), [](const HType& H, Real beta, int n_random, int n_steps) {
+        return ftlm<ExecSpace>(H, beta, n_random, n_steps);
+    }, "H"_a, "beta"_a, "n_random"_a = 50, "n_steps"_a = 100);
+
+    std::string ftlm_sweep_name = "ftlm_sweep_" + suffix + type_suffix;
+    m.def(ftlm_sweep_name.c_str(),
+        [](const HType& H, const std::vector<Real>& beta_grid,
+           const std::vector<HType>& observables,
+           int n_random, int n_steps, uint64_t seed) {
+            return ftlm_sweep<ExecSpace>(H, beta_grid, observables, n_random, n_steps, seed);
+        },
+        "H"_a, "beta_grid"_a, "observables"_a = std::vector<HType>{},
+        "n_random"_a = 50, "n_steps"_a = 100, "seed"_a = 42);
 
     std::string cv_name = "correction_vector_spectral_" + suffix + type_suffix;
     m.def(cv_name.c_str(),
@@ -154,28 +171,6 @@ static void bind_backend(nb::module_& m, const std::string& suffix, const std::s
 }
 
 static void bind_impl(nb::module_& m, const std::string& type_suffix) {
-    nb::class_<Sector>(m, ("Sector" + type_suffix).c_str())
-        .def(nb::init<>())
-        .def_rw("use_sz", &Sector::use_sz)
-        .def_rw("sz2", &Sector::sz2)
-        .def_rw("use_nup", &Sector::use_nup)
-        .def_rw("use_ndn", &Sector::use_ndn)
-        .def_rw("nup", &Sector::nup)
-        .def_rw("ndn", &Sector::ndn)
-        .def_rw("use_n", &Sector::use_n)
-        .def_rw("n", &Sector::n)
-        .def_rw("use_nb", &Sector::use_nb)
-        .def_rw("nb", &Sector::nb);
-
-    nb::class_<Device>(m, ("Device" + type_suffix).c_str())
-        .def(nb::init<>())
-        .def(nb::init<const std::string&>(), "device_string"_a)
-        .def(nb::init<int>(), "device_id"_a)
-        .def_ro("id", &Device::id)
-        .def_static("is_gpu_build", &Device::is_gpu_build)
-        .def_static("backend_name", &Device::backend_name)
-        .def_static("gpu_count", &Device::gpu_count);
-
     nb::class_<OperatorFactor>(m, ("OperatorFactor" + type_suffix).c_str())
         .def(nb::init<std::string, int>(), "op"_a, "site"_a)
         .def_rw("op", &OperatorFactor::op)
@@ -204,50 +199,6 @@ static void bind_impl(nb::module_& m, const std::string& type_suffix) {
         .def("clear", &OpSum::clear)
         .def("size", &OpSum::size)
         .def("terms", &OpSum::terms);
-
-    nb::class_<Basis>(m, ("Basis" + type_suffix).c_str());
-
-    nb::class_<SpinHalfBasis, Basis>(m, ("SpinHalfBasis" + type_suffix).c_str())
-        .def(nb::init<int, const Sector&>(), "N"_a, "sector"_a = Sector())
-        .def("size", &SpinHalfBasis::size)
-        .def("state", &SpinHalfBasis::state)
-        .def("index", &SpinHalfBasis::index)
-        .def("contains", &SpinHalfBasis::contains)
-        .def("nsites", &SpinHalfBasis::nsites);
-
-    nb::class_<FermionBasis, Basis>(m, ("FermionBasis" + type_suffix).c_str())
-        .def(nb::init<int, const Sector&>(), "N"_a, "sector"_a = Sector())
-        .def("size", &FermionBasis::size)
-        .def("state", &FermionBasis::state)
-        .def("index", &FermionBasis::index)
-        .def("contains", &FermionBasis::contains)
-        .def("nsites", &FermionBasis::nsites);
-
-    nb::class_<HubbardBasis, Basis>(m, ("HubbardBasis" + type_suffix).c_str())
-        .def(nb::init<int, const Sector&>(), "N"_a, "sector"_a = Sector())
-        .def("size", &HubbardBasis::size)
-        .def("state", &HubbardBasis::state)
-        .def("index", &HubbardBasis::index)
-        .def("contains", &HubbardBasis::contains)
-        .def("nsites", &HubbardBasis::nsites);
-
-    nb::class_<TJBasis, Basis>(m, ("TJBasis" + type_suffix).c_str())
-        .def(nb::init<int, const Sector&>(), "N"_a, "sector"_a = Sector())
-        .def("size", &TJBasis::size)
-        .def("state", &TJBasis::state)
-        .def("index", &TJBasis::index)
-        .def("contains", &TJBasis::contains)
-        .def("nsites", &TJBasis::nsites);
-
-    nb::class_<SpinSBasis, Basis>(m, ("SpinSBasis" + type_suffix).c_str())
-        .def(nb::init<int, double, const Sector&>(), "N"_a, "S"_a = 0.5, "sector"_a = Sector())
-        .def("size", &SpinSBasis::size)
-        .def("state", &SpinSBasis::state)
-        .def("index", &SpinSBasis::index)
-        .def("contains", &SpinSBasis::contains)
-        .def("nsites", &SpinSBasis::nsites)
-        .def_prop_ro("spin", &SpinSBasis::spin)
-        .def_prop_ro("dimension_per_site", &SpinSBasis::dimension_per_site);
 
     nb::class_<Site>(m, ("Site" + type_suffix).c_str());
 
@@ -285,8 +236,22 @@ static void bind_impl(nb::module_& m, const std::string& type_suffix) {
     nb::class_<FTLMResult>(m, ("FTLMResult" + type_suffix).c_str())
         .def_rw("beta", &FTLMResult::beta)
         .def_rw("partition_function", &FTLMResult::partition_function)
+        .def_rw("free_energy", &FTLMResult::free_energy)
         .def_rw("internal_energy", &FTLMResult::internal_energy)
-        .def_rw("specific_heat", &FTLMResult::specific_heat);
+        .def_rw("specific_heat", &FTLMResult::specific_heat)
+        .def_rw("entropy", &FTLMResult::entropy)
+        .def_rw("observable_expectations", &FTLMResult::observable_expectations)
+        .def_rw("observable_errors", &FTLMResult::observable_errors);
+
+    nb::class_<FTLMSweepResult>(m, ("FTLMSweepResult" + type_suffix).c_str())
+        .def_rw("beta_grid", &FTLMSweepResult::beta_grid)
+        .def_rw("partition_functions", &FTLMSweepResult::partition_functions)
+        .def_rw("free_energies", &FTLMSweepResult::free_energies)
+        .def_rw("internal_energies", &FTLMSweepResult::internal_energies)
+        .def_rw("specific_heats", &FTLMSweepResult::specific_heats)
+        .def_rw("entropies", &FTLMSweepResult::entropies)
+        .def_rw("observable_expectations", &FTLMSweepResult::observable_expectations)
+        .def_rw("observable_errors", &FTLMSweepResult::observable_errors);
 
     using DblArray = nb::ndarray<const Real, nb::shape<-1>, nb::c_contig, nb::device::cpu>;
     m.def(("evaluate_spectral_function" + type_suffix).c_str(),

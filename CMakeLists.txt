@@ -17,12 +17,15 @@ option(QKRYLOV_BUILD_TESTS "Build qkrylov test executables" ON)
 option(QKRYLOV_BUILD_EXAMPLES "Build qkrylov examples" OFF)
 option(QKRYLOV_BUILD_PYTHON "Build Python bindings" OFF)
 
-set(QKRYLOV_SOURCES
+set(QKRYLOV_COMMON_SOURCES
     src/basis/spinhalf_basis.cpp
     src/basis/spin_s_basis.cpp
     src/basis/fermion_basis.cpp
     src/basis/hubbard_basis.cpp
     src/basis/tj_basis.cpp
+)
+
+set(QKRYLOV_SOURCES
     src/hamiltonian/matrix_free_hamiltonian.cpp
     src/operators/opsum.cpp
     src/sites/spinhalf_site.cpp
@@ -36,6 +39,10 @@ set(QKRYLOV_SOURCES
     src/solvers/ftlm.cpp
     src/solvers/correction_vector.cpp
 )
+
+add_library(qkrylov_common OBJECT ${QKRYLOV_COMMON_SOURCES})
+target_compile_features(qkrylov_common PUBLIC cxx_std_20)
+set_target_properties(qkrylov_common PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(qkrylov_fp32 OBJECT ${QKRYLOV_SOURCES})
 target_compile_definitions(qkrylov_fp32 PUBLIC QKRYLOV_SINGLE_PRECISION)
@@ -58,6 +65,7 @@ target_compile_features(qkrylov_c_api_fp64 PUBLIC cxx_std_20)
 set_target_properties(qkrylov_c_api_fp64 PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_library(qkrylov
+    $<TARGET_OBJECTS:qkrylov_common>
     $<TARGET_OBJECTS:qkrylov_fp32>
     $<TARGET_OBJECTS:qkrylov_fp64>
     $<TARGET_OBJECTS:qkrylov_c_api_fp32>
@@ -70,6 +78,7 @@ target_compile_features(qkrylov PUBLIC cxx_std_20)
 set_target_properties(qkrylov PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if(MSVC)
+    target_compile_definitions(qkrylov_common PUBLIC _USE_MATH_DEFINES)
     target_compile_definitions(qkrylov_fp32 PUBLIC _USE_MATH_DEFINES)
     target_compile_definitions(qkrylov_fp64 PUBLIC _USE_MATH_DEFINES)
     target_compile_definitions(qkrylov_c_api_fp32 PUBLIC _USE_MATH_DEFINES)
@@ -104,12 +113,14 @@ if(NOT Kokkos_FOUND)
     FetchContent_MakeAvailable(kokkos)
 endif()
 
+target_link_libraries(qkrylov_common PUBLIC Kokkos::kokkos)
 target_link_libraries(qkrylov_fp32 PUBLIC Kokkos::kokkos)
 target_link_libraries(qkrylov_fp64 PUBLIC Kokkos::kokkos)
 target_link_libraries(qkrylov_c_api_fp32 PUBLIC Kokkos::kokkos)
 target_link_libraries(qkrylov_c_api_fp64 PUBLIC Kokkos::kokkos)
 target_link_libraries(qkrylov PUBLIC Kokkos::kokkos)
 
+target_include_directories(qkrylov_common PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 target_include_directories(qkrylov_fp32 PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 target_include_directories(qkrylov_fp64 PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 target_include_directories(qkrylov_c_api_fp32 PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)

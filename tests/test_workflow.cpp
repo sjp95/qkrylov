@@ -34,7 +34,10 @@ void test_heisenberg_workflow() {
     Hamiltonian H(basis, os, device::cpu{});
     assert(H.dimension() == 6 && "Hamiltonian dimension should match Sz=0 sector size");
 
-    auto [res_energy, res_vec] = solvers::lanczos(H, {200, 1e-12});
+    LanczosConfig cfg;
+    cfg.maxiter = 200;
+    cfg.tol = 1e-12;
+    auto [res_energy, res_vec] = solvers::lanczos<solvers::policy::OnePass_DKGS>(H, cfg);
 
     // Exact ground state energy for 4-site Heisenberg chain (OBC) = 1 - sqrt(2) ≈ -0.6160254038
     // but restricted to Sz=0 sector the ground state is still -1.6160254038

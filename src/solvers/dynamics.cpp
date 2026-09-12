@@ -1,14 +1,13 @@
 #include "qkrylov/core/types.hpp"
 #include "qkrylov/solvers/dynamics.hpp"
+#include "qkrylov/solvers/lanczos.hpp"
 
 #include <cmath>
 #include <complex>
 #include <limits>
-#include <Kokkos_Core.hpp>
 
 namespace qkrylov {
 namespace QKRYLOV_PRECISION_NAMESPACE {
-
 
 template <typename ExecSpace>
 DynamicsResult continued_fraction_coeffs(
@@ -18,45 +17,30 @@ DynamicsResult continued_fraction_coeffs(
 )
 {
     const Index dim = H.dimension();
-    if (dim == 0) return {};
+    if (dim == 0 || phi0.empty()) return {};
 
-    VectorView<ExecSpace> dev_phi0("dev_phi0", dim);
-    copy_host_to_device(phi0, dev_phi0);
+    Real norm_sq = Real(0.0);
+    for (Index i = 0; i < phi0.size(); ++i) {
+        norm_sq += std::norm(phi0[i]);
+    }
+    const Real norm_phi = std::sqrt(norm_sq);
 
     const Real mach_eps = std::numeric_limits<Real>::epsilon() * Real(4.0);
-    Real norm_phi = norm(dev_phi0);
-    if (norm_phi < mach_eps) return { {}, {}, 0.0 };
+    if (norm_phi < mach_eps) return { {}, {}, Real(0.0) };
 
-    VectorView<ExecSpace> v_curr("v_curr", dim);
-    Kokkos::deep_copy(v_curr, dev_phi0);
-    scal(1.0/norm_phi, v_curr);
+    LanczosConfig cfg;
+    cfg.maxiter = n_iter;
+    cfg.min_iterations = n_iter;
+    cfg.tol = Real(0.0);
+    cfg.initial_vector = phi0;
+    cfg.compute_eigenvectors = false;
 
-    VectorView<ExecSpace> v_prev("v_prev", dim);
-    VectorView<ExecSpace> w("w", dim);
+    auto l_res = solvers::lanczos<solvers::policy::OnePass>(H, cfg);
 
     DynamicsResult res;
+    res.alphas = std::move(l_res.alphas);
+    res.betas = std::move(l_res.betas);
     res.norm_phi0 = norm_phi;
-
-    for (int iter = 0; iter < n_iter; ++iter) {
-        H.apply(v_curr, w);
-
-        Real alpha = dot(v_curr, w).real();
-        res.alphas.push_back(alpha);
-
-        axpy(-alpha, v_curr, w);
-        if (iter > 0) {
-            axpy(-res.betas.back(), v_prev, w);
-        }
-
-        Real beta = norm(w);
-        if (beta < mach_eps) break;
-
-        res.betas.push_back(beta);
-        Kokkos::deep_copy(v_prev, v_curr);
-        Kokkos::deep_copy(v_curr, w);
-        scal(1.0/beta, v_curr);
-    }
-
     return res;
 }
 

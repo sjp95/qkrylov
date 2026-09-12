@@ -6,7 +6,6 @@
 #include <algorithm>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
 
 
 
@@ -95,5 +94,4 @@ void FermionBasis::build_n_basis()
 
 
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

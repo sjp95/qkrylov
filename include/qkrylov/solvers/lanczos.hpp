@@ -6,6 +6,8 @@
 #include "qkrylov/solvers/policy.hpp"
 
 #include <tuple>
+#include <vector>
+#include <optional>
 #include <type_traits>
 
 namespace qkrylov {
@@ -13,19 +15,29 @@ namespace QKRYLOV_PRECISION_NAMESPACE {
 
 struct LanczosConfig
 {
-    int maxiter = 200;
-    Real tol = 1.0e-12;
-    HostVector initial_vector = {};
+    int n_eig = 1;                               // Number of lowest eigenpairs to compute (OnePass_DKGS)
+    int maxiter = 200;                           // Maximum Krylov iterations
+    int min_iterations = 1;                      // Minimum iterations before checking convergence
+    int check_interval = 1;                      // Convergence check stride
+    Real tol = Real(1.0e-12);                    // Energy & Ritz residual convergence tolerance
+    Real breakdown_tol = Real(0.0);              // Invariant subspace breakdown tolerance (0 => 4 * eps)
+    std::optional<uint64_t> seed = std::nullopt; // Deterministic PRNG seed (default: 123456789ULL)
+    HostVector initial_vector = {};              // Warm-starting trial vector
+    bool compute_eigenvectors = true;            // Compute state vector(s) when policy supports it
 };
 
 struct LanczosResult
 {
-    Real energy = 0.0;
-    int iterations = 0;
-    bool converged = false;
+    Real energy = Real(0.0);                     // Lowest eigenvalue (lambda_0)
+    std::vector<Real> eigenvalues = {};          // All computed eigenvalues (size n_eig)
+    HostVector eigenvector = {};                 // Lowest eigenvector (psi_0)
+    std::vector<HostVector> eigenvectors = {};   // All computed eigenvectors (size n_eig)
+    int iterations = 0;                          // Iterations run
+    bool converged = false;                      // True if requested state(s) converged
+    std::vector<Real> alphas = {};               // Tridiagonal diagonal elements (alpha_0 ... alpha_{m-1})
+    std::vector<Real> betas = {};                // Tridiagonal subdiagonal elements (beta_0 ... beta_{m-2})
 
-    HostVector eigenvector;
-
+    // Structured binding support: auto [e, v] = res;
     template <std::size_t I>
     decltype(auto) get() & {
         if constexpr (I == 0) return (energy);
@@ -51,22 +63,9 @@ struct LanczosResult
     }
 };
 
-struct LanczosLowestResult
-{
-    std::vector<Real> eigenvalues;
-    std::vector<HostVector> eigenvectors;
-    int iterations = 0;
-    bool converged = false;
-};
-
-struct LanczosLowestConfig
-{
-    int n_eig = 1;
-    int maxiter = 200;
-    Real tol = 1.0e-12;
-    bool compute_eigenvectors = true;
-    HostVector initial_vector = {};
-};
+// Aliases for unified result types
+using LanczosLowestResult = LanczosResult;
+using LanczosLowestConfig = LanczosConfig;
 
 template <std::size_t I>
 decltype(auto) get(const LanczosResult& res) {
@@ -99,53 +98,106 @@ LanczosResult lanczos(
 );
 
 template <typename ExecSpace>
-LanczosLowestResult lanczos_lowest(
+inline LanczosResult lanczos_lowest(
     const QKRYLOV_PRECISION_NAMESPACE::MatrixFreeHamiltonian<ExecSpace>& H,
-    const LanczosLowestConfig& config = {}
-);
+    const LanczosConfig& config = {}
+) {
+    return lanczos<policy::OnePass_DKGS>(H, config);
+}
 
 } // namespace solvers
 
 namespace QKRYLOV_PRECISION_NAMESPACE {
 
-// Convenience functions
+// Idiomatic Convenience Wrappers
+template <typename ExecSpace>
+inline LanczosResult lanczos_energy(
+    const MatrixFreeHamiltonian<ExecSpace>& H,
+    const LanczosConfig& config = {}
+) {
+    return solvers::lanczos<solvers::policy::OnePass>(H, config);
+}
+
 template <typename ExecSpace>
 inline LanczosResult lanczos_ground_state(
     const MatrixFreeHamiltonian<ExecSpace>& H,
-    int maxiter = 200,
-    Real tol = 1.0e-12,
+    const LanczosConfig& config = {}
+) {
+    return solvers::lanczos<solvers::policy::OnePass_DKGS>(H, config);
+}
+
+template <typename ExecSpace>
+inline LanczosResult lanczos_ground_state(
+    const MatrixFreeHamiltonian<ExecSpace>& H,
+    int maxiter,
+    Real tol = Real(1.0e-12),
     const HostVector& initial_vector = {}
 ) {
-    return solvers::lanczos<solvers::policy::Default>(H, {maxiter, tol, initial_vector});
+    LanczosConfig cfg;
+    cfg.maxiter = maxiter;
+    cfg.tol = tol;
+    cfg.initial_vector = initial_vector;
+    return solvers::lanczos<solvers::policy::OnePass_DKGS>(H, cfg);
 }
 
 template <typename ExecSpace>
 inline LanczosResult lanczos_two_pass(
     const MatrixFreeHamiltonian<ExecSpace>& H,
-    int maxiter = 200,
-    Real tol = 1.0e-12,
-    const HostVector& initial_vector = {}
+    const LanczosConfig& config = {}
 ) {
-    return solvers::lanczos<solvers::policy::TwoPass>(H, {maxiter, tol, initial_vector});
+    return solvers::lanczos<solvers::policy::TwoPass>(H, config);
 }
 
 template <typename ExecSpace>
-inline LanczosLowestResult lanczos_lowest(
+inline LanczosResult lanczos_two_pass(
     const MatrixFreeHamiltonian<ExecSpace>& H,
-    int n_eig = 1,
-    int maxiter = 200,
-    Real tol = 1.0e-12,
+    int maxiter,
+    Real tol = Real(1.0e-12),
+    const HostVector& initial_vector = {}
+) {
+    LanczosConfig cfg;
+    cfg.maxiter = maxiter;
+    cfg.tol = tol;
+    cfg.initial_vector = initial_vector;
+    return solvers::lanczos<solvers::policy::TwoPass>(H, cfg);
+}
+
+template <typename ExecSpace>
+inline LanczosResult lanczos_lowest(
+    const MatrixFreeHamiltonian<ExecSpace>& H,
+    int n_eig,
+    const LanczosConfig& config = {}
+) {
+    LanczosConfig cfg = config;
+    cfg.n_eig = n_eig;
+    return solvers::lanczos<solvers::policy::OnePass_DKGS>(H, cfg);
+}
+
+template <typename ExecSpace>
+inline LanczosResult lanczos_lowest(
+    const MatrixFreeHamiltonian<ExecSpace>& H,
+    int n_eig,
+    int maxiter,
+    Real tol = Real(1.0e-12),
     bool compute_eigenvectors = true,
     const HostVector& initial_vector = {}
 ) {
-    return solvers::lanczos_lowest(H, {n_eig, maxiter, tol, compute_eigenvectors, initial_vector});
+    LanczosConfig cfg;
+    cfg.n_eig = n_eig;
+    cfg.maxiter = maxiter;
+    cfg.tol = tol;
+    cfg.compute_eigenvectors = compute_eigenvectors;
+    cfg.initial_vector = initial_vector;
+    return solvers::lanczos<solvers::policy::OnePass_DKGS>(H, cfg);
 }
 
 } // namespace QKRYLOV_PRECISION_NAMESPACE
 
+using QKRYLOV_PRECISION_NAMESPACE::lanczos_energy;
 using QKRYLOV_PRECISION_NAMESPACE::lanczos_ground_state;
 using QKRYLOV_PRECISION_NAMESPACE::lanczos_two_pass;
 using QKRYLOV_PRECISION_NAMESPACE::lanczos_lowest;
+
 } // namespace qkrylov
 
 namespace std {

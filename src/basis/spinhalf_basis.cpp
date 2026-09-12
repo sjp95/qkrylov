@@ -6,7 +6,6 @@
 #include <algorithm>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
 
 
 
@@ -32,18 +31,29 @@ SpinHalfBasis::SpinHalfBasis(
 
 Index SpinHalfBasis::size() const
 {
+    if (!sector_.use_sz) {
+        return Index(1) << N_;
+    }
     return states_.size();
 }
 
 StateID SpinHalfBasis::state(Index i) const
 {
+    if (!sector_.use_sz) {
+        const Index dim = Index(1) << N_;
+        if (i >= dim) {
+            throw std::out_of_range("SpinHalfBasis::state: index out of range");
+        }
+        return static_cast<StateID>(i);
+    }
     return states_.at(i);
 }
 
 Index SpinHalfBasis::index(StateID s) const
 {
     if (!sector_.use_sz) {
-        if (s < static_cast<StateID>(states_.size())) {
+        const StateID dim = StateID(1) << N_;
+        if (s < dim) {
             return static_cast<Index>(s);
         }
         throw std::runtime_error("State not present in basis");
@@ -59,21 +69,15 @@ Index SpinHalfBasis::index(StateID s) const
 bool SpinHalfBasis::contains(StateID s) const
 {
     if (!sector_.use_sz) {
-        return s < static_cast<StateID>(states_.size());
+        const StateID dim = StateID(1) << N_;
+        return s < dim;
     }
     return std::binary_search(states_.begin(), states_.end(), s);
 }
 
 void SpinHalfBasis::build_full_basis()
 {
-    const StateID dim = StateID(1) << N_;
-
-    states_.reserve(dim);
-
-    for(StateID s = 0; s < dim; ++s)
-    {
-        states_.push_back(s);
-    }
+    // Implicit indexing: states_ remains empty, zero RAM allocated.
 }
 
 int SpinHalfBasis::compute_sz2(
@@ -110,5 +114,4 @@ void SpinHalfBasis::build_sz_basis()
 
 
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

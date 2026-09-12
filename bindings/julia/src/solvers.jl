@@ -13,11 +13,27 @@ struct ExcitedStatesProblem{HType} <: AbstractQuantumProblem
 end
 ExcitedStatesProblem(H; n_eig::Integer=1) = ExcitedStatesProblem(H, Int(n_eig))
 
-struct ThermalProblem{HType} <: AbstractQuantumProblem
+struct ThermalProblem{HType, BType, OType} <: AbstractQuantumProblem
     H::HType
-    beta::Float64
+    betas::BType
+    observables::OType
+    is_sweep::Bool
 end
-ThermalProblem(H; beta::Real=1.0) = ThermalProblem(H, Float64(beta))
+ThermalProblem(H; beta::Real=1.0, observables=MatrixFreeHamiltonian[]) = ThermalProblem(H, [Float64(beta)], observables, false)
+ThermalProblem(H, beta::Real; observables=MatrixFreeHamiltonian[]) = ThermalProblem(H, [Float64(beta)], observables, false)
+ThermalProblem(H, betas::AbstractVector{<:Real}; observables=MatrixFreeHamiltonian[]) = ThermalProblem(H, Vector{Float64}(betas), observables, true)
+
+function Base.getproperty(prob::ThermalProblem, s::Symbol)
+    if s === :beta
+        return getfield(prob, :betas)[1]
+    else
+        return getfield(prob, s)
+    end
+end
+
+function Base.propertynames(prob::ThermalProblem, private::Bool=false)
+    return private ? fieldnames(ThermalProblem) : (:H, :betas, :observables, :beta, :is_sweep)
+end
 
 struct DynamicsProblem{HType, VType} <: AbstractQuantumProblem
     H::HType
@@ -69,9 +85,12 @@ struct FTLM <: AbstractQuantumAlgorithm
     beta::Float64
     n_random::Int
     n_steps::Int
+    seed::UInt64
 end
-FTLM(; beta::Real=1.0, n_random::Integer=10, n_steps::Integer=50) =
-    FTLM(Float64(beta), Int(n_random), Int(n_steps))
+FTLM(; beta::Real=1.0, n_random::Integer=50, n_steps::Integer=100, seed::Integer=42) =
+    FTLM(Float64(beta), Int(n_random), Int(n_steps), UInt64(seed))
+FTLM(beta::Real, n_random::Integer, n_steps::Integer) =
+    FTLM(Float64(beta), Int(n_random), Int(n_steps), UInt64(42))
 
 struct ContinuedFraction <: AbstractQuantumAlgorithm
     n_iter::Int
@@ -120,6 +139,32 @@ struct FTLMResultFP64C
     partition_function::Cdouble
     internal_energy::Cdouble
     specific_heat::Cdouble
+end
+
+struct FTLMSweepResultFP32C
+    num_betas::Cint
+    num_observables::Cint
+    beta_grid::Ptr{Cfloat}
+    partition_functions::Ptr{Cfloat}
+    free_energies::Ptr{Cfloat}
+    internal_energies::Ptr{Cfloat}
+    specific_heats::Ptr{Cfloat}
+    entropies::Ptr{Cfloat}
+    observable_expectations::Ptr{Cfloat}
+    observable_errors::Ptr{Cfloat}
+end
+
+struct FTLMSweepResultFP64C
+    num_betas::Cint
+    num_observables::Cint
+    beta_grid::Ptr{Cdouble}
+    partition_functions::Ptr{Cdouble}
+    free_energies::Ptr{Cdouble}
+    internal_energies::Ptr{Cdouble}
+    specific_heats::Ptr{Cdouble}
+    entropies::Ptr{Cdouble}
+    observable_expectations::Ptr{Cdouble}
+    observable_errors::Ptr{Cdouble}
 end
 
 struct CorrectionVectorResultFP32C
@@ -324,7 +369,11 @@ function solve(prob::ExcitedStatesProblem, alg::Davidson=Davidson(); kwargs...)
 end
 
 function solve(prob::ThermalProblem, alg::FTLM=FTLM(); kwargs...)
-    return ftlm(prob.H; beta=prob.beta, n_random=alg.n_random, n_steps=alg.n_steps)
+    if prob.is_sweep || length(prob.betas) > 1 || !isempty(prob.observables)
+        return ftlm_sweep(prob.H; betas=prob.betas, observables=prob.observables, n_random=alg.n_random, n_steps=alg.n_steps, seed=alg.seed)
+    else
+        return ftlm(prob.H; beta=prob.beta, n_random=alg.n_random, n_steps=alg.n_steps)
+    end
 end
 
 function solve(prob::DynamicsProblem, alg::ContinuedFraction=ContinuedFraction(); kwargs...)
@@ -733,6 +782,127 @@ function ftlm(
         res_c[].internal_energy,
         res_c[].specific_heat
     )
+end
+
+struct FTLMSweepResult{T<:Real}
+    beta_grid::Vector{T}
+    partition_functions::Vector{T}
+    free_energies::Vector{T}
+    internal_energies::Vector{T}
+    specific_heats::Vector{T}
+    entropies::Vector{T}
+    observable_expectations::Vector{Vector{T}}
+    observable_errors::Vector{Vector{T}}
+end
+
+function Base.getproperty(res::FTLMSweepResult, s::Symbol)
+    if s === :partition_function
+        return getfield(res, :partition_functions)[1]
+    elseif s === :internal_energy
+        return getfield(res, :internal_energies)[1]
+    elseif s === :specific_heat
+        return getfield(res, :specific_heats)[1]
+    elseif s === :free_energy
+        return getfield(res, :free_energies)[1]
+    elseif s === :entropy
+        return getfield(res, :entropies)[1]
+    elseif s === :beta
+        return getfield(res, :beta_grid)[1]
+    else
+        return getfield(res, s)
+    end
+end
+
+function ftlm_sweep(
+    H::MatrixFreeHamiltonian{Float64};
+    betas::AbstractVector{<:Real}=[1.0],
+    observables::Vector{<:MatrixFreeHamiltonian{Float64}}=MatrixFreeHamiltonian{Float64}[],
+    n_random::Integer=50,
+    n_steps::Integer=100,
+    seed::Integer=42
+)::FTLMSweepResult{Float64}
+    nb = length(betas)
+    n_obs = length(observables)
+    beta_arr = Vector{Float64}(betas)
+    obs_ptrs = [obs.ptr for obs in observables]
+
+    res_c = Ref{FTLMSweepResultFP64C}()
+    status = ccall(
+        (:qkrylov_ftlm_sweep_fp64, libqkrylov),
+        Cint,
+        (Ptr{Cvoid}, Ptr{Cdouble}, Cint, Ptr{Ptr{Cvoid}}, Cint, Cint, Cint, Culonglong, Ref{FTLMSweepResultFP64C}),
+        H.ptr, pointer(beta_arr), Cint(nb), isempty(obs_ptrs) ? C_NULL : pointer(obs_ptrs), Cint(n_obs), Cint(n_random), Cint(n_steps), Culonglong(seed), res_c
+    )
+    _check_status(status, "FTLM sweep failed")
+
+    raw = res_c[]
+    b_grid = copy(unsafe_wrap(Array, raw.beta_grid, nb))
+    z_arr  = copy(unsafe_wrap(Array, raw.partition_functions, nb))
+    f_arr  = copy(unsafe_wrap(Array, raw.free_energies, nb))
+    e_arr  = copy(unsafe_wrap(Array, raw.internal_energies, nb))
+    cv_arr = copy(unsafe_wrap(Array, raw.specific_heats, nb))
+    s_arr  = copy(unsafe_wrap(Array, raw.entropies, nb))
+
+    obs_exp = Vector{Vector{Float64}}(undef, n_obs)
+    obs_err = Vector{Vector{Float64}}(undef, n_obs)
+    if n_obs > 0
+        raw_obs = unsafe_wrap(Array, raw.observable_expectations, (nb, n_obs))
+        raw_err = unsafe_wrap(Array, raw.observable_errors, (nb, n_obs))
+        for oi in 1:n_obs
+            obs_exp[oi] = copy(raw_obs[:, oi])
+            obs_err[oi] = copy(raw_err[:, oi])
+        end
+    end
+
+    ccall((:qkrylov_ftlm_sweep_result_free_fp64, libqkrylov), Cvoid, (Ref{FTLMSweepResultFP64C},), res_c)
+
+    return FTLMSweepResult{Float64}(b_grid, z_arr, f_arr, e_arr, cv_arr, s_arr, obs_exp, obs_err)
+end
+
+function ftlm_sweep(
+    H::MatrixFreeHamiltonian{Float32};
+    betas::AbstractVector{<:Real}=[1.0],
+    observables::Vector{<:MatrixFreeHamiltonian{Float32}}=MatrixFreeHamiltonian{Float32}[],
+    n_random::Integer=50,
+    n_steps::Integer=100,
+    seed::Integer=42
+)::FTLMSweepResult{Float32}
+    nb = length(betas)
+    n_obs = length(observables)
+    beta_arr = Vector{Float32}(betas)
+    obs_ptrs = [obs.ptr for obs in observables]
+
+    res_c = Ref{FTLMSweepResultFP32C}()
+    status = ccall(
+        (:qkrylov_ftlm_sweep_fp32, libqkrylov),
+        Cint,
+        (Ptr{Cvoid}, Ptr{Cfloat}, Cint, Ptr{Ptr{Cvoid}}, Cint, Cint, Cint, Culonglong, Ref{FTLMSweepResultFP32C}),
+        H.ptr, pointer(beta_arr), Cint(nb), isempty(obs_ptrs) ? C_NULL : pointer(obs_ptrs), Cint(n_obs), Cint(n_random), Cint(n_steps), Culonglong(seed), res_c
+    )
+    _check_status(status, "FTLM sweep failed")
+
+    raw = res_c[]
+    b_grid = copy(unsafe_wrap(Array, raw.beta_grid, nb))
+    z_arr  = copy(unsafe_wrap(Array, raw.partition_functions, nb))
+    f_arr  = copy(unsafe_wrap(Array, raw.free_energies, nb))
+    e_arr  = copy(unsafe_wrap(Array, raw.internal_energies, nb))
+    cv_arr = copy(unsafe_wrap(Array, raw.specific_heats, nb))
+    s_arr  = copy(unsafe_wrap(Array, raw.entropies, nb))
+
+    obs_exp = Vector{Vector{Float32}}(undef, n_obs)
+    obs_err = Vector{Vector{Float32}}(undef, n_obs)
+    if n_obs > 0
+        raw_obs = unsafe_wrap(Array, raw.observable_expectations, (nb, n_obs))
+        raw_err = unsafe_wrap(Array, raw.observable_errors, (nb, n_obs))
+        for oi in 1:n_obs
+            obs_exp[oi] = copy(raw_obs[:, oi])
+            obs_err[oi] = copy(raw_err[:, oi])
+        end
+    end
+
+    ccall((:qkrylov_ftlm_sweep_result_free_fp32, libqkrylov), Cvoid, (Ref{FTLMSweepResultFP32C},), res_c)
+
+    return FTLMSweepResult{Float32}(b_grid, z_arr, f_arr, e_arr, cv_arr, s_arr, obs_exp, obs_err)
 end
 
 # Correction Vector Spectroscopy Solver

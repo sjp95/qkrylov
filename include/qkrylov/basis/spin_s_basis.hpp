@@ -10,7 +10,6 @@
 #include <cmath>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
 
 class SpinSBasis : public Basis
 {
@@ -68,10 +67,12 @@ private:
     std::vector<StateID> states_;
 };
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
+namespace QKRYLOV_PRECISION_NAMESPACE {
+using qkrylov::SpinSBasis;
+}
 
 namespace basis {
-    using SpinS = QKRYLOV_PRECISION_NAMESPACE::SpinSBasis;
+    using SpinS = qkrylov::SpinSBasis;
     namespace sector = qkrylov::sector;
 }
 

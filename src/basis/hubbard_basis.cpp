@@ -6,7 +6,6 @@
 #include <algorithm>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
 
 
 
@@ -106,5 +105,4 @@ void HubbardBasis::build_nup_ndn_basis()
 
 
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

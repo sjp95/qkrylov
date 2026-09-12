@@ -23,9 +23,23 @@ using namespace qkrylov::QKRYLOV_PRECISION_NAMESPACE;
 void test_policy_traits() {
     std::cout << "Testing policy traits..." << std::endl;
     static_assert(solvers::policy::is_policy_v<solvers::policy::Default>);
-    static_assert(solvers::policy::is_policy_v<solvers::policy::SinglePass>);
+    static_assert(solvers::policy::is_policy_v<solvers::policy::OnePass>);
+    static_assert(solvers::policy::is_policy_v<solvers::policy::OnePass_DKGS>);
+    static_assert(solvers::policy::is_policy_v<solvers::policy::OnePass_full>);
     static_assert(solvers::policy::is_policy_v<solvers::policy::TwoPass>);
     static_assert(!solvers::policy::is_policy_v<int>);
+
+    static_assert(!solvers::policy::policy_traits<solvers::policy::OnePass>::supports_multistate);
+    static_assert(!solvers::policy::policy_traits<solvers::policy::OnePass>::computes_vector);
+    static_assert(solvers::policy::policy_traits<solvers::policy::OnePass_DKGS>::supports_multistate);
+    static_assert(solvers::policy::policy_traits<solvers::policy::OnePass_DKGS>::uses_dgks);
+    static_assert(solvers::policy::policy_traits<solvers::policy::OnePass_DKGS>::computes_vector);
+    static_assert(!solvers::policy::policy_traits<solvers::policy::OnePass_full>::supports_multistate);
+    static_assert(!solvers::policy::policy_traits<solvers::policy::OnePass_full>::uses_dgks);
+    static_assert(solvers::policy::policy_traits<solvers::policy::OnePass_full>::computes_vector);
+    static_assert(!solvers::policy::policy_traits<solvers::policy::TwoPass>::supports_multistate);
+    static_assert(solvers::policy::policy_traits<solvers::policy::TwoPass>::is_two_pass);
+    static_assert(solvers::policy::policy_traits<solvers::policy::TwoPass>::computes_vector);
     std::cout << "Policy traits OK!" << std::endl;
 }
 
@@ -103,25 +117,33 @@ void test_solvers_structured_bindings() {
     os += 1.0 * Sz(0) * Sz(1) + 0.5 * Sp(0) * Sm(1) + 0.5 * Sm(0) * Sp(1);
 
     Hamiltonian H(basis, os, device::cpu{});
-    LanczosConfig config{100, 1e-12};
+    LanczosConfig config;
+    config.maxiter = 100;
+    config.tol = (sizeof(Real) == 4) ? Real(1e-6) : Real(1e-12);
 
-    // Default policy structured binding
+    // Default policy (OnePass): energy scalar only, eigenvector is empty
     auto [e_def, v_def] = solvers::lanczos(H, config);
-    assert(std::abs(e_def - (-0.75)) < 1e-6);
-    assert(v_def.size() == 4);
+    assert(std::abs(e_def - (-0.75)) < 1e-5);
+    assert(v_def.empty());
 
-    // SinglePass policy structured binding
-    auto [e_sp, v_sp] = solvers::lanczos<solvers::policy::SinglePass>(H, config);
-    assert(std::abs(e_sp - (-0.75)) < 1e-6);
-    assert(v_sp.size() == 4);
+    // OnePass_DKGS policy structured binding (with exact eigenvector)
+    auto [e_dkgs, v_dkgs] = solvers::lanczos<solvers::policy::OnePass_DKGS>(H, config);
+    assert(std::abs(e_dkgs - (-0.75)) < 1e-5);
+    assert(v_dkgs.size() == 4);
 
-    // TwoPass policy structured binding
+    // OnePass_full policy structured binding (fast ground state with eigenvector)
+    auto [e_full, v_full] = solvers::lanczos<solvers::policy::OnePass_full>(H, config);
+    assert(std::abs(e_full - (-0.75)) < 1e-5);
+    assert(v_full.size() == 4);
+
+    // TwoPass policy structured binding (memory constrained replay)
     auto [e_tp, v_tp] = solvers::lanczos<solvers::policy::TwoPass>(H, config);
     assert(std::abs(e_tp - (-0.75)) < 1e-5);
     assert(v_tp.size() == 4);
 
     const Real comp_tol = (sizeof(Real) == 4) ? Real(1e-5) : Real(1e-10);
-    assert(std::abs(e_sp - e_tp) < comp_tol);
+    assert(std::abs(e_dkgs - e_tp) < comp_tol);
+    assert(std::abs(e_full - e_tp) < comp_tol);
 
     // Convenience zero-flag functions
     auto res_gs = lanczos_ground_state(H, 100, 1e-6);
@@ -135,7 +157,7 @@ void test_solvers_structured_bindings() {
     assert(std::abs(res_gs.energy - res_tp_conv.energy) < comp_tol);
 
     // Verify reference structured bindings and mutation semantics
-    LanczosResult res = solvers::lanczos(H, config);
+    LanczosResult res = solvers::lanczos<solvers::policy::OnePass_DKGS>(H, config);
     static_assert(std::is_same_v<decltype(res.get<0>()), Real&>);
     static_assert(std::is_same_v<decltype(res.get<1>()), HostVector&>);
 

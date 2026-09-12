@@ -70,6 +70,16 @@ public:
         Device device = Device()
     ) : MatrixFreeHamiltonian(basis, infer_site_from_basis(*basis), ops, device) {}
 
+    template <typename BasisType>
+        requires std::is_base_of_v<Basis, std::decay_t<BasisType>>
+    MatrixFreeHamiltonian(const BasisType& basis, const OpSum& ops, Device device = Device())
+        : MatrixFreeHamiltonian(std::make_shared<std::decay_t<BasisType>>(basis), ops, device) {}
+
+    template <typename BasisType>
+        requires std::is_base_of_v<Basis, std::decay_t<BasisType>>
+    MatrixFreeHamiltonian(const BasisType& basis, std::shared_ptr<Site> site, const OpSum& ops, Device device = Device())
+        : MatrixFreeHamiltonian(std::make_shared<std::decay_t<BasisType>>(basis), std::move(site), ops, device) {}
+
     /// Apply H to a device-resident vector: y = H * x.
     /// No host↔device copies — both x and y must already live on the device.
     void apply(const VectorView<ExecSpace>& x, VectorView<ExecSpace>& y) const;
@@ -107,69 +117,54 @@ private:
 
     VectorView<ExecSpace> diagonal_;  // size = dim
 
+    // Cached scratch device views for host apply(const Complex*, Complex*)
+    mutable VectorView<ExecSpace> scratch_x_;
+    mutable VectorView<ExecSpace> scratch_y_;
+
     // ---- Original objects (kept for reference/future use) ----
     std::shared_ptr<Basis> basis_;
     std::shared_ptr<Site>  site_;
     OpSum ops_;
 };
 
-/// Modern Hamiltonian class supporting CTAD, site auto-inference, and device tag dispatch.
+// CTAD deduction guides for MatrixFreeHamiltonian
+template <typename BasisType, typename DeviceTag>
+    requires (!std::is_same_v<std::decay_t<DeviceTag>, Device>)
+MatrixFreeHamiltonian(const BasisType&, const OpSum&, DeviceTag)
+    -> MatrixFreeHamiltonian<typename traits::device_execution_space<std::decay_t<DeviceTag>>::type>;
+
+template <typename BasisType>
+MatrixFreeHamiltonian(const BasisType&, const OpSum&)
+    -> MatrixFreeHamiltonian<typename traits::device_execution_space<device::cpu>::type>;
+
+template <typename DeviceTag>
+    requires (!std::is_same_v<std::decay_t<DeviceTag>, Device>)
+MatrixFreeHamiltonian(std::shared_ptr<Basis>, const OpSum&, DeviceTag)
+    -> MatrixFreeHamiltonian<typename traits::device_execution_space<std::decay_t<DeviceTag>>::type>;
+
+MatrixFreeHamiltonian(std::shared_ptr<Basis>, const OpSum&)
+    -> MatrixFreeHamiltonian<typename traits::device_execution_space<device::cpu>::type>;
+
+template <typename BasisType, typename DeviceTag>
+    requires (!std::is_same_v<std::decay_t<DeviceTag>, Device>)
+MatrixFreeHamiltonian(const BasisType&, std::shared_ptr<Site>, const OpSum&, DeviceTag)
+    -> MatrixFreeHamiltonian<typename traits::device_execution_space<std::decay_t<DeviceTag>>::type>;
+
+template <typename BasisType>
+MatrixFreeHamiltonian(const BasisType&, std::shared_ptr<Site>, const OpSum&)
+    -> MatrixFreeHamiltonian<typename traits::device_execution_space<device::cpu>::type>;
+
+template <typename DeviceTag>
+    requires (!std::is_same_v<std::decay_t<DeviceTag>, Device>)
+MatrixFreeHamiltonian(std::shared_ptr<Basis>, std::shared_ptr<Site>, const OpSum&, DeviceTag)
+    -> MatrixFreeHamiltonian<typename traits::device_execution_space<std::decay_t<DeviceTag>>::type>;
+
+MatrixFreeHamiltonian(std::shared_ptr<Basis>, std::shared_ptr<Site>, const OpSum&)
+    -> MatrixFreeHamiltonian<typename traits::device_execution_space<device::cpu>::type>;
+
+/// Modern alias for MatrixFreeHamiltonian
 template <typename ExecSpace = Kokkos::DefaultExecutionSpace>
-class Hamiltonian : public MatrixFreeHamiltonian<ExecSpace> {
-public:
-    using Base = MatrixFreeHamiltonian<ExecSpace>;
-
-    Hamiltonian(std::shared_ptr<Basis> basis, std::shared_ptr<Site> site, const OpSum& ops, Device device = Device())
-        : Base(std::move(basis), std::move(site), ops, device) {}
-
-    Hamiltonian(std::shared_ptr<Basis> basis, const OpSum& ops, Device device = Device())
-        : Base(std::move(basis), ops, device) {}
-
-    template <typename BasisType>
-        requires std::is_base_of_v<Basis, std::decay_t<BasisType>>
-    Hamiltonian(const BasisType& basis, const OpSum& ops, Device device = Device())
-        : Base(std::make_shared<std::decay_t<BasisType>>(basis), ops, device) {}
-
-    template <typename BasisType>
-        requires std::is_base_of_v<Basis, std::decay_t<BasisType>>
-    Hamiltonian(const BasisType& basis, std::shared_ptr<Site> site, const OpSum& ops, Device device = Device())
-        : Base(std::make_shared<std::decay_t<BasisType>>(basis), std::move(site), ops, device) {}
-};
-
-// CTAD deduction guides
-template <typename BasisType, typename DeviceTag>
-    requires (!std::is_same_v<std::decay_t<DeviceTag>, Device>)
-Hamiltonian(const BasisType&, const OpSum&, DeviceTag)
-    -> Hamiltonian<typename traits::device_execution_space<std::decay_t<DeviceTag>>::type>;
-
-template <typename BasisType>
-Hamiltonian(const BasisType&, const OpSum&)
-    -> Hamiltonian<typename traits::device_execution_space<device::cpu>::type>;
-
-template <typename DeviceTag>
-    requires (!std::is_same_v<std::decay_t<DeviceTag>, Device>)
-Hamiltonian(std::shared_ptr<Basis>, const OpSum&, DeviceTag)
-    -> Hamiltonian<typename traits::device_execution_space<std::decay_t<DeviceTag>>::type>;
-
-Hamiltonian(std::shared_ptr<Basis>, const OpSum&)
-    -> Hamiltonian<typename traits::device_execution_space<device::cpu>::type>;
-
-template <typename BasisType, typename DeviceTag>
-    requires (!std::is_same_v<std::decay_t<DeviceTag>, Device>)
-Hamiltonian(const BasisType&, std::shared_ptr<Site>, const OpSum&, DeviceTag)
-    -> Hamiltonian<typename traits::device_execution_space<std::decay_t<DeviceTag>>::type>;
-
-template <typename BasisType>
-Hamiltonian(const BasisType&, std::shared_ptr<Site>, const OpSum&)
-    -> Hamiltonian<typename traits::device_execution_space<device::cpu>::type>;
-
-template <typename DeviceTag>
-    requires (!std::is_same_v<std::decay_t<DeviceTag>, Device>)
-Hamiltonian(std::shared_ptr<Basis>, std::shared_ptr<Site>, const OpSum&, DeviceTag)
-    -> Hamiltonian<typename traits::device_execution_space<std::decay_t<DeviceTag>>::type>;
-
-Hamiltonian(std::shared_ptr<Basis>, std::shared_ptr<Site>, const OpSum&)
-    -> Hamiltonian<typename traits::device_execution_space<device::cpu>::type>;
+using Hamiltonian = MatrixFreeHamiltonian<ExecSpace>;
 
 } // namespace QKRYLOV_PRECISION_NAMESPACE
 

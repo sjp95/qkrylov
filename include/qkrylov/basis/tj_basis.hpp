@@ -9,8 +9,6 @@
 #include <memory>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
 
 class TJBasis : public Basis
 {
@@ -64,10 +62,12 @@ private:
     std::vector<StateID> states_;
 };
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
+namespace QKRYLOV_PRECISION_NAMESPACE {
+using qkrylov::TJBasis;
+}
 
 namespace basis {
-    using TJ = QKRYLOV_PRECISION_NAMESPACE::TJBasis;
+    using TJ = qkrylov::TJBasis;
     namespace sector = qkrylov::sector;
 }
 

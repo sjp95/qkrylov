@@ -32,7 +32,7 @@ export AbstractQuantumSolution, GroundStateSolution, LanczosResult, ExcitedState
 export lanczos_ground_state, lanczos_lowest, LanczosLowestResult
 export davidson_lowest, DavidsonResult
 export continued_fraction_coeffs, ContinuedFractionResult, evaluate_spectral_function
-export ftlm, FTLMResult
+export ftlm, FTLMResult, ftlm_sweep, FTLMSweepResult
 export solver_correction_vector, CorrectionVectorResult
 export vector_dot, vector_norm, vector_axpy!, vector_scal!, vector_normalize!, vector_zero_fill!, vector_copy!
 export AbstractDevice, CPUDevice, CUDADevice, HIPDevice, SYCLDevice

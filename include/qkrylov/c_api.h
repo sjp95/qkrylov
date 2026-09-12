@@ -297,6 +297,34 @@ typedef struct {
 typedef qkrylov_ftlm_result_fp64_t qkrylov_ftlm_result_c_t;
 
 typedef struct {
+    int num_betas;
+    int num_observables;
+    const float* beta_grid;
+    const float* partition_functions;
+    const float* free_energies;
+    const float* internal_energies;
+    const float* specific_heats;
+    const float* entropies;
+    const float* observable_expectations; /* Row-major: num_observables x num_betas */
+    const float* observable_errors;       /* Row-major: num_observables x num_betas */
+} qkrylov_ftlm_sweep_result_fp32_t;
+
+typedef struct {
+    int num_betas;
+    int num_observables;
+    const double* beta_grid;
+    const double* partition_functions;
+    const double* free_energies;
+    const double* internal_energies;
+    const double* specific_heats;
+    const double* entropies;
+    const double* observable_expectations; /* Row-major: num_observables x num_betas */
+    const double* observable_errors;       /* Row-major: num_observables x num_betas */
+} qkrylov_ftlm_sweep_result_fp64_t;
+
+typedef qkrylov_ftlm_sweep_result_fp64_t qkrylov_ftlm_sweep_result_c_t;
+
+typedef struct {
     float spectral_function;
     int iterations;
     int converged;
@@ -363,6 +391,16 @@ QKRYLOV_API int   qkrylov_ftlm_fp32(qkrylov_hamiltonian_h h,
                                     int n_random,
                                     int n_steps,
                                     qkrylov_ftlm_result_fp32_t* result);
+QKRYLOV_API int   qkrylov_ftlm_sweep_fp32(qkrylov_hamiltonian_h h,
+                                          const float* beta_grid,
+                                          int num_betas,
+                                          const qkrylov_hamiltonian_h* observables,
+                                          int num_observables,
+                                          int n_random,
+                                          int n_steps,
+                                          uint64_t seed,
+                                          qkrylov_ftlm_sweep_result_fp32_t* result);
+QKRYLOV_API void  qkrylov_ftlm_sweep_result_free_fp32(qkrylov_ftlm_sweep_result_fp32_t* result);
 QKRYLOV_API int   qkrylov_solver_correction_vector_fp32(qkrylov_hamiltonian_h h,
                                                         const float* op_psi0_complex,
                                                         float e0,
@@ -435,6 +473,16 @@ QKRYLOV_API int    qkrylov_ftlm_fp64(qkrylov_hamiltonian_h h,
                                      int n_random,
                                      int n_steps,
                                      qkrylov_ftlm_result_fp64_t* result);
+QKRYLOV_API int    qkrylov_ftlm_sweep_fp64(qkrylov_hamiltonian_h h,
+                                           const double* beta_grid,
+                                           int num_betas,
+                                           const qkrylov_hamiltonian_h* observables,
+                                           int num_observables,
+                                           int n_random,
+                                           int n_steps,
+                                           uint64_t seed,
+                                           qkrylov_ftlm_sweep_result_fp64_t* result);
+QKRYLOV_API void   qkrylov_ftlm_sweep_result_free_fp64(qkrylov_ftlm_sweep_result_fp64_t* result);
 QKRYLOV_API int    qkrylov_solver_correction_vector_fp64(qkrylov_hamiltonian_h h,
                                                          const double* op_psi0_complex,
                                                          double e0,
@@ -507,6 +555,16 @@ QKRYLOV_API int    qkrylov_ftlm(qkrylov_hamiltonian_h h,
                                 int n_random,
                                 int n_steps,
                                 qkrylov_ftlm_result_c_t* result);
+QKRYLOV_API int    qkrylov_ftlm_sweep(qkrylov_hamiltonian_h h,
+                                      const double* beta_grid,
+                                      int num_betas,
+                                      const qkrylov_hamiltonian_h* observables,
+                                      int num_observables,
+                                      int n_random,
+                                      int n_steps,
+                                      uint64_t seed,
+                                      qkrylov_ftlm_sweep_result_c_t* result);
+QKRYLOV_API void   qkrylov_ftlm_sweep_result_free(qkrylov_ftlm_sweep_result_c_t* result);
 QKRYLOV_API int    qkrylov_solver_correction_vector(qkrylov_hamiltonian_h h,
                                                     const double* op_psi0_complex,
                                                     double e0,

@@ -9,8 +9,6 @@
 #include <memory>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
 
 class HubbardBasis : public Basis
 {
@@ -66,10 +64,12 @@ private:
     std::vector<StateID> states_;
 };
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
+namespace QKRYLOV_PRECISION_NAMESPACE {
+using qkrylov::HubbardBasis;
+}
 
 namespace basis {
-    using Hubbard = QKRYLOV_PRECISION_NAMESPACE::HubbardBasis;
+    using Hubbard = qkrylov::HubbardBasis;
     namespace sector = qkrylov::sector;
 }
 

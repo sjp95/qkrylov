@@ -43,10 +43,6 @@ struct Bosons {
 
 } // namespace sector
 
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
-namespace sector = qkrylov::sector;
-
 struct Sector
 {
     //
@@ -87,7 +83,10 @@ struct Sector
     Sector(const sector::Bosons& b) : use_nb(true), nb(b.nb) {}
 };
 
+namespace QKRYLOV_PRECISION_NAMESPACE {
 
+namespace sector = qkrylov::sector;
+using qkrylov::Sector;
 
 } // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

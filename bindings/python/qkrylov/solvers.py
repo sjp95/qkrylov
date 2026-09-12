@@ -1,6 +1,6 @@
 import numpy as np
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Optional, Any, Union
+from typing import List, Tuple, Optional, Any, Union, Sequence
 from dataclasses import dataclass
 from . import _qkrylov_cpp as _cpp
 from .hamiltonian import MatrixFreeHamiltonian
@@ -306,10 +306,14 @@ def evaluate_spectral_function(
 class FTLMResult:
     """Result of a Finite-Temperature Lanczos Method calculation."""
     def __init__(self, cpp_res):
-        self.beta = cpp_res.beta
-        self.partition_function = cpp_res.partition_function
-        self.internal_energy = cpp_res.internal_energy
-        self.specific_heat = cpp_res.specific_heat
+        self.beta = getattr(cpp_res, "beta", 0.0)
+        self.partition_function = getattr(cpp_res, "partition_function", 0.0)
+        self.free_energy = getattr(cpp_res, "free_energy", 0.0)
+        self.internal_energy = getattr(cpp_res, "internal_energy", 0.0)
+        self.specific_heat = getattr(cpp_res, "specific_heat", 0.0)
+        self.entropy = getattr(cpp_res, "entropy", 0.0)
+        self.observable_expectations = getattr(cpp_res, "observable_expectations", [])
+        self.observable_errors = getattr(cpp_res, "observable_errors", [])
 
     def __iter__(self):
         return iter((self.beta, self.partition_function, self.internal_energy, self.specific_heat))
@@ -327,6 +331,25 @@ class FTLMResult:
         )
 
 
+class FTLMSweepResult:
+    """Result of an FTLM multi-temperature sweep with observables."""
+    def __init__(self, cpp_res):
+        self.beta_grid = np.array(cpp_res.beta_grid, dtype=float)
+        self.partition_functions = np.array(cpp_res.partition_functions, dtype=float)
+        self.free_energies = np.array(cpp_res.free_energies, dtype=float)
+        self.internal_energies = np.array(cpp_res.internal_energies, dtype=float)
+        self.specific_heats = np.array(cpp_res.specific_heats, dtype=float)
+        self.entropies = np.array(cpp_res.entropies, dtype=float)
+        self.observable_expectations = [np.array(x, dtype=float) for x in cpp_res.observable_expectations]
+        self.observable_errors = [np.array(x, dtype=float) for x in cpp_res.observable_errors]
+
+    def __repr__(self) -> str:
+        return (
+            f"FTLMSweepResult(num_betas={len(self.beta_grid)}, "
+            f"num_observables={len(self.observable_expectations)})"
+        )
+
+
 class FTLM(Solver):
     """Finite-Temperature Lanczos Method (FTLM) solver.
 
@@ -338,28 +361,48 @@ class FTLM(Solver):
         Number of random starting vectors for trace averaging (default 50).
     n_steps : int, optional
         Number of Lanczos expansion steps per sample (default 100).
+    seed : int, optional
+        Deterministic random seed (default 42).
     """
 
-    def __init__(self, beta: float = 1.0, n_random: int = 50, n_steps: int = 100):
+    def __init__(self, beta: float = 1.0, n_random: int = 50, n_steps: int = 100, seed: int = 42):
         self.beta = float(beta)
         self.n_random = int(n_random)
         self.n_steps = int(n_steps)
+        self.seed = int(seed)
 
-    def solve(self, H: MatrixFreeHamiltonian) -> FTLMResult:
+    def solve(
+        self,
+        H: MatrixFreeHamiltonian,
+        betas: Optional[Sequence[float]] = None,
+        observables: Optional[Sequence[MatrixFreeHamiltonian]] = None
+    ) -> Union[FTLMResult, FTLMSweepResult]:
         s_dtype = "_FP64" if getattr(H, "dtype", np.float32) == np.float64 else "_FP32"
-        fn = getattr(_cpp, f"ftlm_{H._backend_suffix}{s_dtype}")
-        res = fn(H._cpp_obj, self.beta, self.n_random, self.n_steps)
-        return FTLMResult(res)
+        if betas is not None or observables:
+            fn = getattr(_cpp, f"ftlm_sweep_{H._backend_suffix}{s_dtype}")
+            b_list = [float(b) for b in betas] if betas is not None else [self.beta]
+            obs_cpp = [obs._cpp_obj for obs in (observables or [])]
+            res = fn(H._cpp_obj, b_list, obs_cpp, self.n_random, self.n_steps, self.seed)
+            return FTLMSweepResult(res)
+        else:
+            fn = getattr(_cpp, f"ftlm_{H._backend_suffix}{s_dtype}")
+            res = fn(H._cpp_obj, self.beta, self.n_random, self.n_steps)
+            return FTLMResult(res)
 
 
 def ftlm(
     H: MatrixFreeHamiltonian,
     beta: float = 1.0,
     n_random: int = 50,
-    n_steps: int = 100
-) -> FTLMResult:
+    n_steps: int = 100,
+    betas: Optional[Sequence[float]] = None,
+    observables: Optional[Sequence[MatrixFreeHamiltonian]] = None,
+    seed: int = 42
+) -> Union[FTLMResult, FTLMSweepResult]:
     """Compute finite-temperature thermodynamic observables using FTLM."""
-    return FTLM(beta=beta, n_random=n_random, n_steps=n_steps).solve(H)
+    return FTLM(beta=beta, n_random=n_random, n_steps=n_steps, seed=seed).solve(
+        H, betas=betas, observables=observables
+    )
 
 
 @dataclass

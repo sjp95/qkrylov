@@ -287,6 +287,12 @@ using QuantumKrylov
         sol_ftlm = solve(th_prob, FTLM(beta=1.0, n_random=5, n_steps=20))
         @test sol_ftlm.partition_function > 0.0
 
+        th_sweep_prob = ThermalProblem(H, [0.5, 1.0]; observables=[H])
+        sol_sweep = solve(th_sweep_prob, FTLM(n_random=5, n_steps=20))
+        @test sol_sweep isa FTLMSweepResult
+        @test length(sol_sweep.beta_grid) == 2
+        @test isapprox(sol_sweep.observable_expectations[1][1], sol_sweep.internal_energies[1], rtol=1e-4)
+
         # 6. DynamicsProblem with ContinuedFraction
         dyn_prob = DynamicsProblem(H, psi)
         @test dyn_prob isa AbstractQuantumProblem
@@ -361,6 +367,17 @@ using QuantumKrylov
         ftlm_res = ftlm(H, beta=1.0, n_random=5, n_steps=20)
         @test isapprox(ftlm_res.beta, 1.0)
         @test ftlm_res.partition_function > 0.0
+
+        sweep_res = ftlm_sweep(H; betas=[0.5, 1.0, 2.0], observables=[H], n_random=10, n_steps=20, seed=123)
+        @test sweep_res isa FTLMSweepResult
+        @test length(sweep_res.beta_grid) == 3
+        @test all(sweep_res.partition_functions .> 0.0)
+        @test all(sweep_res.specific_heats .>= -1e-12)
+        @test all(sweep_res.entropies .>= -1e-12)
+        @test length(sweep_res.observable_expectations) == 1
+        @test isapprox(sweep_res.observable_expectations[1], sweep_res.internal_energies, rtol=1e-4)
+        @test length(sweep_res.observable_errors) == 1
+        @test all(sweep_res.observable_errors[1] .>= 0.0)
     end
 
     @testset "Device & Hardware Query API" begin

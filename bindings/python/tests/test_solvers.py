@@ -15,6 +15,7 @@ from qkrylov.solvers import (
     DavidsonResult,
     DynamicsResult,
     FTLMResult,
+    FTLMSweepResult,
     CorrectionVectorResult,
 )
 
@@ -221,3 +222,53 @@ def test_correction_vector_oop_solver():
     assert len(res.correction_vector) == H.dimension
     corr_vec, spec, iters, conv = solver.solve(H, op_psi0)
     assert math.isclose(spec, res.spectral_function, abs_tol=1e-12)
+
+
+def test_ftlm_oop_solver():
+    _, _, _, H = _build_heisenberg_model(N=4, dtype=np.float64)
+    solver = FTLM(beta=1.0, n_random=10, n_steps=20, seed=42)
+    res = solver.solve(H)
+    assert isinstance(res, FTLMResult)
+    assert math.isclose(res.beta, 1.0, abs_tol=1e-12)
+    assert res.partition_function > 0.0
+
+    # Test tuple unpacking
+    b, z, e, cv = solver.solve(H)
+    assert math.isclose(b, 1.0, abs_tol=1e-12)
+    assert z > 0.0
+
+
+def test_ftlm_sweep_oop_solver():
+    _, _, _, H = _build_heisenberg_model(N=4, dtype=np.float64)
+    betas = [0.2, 0.5, 1.0, 2.0]
+    solver = FTLM(n_random=15, n_steps=25, seed=123)
+    res = solver.solve(H, betas=betas, observables=[H])
+
+    assert isinstance(res, FTLMSweepResult)
+    assert len(res.beta_grid) == len(betas)
+    assert np.allclose(res.beta_grid, betas)
+    assert len(res.partition_functions) == len(betas)
+    assert np.all(res.partition_functions > 0.0)
+    assert len(res.internal_energies) == len(betas)
+    assert len(res.free_energies) == len(betas)
+    assert len(res.specific_heats) == len(betas)
+    assert np.all(res.specific_heats >= -1e-12)
+    assert len(res.entropies) == len(betas)
+    assert np.all(res.entropies >= -1e-12)
+
+    # Check observable expectations for H match internal energy algebraically
+    assert len(res.observable_expectations) == 1
+    obs_H = res.observable_expectations[0]
+    assert len(obs_H) == len(betas)
+    assert np.allclose(obs_H, res.internal_energies, atol=1e-5, rtol=1e-4)
+
+    # Check error bars array exists and has same shape
+    assert len(res.observable_errors) == 1
+    assert len(res.observable_errors[0]) == len(betas)
+    assert np.all(res.observable_errors[0] >= 0.0)
+
+    # Also test functional convenience API
+    res_fn = qk.solvers.ftlm(H, betas=betas, observables=[H], n_random=15, n_steps=25, seed=123)
+    assert isinstance(res_fn, FTLMSweepResult)
+    assert np.allclose(res_fn.internal_energies, res.internal_energies)
+

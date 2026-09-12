@@ -40,7 +40,7 @@ int main() {
     }
 
     MatrixFreeHamiltonian<Kokkos::DefaultExecutionSpace> H(basis, site, os);
-    auto [res_energy, res_eigenvector] = solvers::lanczos(H);
+    auto [res_energy, res_eigenvector] = solvers::lanczos<solvers::policy::OnePass_DKGS>(H);
 
     std::cout << "Lanczos Energy: " << res_energy << " (Expected -0.75)\n";
     assert(std::abs(res_energy + 0.75) < 1e-5);

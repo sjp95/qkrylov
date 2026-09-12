@@ -1157,6 +1157,22 @@ int qkrylov_ftlm(qkrylov_hamiltonian_h h,
     return qkrylov_ftlm_fp64(h, beta, n_random, n_steps, result);
 }
 
+int qkrylov_ftlm_sweep(qkrylov_hamiltonian_h h,
+                       const double* beta_grid,
+                       int num_betas,
+                       const qkrylov_hamiltonian_h* observables,
+                       int num_observables,
+                       int n_random,
+                       int n_steps,
+                       uint64_t seed,
+                       qkrylov_ftlm_sweep_result_c_t* result) {
+    return qkrylov_ftlm_sweep_fp64(h, beta_grid, num_betas, observables, num_observables, n_random, n_steps, seed, result);
+}
+
+void qkrylov_ftlm_sweep_result_free(qkrylov_ftlm_sweep_result_c_t* result) {
+    qkrylov_ftlm_sweep_result_free_fp64(result);
+}
+
 int qkrylov_solver_correction_vector(qkrylov_hamiltonian_h h,
                                      const double* op_psi0_complex,
                                      double e0,

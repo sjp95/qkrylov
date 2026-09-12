@@ -199,27 +199,30 @@ void MatrixFreeHamiltonian<ExecSpace>::apply(
 ) const
 {
     const Index dim = dim_;
+    if (dim == 0) return;
 
-    // Allocate temporary device views
-    VectorView<ExecSpace> x_dev("x_temp", dim);
-    VectorView<ExecSpace> y_dev("y_temp", dim);
+    // Allocate or reuse cached scratch device views
+    if (scratch_x_.extent(0) != dim) {
+        scratch_x_ = VectorView<ExecSpace>("scratch_x", dim);
+        scratch_y_ = VectorView<ExecSpace>("scratch_y", dim);
+    }
 
     // Copy input host → device
     auto x_host = Kokkos::View<const KComplex*,
                                Kokkos::HostSpace,
                                Kokkos::MemoryUnmanaged>(
         reinterpret_cast<const KComplex*>(x), dim);
-    Kokkos::deep_copy(ExecSpace(), x_dev, x_host);
+    Kokkos::deep_copy(ExecSpace(), scratch_x_, x_host);
 
     // Run the device kernel
-    apply(x_dev, y_dev);
+    apply(scratch_x_, scratch_y_);
 
     // Copy result device → host
     auto y_host = Kokkos::View<KComplex*,
                                Kokkos::HostSpace,
                                Kokkos::MemoryUnmanaged>(
         reinterpret_cast<KComplex*>(y), dim);
-    Kokkos::deep_copy(ExecSpace(), y_host, y_dev);
+    Kokkos::deep_copy(ExecSpace(), y_host, scratch_y_);
 }
 
 // ====================================================================

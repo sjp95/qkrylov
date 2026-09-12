@@ -9,8 +9,6 @@
 #include <memory>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
 
 class SpinHalfBasis : public Basis
 {
@@ -71,10 +69,12 @@ private:
     std::vector<StateID> states_;
 };
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
+namespace QKRYLOV_PRECISION_NAMESPACE {
+using qkrylov::SpinHalfBasis;
+}
 
 namespace basis {
-    using SpinHalf = QKRYLOV_PRECISION_NAMESPACE::SpinHalfBasis;
+    using SpinHalf = qkrylov::SpinHalfBasis;
     namespace sector = qkrylov::sector;
 }
 

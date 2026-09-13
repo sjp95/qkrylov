@@ -98,8 +98,9 @@ int main()
         );
 
     // Verify structured binding unpack
+    const Real bind_tol = (sizeof(Real) == 4) ? Real(1e-6) : Real(1e-12);
     auto [e, v] = solvers::lanczos<solvers::policy::TwoPass>(H, config);
-    if (std::abs(e - res2.energy) > 1e-12) {
+    if (std::abs(e - res2.energy) > bind_tol) {
         std::cerr << "Structured binding energy mismatch!\n";
         return 1;
     }
@@ -123,7 +124,8 @@ int main()
         << e
         << "\n";
 
-    if (std::abs(res1.energy - res2.energy) > 1e-10) {
+    const Real comp_tol = (sizeof(Real) == 4) ? Real(1e-5) : Real(1e-10);
+    if (std::abs(res1.energy - res2.energy) > comp_tol) {
         std::cerr << "Mismatch between single-pass and two-pass energy!\n";
         return 1;
     }

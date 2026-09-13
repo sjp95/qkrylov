@@ -6,6 +6,7 @@
 #include <cmath>
 #include <algorithm>
 #include <iostream>
+#include <limits>
 #include <Kokkos_Core.hpp>
 
 namespace qkrylov {
@@ -31,9 +32,11 @@ FullTridiagResult diagonalize_tridiag_full(const std::vector<Real>& alpha, const
     std::vector<std::vector<Real>> z(n, std::vector<Real>(n, 0.0));
     for (int i = 0; i < n; ++i) z[i][i] = 1.0;
 
+    const Real eps = std::numeric_limits<Real>::epsilon() * Real(4.0);
+
     for (int iter = 0; iter < 1000; ++iter) {
         for (int i = 0; i < n - 1; ++i) {
-            if (std::abs(e[i]) < 1e-14 * (std::abs(d[i]) + std::abs(d[i+1]))) e[i] = 0.0;
+            if (std::abs(e[i]) <= eps * (std::abs(d[i]) + std::abs(d[i+1]))) e[i] = Real(0.0);
         }
         int m = n - 1;
         while (m > 0 && e[m-1] == 0.0) m--;
@@ -92,16 +95,32 @@ template <typename ExecSpace>
 Real FTLMResult<ExecSpace>::partition_function(Real b) const
 {
     if (samples.empty()) return 0.0;
-    Real sum_z = 0.0;
+
+    Real E_min = std::numeric_limits<Real>::infinity();
+    for (const auto& sample : samples) {
+        for (Real eval : sample.eigenvalues) {
+            if (eval < E_min) E_min = eval;
+        }
+    }
+    if (std::isinf(E_min)) return 0.0;
+
+    Real sum_z_shifted = 0.0;
     for (const auto& sample : samples) {
         Real sample_z = 0.0;
         for (size_t m = 0; m < sample.eigenvalues.size(); ++m) {
-            Real w_m = (sample.norm_r * sample.norm_r) * (sample.first_components[m] * sample.first_components[m]) * std::exp(-b * sample.eigenvalues[m]);
+            Real exponent = -b * (sample.eigenvalues[m] - E_min);
+            Real exp_val = (exponent < -Real(80.0)) ? Real(0.0) : std::exp(exponent);
+            Real w_m = (sample.norm_r * sample.norm_r) * (sample.first_components[m] * sample.first_components[m]) * exp_val;
             sample_z += w_m;
         }
-        sum_z += sample_z;
+        sum_z_shifted += sample_z;
     }
-    return (sum_z / samples.size()) * (hilbert_dim > 0 ? hilbert_dim / static_cast<Real>(hilbert_dim) : 1.0);
+    Real z_avg_shifted = sum_z_shifted / samples.size();
+    if (z_avg_shifted <= Real(0.0)) return 0.0;
+
+    Real log_Z = std::log(z_avg_shifted) - b * E_min;
+    const Real max_exp = (sizeof(Real) > 4) ? Real(700.0) : Real(85.0);
+    return (log_Z < max_exp) ? std::exp(log_Z) : std::numeric_limits<Real>::infinity();
 }
 
 template <typename ExecSpace>
@@ -118,11 +137,22 @@ template <typename ExecSpace>
 Real FTLMResult<ExecSpace>::internal_energy(Real b) const
 {
     if (samples.empty()) return 0.0;
+
+    Real E_min = std::numeric_limits<Real>::infinity();
+    for (const auto& sample : samples) {
+        for (Real eval : sample.eigenvalues) {
+            if (eval < E_min) E_min = eval;
+        }
+    }
+    if (std::isinf(E_min)) return 0.0;
+
     Real sum_z = 0.0;
     Real sum_e = 0.0;
     for (const auto& sample : samples) {
         for (size_t m = 0; m < sample.eigenvalues.size(); ++m) {
-            Real w_m = (sample.norm_r * sample.norm_r) * (sample.first_components[m] * sample.first_components[m]) * std::exp(-b * sample.eigenvalues[m]);
+            Real exponent = -b * (sample.eigenvalues[m] - E_min);
+            Real exp_val = (exponent < -Real(80.0)) ? Real(0.0) : std::exp(exponent);
+            Real w_m = (sample.norm_r * sample.norm_r) * (sample.first_components[m] * sample.first_components[m]) * exp_val;
             sum_z += w_m;
             sum_e += sample.eigenvalues[m] * w_m;
         }
@@ -144,6 +174,15 @@ template <typename ExecSpace>
 Real FTLMResult<ExecSpace>::expectation_value(const MatrixFreeHamiltonian<ExecSpace>& A, Real b) const
 {
     if (samples.empty()) return 0.0;
+
+    Real E_min = std::numeric_limits<Real>::infinity();
+    for (const auto& sample : samples) {
+        for (Real eval : sample.eigenvalues) {
+            if (eval < E_min) E_min = eval;
+        }
+    }
+    if (std::isinf(E_min)) return 0.0;
+
     Real sum_z = 0.0;
     Real sum_a = 0.0;
 
@@ -176,7 +215,8 @@ Real FTLMResult<ExecSpace>::expectation_value(const MatrixFreeHamiltonian<ExecSp
             }
             Real ym_A_r = sample.norm_r * ym_A_v0.real();
 
-            Real boltzmann = std::exp(-b * sample.eigenvalues[m]);
+            Real exponent = -b * (sample.eigenvalues[m] - E_min);
+            Real boltzmann = (exponent < -Real(80.0)) ? Real(0.0) : std::exp(exponent);
             Real w_m = c_r_ym * c_r_ym * boltzmann;
             sum_z += w_m;
             sum_a += c_r_ym * ym_A_r * boltzmann;
@@ -218,6 +258,8 @@ FTLMResult<ExecSpace> ftlm(
     // Standard complex Gaussian vector: Real & Imag parts mean 0, stddev 1/sqrt(2)
     std::normal_distribution<Real> dist(0.0, 1.0 / std::sqrt(2.0));
 
+    const Real mach_eps = std::numeric_limits<Real>::epsilon() * Real(4.0);
+
     for (int r = 0; r < n_random; ++r) {
         FTLMSample<ExecSpace> sample;
 
@@ -231,7 +273,7 @@ FTLMResult<ExecSpace> ftlm(
         Real nrm = norm(r_vec);
         sample.norm_r = nrm;
 
-        if (nrm < 1e-15) continue;
+        if (nrm < mach_eps) continue;
 
         // Lanczos loop storing Krylov basis
         VectorView<ExecSpace> v_curr("v_curr", dim);
@@ -259,7 +301,7 @@ FTLMResult<ExecSpace> ftlm(
             }
 
             Real b_val = norm(w);
-            if (b_val < 1e-15) break;
+            if (b_val < mach_eps) break;
 
             betas_l.push_back(b_val);
             Kokkos::deep_copy(v_prev, v_curr);
@@ -305,6 +347,8 @@ std::vector<Real> ftlm_dynamical_correlation(
     std::mt19937 rng(42);
     std::normal_distribution<Real> dist(0.0, 1.0 / std::sqrt(2.0));
 
+    const Real mach_eps = std::numeric_limits<Real>::epsilon() * Real(4.0);
+
     Real total_Z = 0.0;
 
     for (int r = 0; r < n_random; ++r) {
@@ -316,7 +360,7 @@ std::vector<Real> ftlm_dynamical_correlation(
         Kokkos::deep_copy(r_vec, r_vec_host);
 
         Real norm_r = norm(r_vec);
-        if (norm_r < 1e-15) continue;
+        if (norm_r < mach_eps) continue;
 
         // Step 1: Thermalization Lanczos on H
         VectorView<ExecSpace> v_curr("v_curr", dim);
@@ -342,7 +386,7 @@ std::vector<Real> ftlm_dynamical_correlation(
             if (i > 0) axpy(-betas_1.back(), v_prev, w);
 
             Real b_val = norm(w);
-            if (b_val < 1e-15) break;
+            if (b_val < mach_eps) break;
 
             betas_1.push_back(b_val);
             Kokkos::deep_copy(v_prev, v_curr);
@@ -353,10 +397,18 @@ std::vector<Real> ftlm_dynamical_correlation(
         auto tridiag_1 = diagonalize_tridiag_full(alphas_1, betas_1);
         int M1 = krylov_1.size();
 
-        // Accumulate sample Z
+        // Find E_min for thermal sample
+        Real E1_min = std::numeric_limits<Real>::infinity();
+        for (int m = 0; m < M1; ++m) {
+            if (tridiag_1.eigenvalues[m] < E1_min) E1_min = tridiag_1.eigenvalues[m];
+        }
+
+        // Accumulate sample Z (shifted)
         Real sample_Z = 0.0;
         for (int m = 0; m < M1; ++m) {
-            Real w_m = (norm_r * norm_r) * (tridiag_1.first_components[m] * tridiag_1.first_components[m]) * std::exp(-beta * tridiag_1.eigenvalues[m]);
+            Real exponent = -beta * (tridiag_1.eigenvalues[m] - E1_min);
+            Real exp_val = (exponent < -Real(80.0)) ? Real(0.0) : std::exp(exponent);
+            Real w_m = (norm_r * norm_r) * (tridiag_1.first_components[m] * tridiag_1.first_components[m]) * exp_val;
             sample_Z += w_m;
         }
         total_Z += sample_Z;
@@ -377,7 +429,7 @@ std::vector<Real> ftlm_dynamical_correlation(
             VectorView<ExecSpace> phi_m("phi_m", dim);
             B.apply(y_m, phi_m);
             Real norm_phi = norm(phi_m);
-            if (norm_phi < 1e-15) continue;
+            if (norm_phi < mach_eps) continue;
 
             // Step 2: Second Lanczos run on H starting from |phi_m> / norm_phi
             VectorView<ExecSpace> v2_curr("v2_curr", dim);
@@ -403,7 +455,7 @@ std::vector<Real> ftlm_dynamical_correlation(
                 if (i > 0) axpy(-betas_2.back(), v2_prev, w2);
 
                 Real b_val = norm(w2);
-                if (b_val < 1e-15) break;
+                if (b_val < mach_eps) break;
 
                 betas_2.push_back(b_val);
                 Kokkos::deep_copy(v2_prev, v2_curr);
@@ -419,11 +471,12 @@ std::vector<Real> ftlm_dynamical_correlation(
             VectorView<ExecSpace> A_ym("A_ym", dim);
             A.apply(y_m, A_ym);
 
+            Real exp_shift = -beta * (E_m - E1_min);
+            Real exp_m = (exp_shift < -Real(80.0)) ? Real(0.0) : std::exp(exp_shift);
+
             for (int p = 0; p < M2; ++p) {
                 Real E_tilde_p = tridiag_2.eigenvalues[p];
 
-                // Reconstruct Ritz state |z_p> = sum_j Z_jp |v2_j>
-                // We want <z_p | A | y_m> = sum_j Z_jp <v2_j | A | y_m>
                 Complex z_p_A_ym = 0.0;
                 for (int j = 0; j < M2; ++j) {
                     Real Z_jp = tridiag_2.ritz_vectors[j][p];
@@ -431,14 +484,11 @@ std::vector<Real> ftlm_dynamical_correlation(
                     z_p_A_ym += Z_jp * dot_val;
                 }
 
-                // Weight factor: exp(-beta * E_m) * <r | y_m>^2 * <y_m | B^\dagger | z_p> <z_p | A | y_m>
-                // Note: <z_p | B | y_m> = norm_phi * Z_0p (since |phi_m> = B|y_m> = norm_phi * |v2_0>)
-                // Therefore <y_m | B^\dagger | z_p> = norm_phi * Z_0p
-                Real weight = std::exp(-beta * E_m) * (c_r_ym * c_r_ym) * norm_phi * tridiag_2.first_components[p] * z_p_A_ym.real();
+                Real weight = exp_m * (c_r_ym * c_r_ym) * norm_phi * tridiag_2.first_components[p] * z_p_A_ym.real();
 
                 Real dE = E_tilde_p - E_m;
 
-                // Accumulate Lorentzian/Gaussian broadened delta functions
+                // Accumulate Lorentzian broadened delta functions
                 for (size_t i = 0; i < omegas.size(); ++i) {
                     Real w_val = omegas[i];
                     Real diff = w_val - dE;

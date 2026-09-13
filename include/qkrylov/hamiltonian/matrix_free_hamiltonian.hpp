@@ -101,8 +101,8 @@ private:
     // where value = conj(H[col][alpha]), enabling a gather-based
     // SpMV with y[alpha] = sum_j values[j] * x[cols[j]].
     // No atomics needed — each thread owns its output element.
-    Kokkos::View<int*, typename ExecSpace::memory_space>      row_offsets_;  // size = dim + 1
-    Kokkos::View<int*, typename ExecSpace::memory_space>      col_indices_;  // size = nnz
+    Kokkos::View<Index*, typename ExecSpace::memory_space>    row_offsets_;  // size = dim + 1
+    Kokkos::View<Index*, typename ExecSpace::memory_space>    col_indices_;  // size = nnz
     Kokkos::View<KComplex*, typename ExecSpace::memory_space> values_;       // size = nnz
 
     VectorView<ExecSpace> diagonal_;  // size = dim

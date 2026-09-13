@@ -28,8 +28,8 @@ export solve
 export AbstractQuantumProblem, GroundStateProblem, ExcitedStatesProblem, ThermalProblem, DynamicsProblem, SpectralProblem
 export AbstractQuantumAlgorithm, AbstractLanczosVariation, SinglePass, TwoPass
 export Lanczos, Davidson, FTLM, ContinuedFraction, CorrectionVector
-export AbstractQuantumSolution, GroundStateSolution, LanczosResult
-export lanczos_ground_state
+export AbstractQuantumSolution, GroundStateSolution, LanczosResult, ExcitedStatesSolution
+export lanczos_ground_state, lanczos_lowest, LanczosLowestResult
 export davidson_lowest, DavidsonResult
 export continued_fraction_coeffs, ContinuedFractionResult, evaluate_spectral_function
 export ftlm, FTLMResult

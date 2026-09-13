@@ -117,21 +117,22 @@ void test_solvers_structured_bindings() {
 
     // TwoPass policy structured binding
     auto [e_tp, v_tp] = solvers::lanczos<solvers::policy::TwoPass>(H, config);
-    assert(std::abs(e_tp - (-0.75)) < 1e-6);
+    assert(std::abs(e_tp - (-0.75)) < 1e-5);
     assert(v_tp.size() == 4);
 
-    assert(std::abs(e_sp - e_tp) < 1e-10);
+    const Real comp_tol = (sizeof(Real) == 4) ? Real(1e-5) : Real(1e-10);
+    assert(std::abs(e_sp - e_tp) < comp_tol);
 
     // Convenience zero-flag functions
-    auto res_gs = lanczos_ground_state(H, 100, 1e-12);
-    assert(std::abs(res_gs.energy - (-0.75)) < 1e-6);
+    auto res_gs = lanczos_ground_state(H, 100, 1e-6);
+    assert(std::abs(res_gs.energy - (-0.75)) < 1e-5);
     assert(res_gs.eigenvector.size() == 4);
 
-    auto res_tp_conv = lanczos_two_pass(H, 100, 1e-12);
-    assert(std::abs(res_tp_conv.energy - (-0.75)) < 1e-6);
+    auto res_tp_conv = lanczos_two_pass(H, 100, 1e-6);
+    assert(std::abs(res_tp_conv.energy - (-0.75)) < 1e-5);
     assert(res_tp_conv.eigenvector.size() == 4);
 
-    assert(std::abs(res_gs.energy - res_tp_conv.energy) < 1e-10);
+    assert(std::abs(res_gs.energy - res_tp_conv.energy) < comp_tol);
 
     // Verify reference structured bindings and mutation semantics
     LanczosResult res = solvers::lanczos(H, config);

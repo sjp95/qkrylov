@@ -1,3 +1,4 @@
+hooks = ["docs_hooks.py"]
 [project]
 site_url = "https://sjp95.github.io/qkrylov/"
 site_name = "qkrylov"
@@ -7,27 +8,27 @@ repo_name = "qkrylov/qkrylov"
 
 nav = [
   { "Home" = "index.md" },
-  { "Quickstart" = "quickstart.md" },
-  { "Models" = [
-    { "Overview" = "models/index.md" },
-    { "Spin-1/2" = "models/spin.md" },
-    { "Fermion" = "models/fermion.md" },
+  { "Getting Started" = [
+    { "Quickstart" = "quickstart.md" },
+    { "Building the Hamiltonian" = "getting_started/tutorial_hamiltonian/index.md" },
+    { "Ecosystem Interop (NumPy/SciPy/Torch)" = "getting_started/ecosystem.md" },
+    { "The SciML Workflow (Julia)" = "getting_started/sciml_julia.md" },
   ]},
-  { "Solvers" = [
-    { "Overview" = "solvers/index.md" },
-    { "Lanczos" = "solvers/lanczos.md" },
-    { "Davidson" = "solvers/davidson.md" },
-    { "Spectral Functions" = "solvers/dynamics.md" },
-    { "FTLM" = "solvers/ftlm.md" },
+  { "Examples and Benchmarks" = [
+    { "Replicated Papers" = "replications.md" },
+    { "Benchmarks (CPU vs GPU)" = "benchmarks.md" },
   ]},
-  { "Theory" = [
-    { "Overview" = "theory/index.md" },
-    { "Exact Diagonalization" = "theory/exact_diag.md" },
-    { "Krylov Methods" = "theory/krylov.md" },
-    { "Spectral Functions" = "theory/spectral.md" },
+  { "Theory of Algorithms" = [
+    { "Matrix-Free SpMV on GPUs" = "theory/matrix_free_spmv.md" },
+    { "Single-Pass vs Two-Pass Lanczos" = "theory/lanczos_memory.md" },
+    { "Dual-Precision (FP32/FP64) Stability" = "theory/precision_stability.md" },
   ]},
-  { "API Reference" = "api/index.md" },
-  { "Performance" = "performance.md" },
+  { "API Reference" = [
+    { "Overview" = "api/index.md" },
+    { "Python API" = "api/python.md" },
+    { "Julia API" = "api/julia.md" },
+    { "C++ Core API" = "api/cpp.md" },
+  ]},
   { "Contributing" = "contributing.md" },
 ]
 
@@ -52,7 +53,6 @@ features = [
   # "header.autohide",
   # "navigation.expand",
   "navigation.footer",
-  "navigation.indexes",
   "navigation.instant",
   "navigation.instant.prefetch",
   # "navigation.instant.progress",
@@ -152,3 +152,8 @@ pymdownx.tasklist = {
   custom_checkbox = true
 }
 pymdownx.tilde = {}
+
+
+
+[extra]
+polyglot_tutorials = ["docs/getting_started/tutorial_hamiltonian"]

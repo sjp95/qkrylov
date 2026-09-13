@@ -41,6 +41,13 @@ StateID SpinSBasis::state(Index i) const
 
 Index SpinSBasis::index(StateID s) const
 {
+    if (!sector_.use_sz) {
+        if (s < static_cast<StateID>(states_.size())) {
+            return static_cast<Index>(s);
+        }
+        throw std::runtime_error("State not present in basis");
+    }
+
     auto it = std::lower_bound(states_.begin(), states_.end(), s);
     if (it == states_.end() || *it != s) {
         throw std::runtime_error("State not present in basis");
@@ -50,6 +57,9 @@ Index SpinSBasis::index(StateID s) const
 
 bool SpinSBasis::contains(StateID s) const
 {
+    if (!sector_.use_sz) {
+        return s < static_cast<StateID>(states_.size());
+    }
     return std::binary_search(states_.begin(), states_.end(), s);
 }
 

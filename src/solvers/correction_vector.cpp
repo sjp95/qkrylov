@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <complex>
+#include <limits>
 #include <stdexcept>
 #include <Kokkos_Core.hpp>
 
@@ -38,7 +39,8 @@ CorrectionVectorResult correction_vector_spectral(
     scal(KComplex(eta, static_cast<Real>(0.0)), b);
 
     const Real b_norm = norm(b);
-    if (b_norm < static_cast<Real>(1e-15)) {
+    const Real b_min = std::numeric_limits<Real>::epsilon() * Real(4.0);
+    if (b_norm < b_min) {
         return {HostVector(dim, Complex(0.0, 0.0)), static_cast<Real>(0.0), 0, true};
     }
 
@@ -75,13 +77,14 @@ CorrectionVectorResult correction_vector_spectral(
 
     bool converged = false;
     int iter = 0;
+    const Real denom_min = std::numeric_limits<Real>::epsilon() * std::numeric_limits<Real>::epsilon();
 
     for (iter = 0; iter < max_iter; ++iter) {
         apply_A(p, Ap);
 
         KComplex p_Ap = dot(p, Ap);
         Real denom = p_Ap.real();
-        if (std::abs(denom) < static_cast<Real>(1e-20)) {
+        if (std::abs(denom) < denom_min) {
             break;
         }
 

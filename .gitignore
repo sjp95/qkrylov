@@ -60,3 +60,6 @@ private/
 .agents/
 bindings/julia/manual/
 external/
+docs/getting_started/tutorial_hamiltonian/index.md
+docs/getting_started/tutorial_hamiltonian/tutorial_hamiltonian.*
+docs/getting_started/tutorial_hamiltonian/images/

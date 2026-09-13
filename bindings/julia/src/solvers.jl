@@ -106,6 +106,8 @@ struct DavidsonResultC
     converged::Cint
 end
 
+const LanczosLowestResultC = DavidsonResultC
+
 struct FTLMResultFP32C
     beta::Cfloat
     partition_function::Cfloat
@@ -313,6 +315,10 @@ end
 
 solve(prob::GroundStateProblem; kwargs...) = solve(prob, Lanczos(); kwargs...)
 
+function solve(prob::ExcitedStatesProblem, alg::Lanczos; kwargs...)
+    return lanczos_lowest(prob.H; n_eig=prob.n_eig, maxiter=alg.maxiter, tol=alg.tol, compute_eigenvectors=alg.return_state)
+end
+
 function solve(prob::ExcitedStatesProblem, alg::Davidson=Davidson(); kwargs...)
     return davidson_lowest(prob.H; n_eig=alg.n_eig, max_subspace=alg.max_subspace, tol=alg.tol, compute_eigenvectors=alg.compute_eigenvectors)
 end
@@ -339,29 +345,41 @@ function lanczos_ground_state(
     return solve(GroundStateProblem(H), Lanczos(variation=SinglePass(), maxiter=maxiter, tol=tol, return_state=return_state || compute_eigenvector))
 end
 
-# Davidson Preconditioned Eigensolver
-struct DavidsonResult{T<:Real}
+# Excited States Eigensolver Solutions (Davidson and Lanczos Lowest)
+struct ExcitedStatesSolution{T<:Real} <: AbstractQuantumSolution
     eigenvalues::Vector{T}
     eigenvectors::Union{Vector{Vector{Complex{T}}}, Nothing}
     iterations::Int
     converged::Bool
 end
 
-function Base.getproperty(res::DavidsonResult{T}, sym::Symbol) where {T}
+const DavidsonResult{T} = ExcitedStatesSolution{T}
+const LanczosLowestResult{T} = ExcitedStatesSolution{T}
+
+function Base.getproperty(res::ExcitedStatesSolution{T}, sym::Symbol) where {T}
     if sym === :values || sym === :evals
         return getfield(res, :eigenvalues)
+    elseif sym === :energy
+        evals = getfield(res, :eigenvalues)
+        return isempty(evals) ? zero(T) : evals[1]
     elseif sym === :vectors || sym === :evecs
         vecs = getfield(res, :eigenvectors)
         if vecs === nothing
-            error("Eigenvectors were not computed for this Davidson run. Pass `compute_eigenvectors=true` to `davidson_lowest`.")
+            error("Eigenvectors were not computed for this run. Pass `compute_eigenvectors=true` (or `return_state=true`).")
         end
         return vecs
+    elseif sym === :state || sym === :u || sym === :eigenvector
+        vecs = getfield(res, :eigenvectors)
+        if vecs === nothing || isempty(vecs)
+            error("Eigenvectors were not computed or empty.")
+        end
+        return vecs[1]
     end
     return getfield(res, sym)
 end
 
-function Base.propertynames(res::DavidsonResult, private::Bool=false)
-    return private ? fieldnames(DavidsonResult) : (:eigenvalues, :eigenvectors, :iterations, :converged, :values, :evals, :vectors, :evecs)
+function Base.propertynames(res::ExcitedStatesSolution, private::Bool=false)
+    return private ? fieldnames(ExcitedStatesSolution) : (:eigenvalues, :eigenvectors, :iterations, :converged, :values, :evals, :vectors, :evecs, :energy, :state, :u, :eigenvector)
 end
 
 function davidson_lowest(
@@ -436,6 +454,98 @@ function davidson_lowest(
         evecs[idx] = evecs_flat[(idx-1)*dim + 1 : idx*dim]
     end
     return DavidsonResult{Float32}(evals, evecs, iters, conv)
+end
+
+function lanczos_lowest(
+    H::MatrixFreeHamiltonian{Float64};
+    n_eig::Integer=1,
+    maxiter::Integer=200,
+    tol::Real=1e-8,
+    compute_eigenvectors::Bool=true,
+    initial_vector::Union{AbstractVector, Nothing}=nothing
+)::LanczosLowestResult{Float64}
+    dim = Int(dimension(H))
+    if initial_vector !== nothing
+        if length(initial_vector) != dim
+            throw(DimensionMismatch("initial_vector length ($(length(initial_vector))) does not match Hamiltonian dimension ($dim)"))
+        end
+    end
+    init_vec = initial_vector === nothing ? nothing : (initial_vector isa Vector{ComplexF64} ? initial_vector : Vector{ComplexF64}(initial_vector))
+    init_ptr = init_vec === nothing ? Ptr{Cdouble}(C_NULL) : Ptr{Cdouble}(pointer(init_vec))
+
+    evals = Vector{Float64}(undef, n_eig)
+    evecs_flat = compute_eigenvectors ? Vector{ComplexF64}(undef, n_eig * dim) : ComplexF64[]
+    res_c = Ref{LanczosLowestResultC}(LanczosLowestResultC(0, 0))
+
+    GC.@preserve evals evecs_flat init_vec begin
+        evecs_ptr = compute_eigenvectors ? pointer(evecs_flat) : Ptr{ComplexF64}(C_NULL)
+        status = ccall(
+            (:qkrylov_lanczos_lowest_complex_fp64, libqkrylov),
+            Cint,
+            (Ptr{Cvoid}, Cint, Cint, Cdouble, Ptr{Cdouble}, Ptr{Cdouble}, Ref{LanczosLowestResultC}, Ptr{Cdouble}),
+            H.ptr, Cint(n_eig), Cint(maxiter), Cdouble(tol), pointer(evals), Ptr{Cdouble}(evecs_ptr), res_c, init_ptr
+        )
+        _check_status(status, "Lanczos lowest solver failed")
+    end
+
+    iters = Int(res_c[].iterations)
+    conv  = res_c[].converged != 0
+
+    if !compute_eigenvectors
+        return LanczosLowestResult{Float64}(evals, nothing, iters, conv)
+    end
+
+    evecs = Vector{Vector{ComplexF64}}(undef, n_eig)
+    for idx in 1:n_eig
+        evecs[idx] = evecs_flat[(idx-1)*dim + 1 : idx*dim]
+    end
+    return LanczosLowestResult{Float64}(evals, evecs, iters, conv)
+end
+
+function lanczos_lowest(
+    H::MatrixFreeHamiltonian{Float32};
+    n_eig::Integer=1,
+    maxiter::Integer=200,
+    tol::Real=1e-5,
+    compute_eigenvectors::Bool=true,
+    initial_vector::Union{AbstractVector, Nothing}=nothing
+)::LanczosLowestResult{Float32}
+    dim = Int(dimension(H))
+    if initial_vector !== nothing
+        if length(initial_vector) != dim
+            throw(DimensionMismatch("initial_vector length ($(length(initial_vector))) does not match Hamiltonian dimension ($dim)"))
+        end
+    end
+    init_vec = initial_vector === nothing ? nothing : (initial_vector isa Vector{ComplexF32} ? initial_vector : Vector{ComplexF32}(initial_vector))
+    init_ptr = init_vec === nothing ? Ptr{Cfloat}(C_NULL) : Ptr{Cfloat}(pointer(init_vec))
+
+    evals = Vector{Float32}(undef, n_eig)
+    evecs_flat = compute_eigenvectors ? Vector{ComplexF32}(undef, n_eig * dim) : ComplexF32[]
+    res_c = Ref{LanczosLowestResultC}(LanczosLowestResultC(0, 0))
+
+    GC.@preserve evals evecs_flat init_vec begin
+        evecs_ptr = compute_eigenvectors ? pointer(evecs_flat) : Ptr{ComplexF32}(C_NULL)
+        status = ccall(
+            (:qkrylov_lanczos_lowest_complex_fp32, libqkrylov),
+            Cint,
+            (Ptr{Cvoid}, Cint, Cint, Cfloat, Ptr{Cfloat}, Ptr{Cfloat}, Ref{LanczosLowestResultC}, Ptr{Cfloat}),
+            H.ptr, Cint(n_eig), Cint(maxiter), Cfloat(tol), pointer(evals), Ptr{Cfloat}(evecs_ptr), res_c, init_ptr
+        )
+        _check_status(status, "Lanczos lowest solver failed")
+    end
+
+    iters = Int(res_c[].iterations)
+    conv  = res_c[].converged != 0
+
+    if !compute_eigenvectors
+        return LanczosLowestResult{Float32}(evals, nothing, iters, conv)
+    end
+
+    evecs = Vector{Vector{ComplexF32}}(undef, n_eig)
+    for idx in 1:n_eig
+        evecs[idx] = evecs_flat[(idx-1)*dim + 1 : idx*dim]
+    end
+    return LanczosLowestResult{Float32}(evals, evecs, iters, conv)
 end
 
 # Dynamics & Spectral Function
@@ -722,11 +832,11 @@ function Base.show(io::IO, res::LanczosResult{T}) where {T}
     print(io, "LanczosResult{$T}(energy = $(res.energy), iterations = $(res.iterations), $status_str$state_str)")
 end
 
-function Base.show(io::IO, res::DavidsonResult{T}) where {T}
+function Base.show(io::IO, res::ExcitedStatesSolution{T}) where {T}
     n = length(res.eigenvalues)
     has_v = res.eigenvectors !== nothing
     status_str = res.converged ? "converged = true" : "WARNING: maxiter hit without converging!"
-    print(io, "DavidsonResult{$T}(n_eig = $n, energies = $(res.eigenvalues), iterations = $(res.iterations), $status_str, has_eigenvectors = $has_v)")
+    print(io, "ExcitedStatesSolution{$T}(n_eig = $n, energies = $(res.eigenvalues), iterations = $(res.iterations), $status_str, has_eigenvectors = $has_v)")
 end
 
 function Base.show(io::IO, res::ContinuedFractionResult{T}) where {T}

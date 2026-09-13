@@ -30,7 +30,7 @@ jobs:
         run: pip install zensical
 
       - name: Build Docs
-        run: zensical build --clean
+        run: python build_polyglot.py build_ci
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4

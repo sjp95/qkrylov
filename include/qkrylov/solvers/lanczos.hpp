@@ -15,6 +15,7 @@ struct LanczosConfig
 {
     int maxiter = 200;
     Real tol = 1.0e-12;
+    HostVector initial_vector = {};
 };
 
 struct LanczosResult
@@ -50,6 +51,23 @@ struct LanczosResult
     }
 };
 
+struct LanczosLowestResult
+{
+    std::vector<Real> eigenvalues;
+    std::vector<HostVector> eigenvectors;
+    int iterations = 0;
+    bool converged = false;
+};
+
+struct LanczosLowestConfig
+{
+    int n_eig = 1;
+    int maxiter = 200;
+    Real tol = 1.0e-12;
+    bool compute_eigenvectors = true;
+    HostVector initial_vector = {};
+};
+
 template <std::size_t I>
 decltype(auto) get(const LanczosResult& res) {
     return res.template get<I>();
@@ -71,11 +89,19 @@ namespace solvers {
 
 using QKRYLOV_PRECISION_NAMESPACE::LanczosConfig;
 using QKRYLOV_PRECISION_NAMESPACE::LanczosResult;
+using QKRYLOV_PRECISION_NAMESPACE::LanczosLowestConfig;
+using QKRYLOV_PRECISION_NAMESPACE::LanczosLowestResult;
 
 template <typename Policy = policy::Default, typename ExecSpace>
 LanczosResult lanczos(
     const QKRYLOV_PRECISION_NAMESPACE::MatrixFreeHamiltonian<ExecSpace>& H,
     const LanczosConfig& config = {}
+);
+
+template <typename ExecSpace>
+LanczosLowestResult lanczos_lowest(
+    const QKRYLOV_PRECISION_NAMESPACE::MatrixFreeHamiltonian<ExecSpace>& H,
+    const LanczosLowestConfig& config = {}
 );
 
 } // namespace solvers
@@ -87,24 +113,39 @@ template <typename ExecSpace>
 inline LanczosResult lanczos_ground_state(
     const MatrixFreeHamiltonian<ExecSpace>& H,
     int maxiter = 200,
-    Real tol = 1.0e-12
+    Real tol = 1.0e-12,
+    const HostVector& initial_vector = {}
 ) {
-    return solvers::lanczos<solvers::policy::Default>(H, {maxiter, tol});
+    return solvers::lanczos<solvers::policy::Default>(H, {maxiter, tol, initial_vector});
 }
 
 template <typename ExecSpace>
 inline LanczosResult lanczos_two_pass(
     const MatrixFreeHamiltonian<ExecSpace>& H,
     int maxiter = 200,
-    Real tol = 1.0e-12
+    Real tol = 1.0e-12,
+    const HostVector& initial_vector = {}
 ) {
-    return solvers::lanczos<solvers::policy::TwoPass>(H, {maxiter, tol});
+    return solvers::lanczos<solvers::policy::TwoPass>(H, {maxiter, tol, initial_vector});
+}
+
+template <typename ExecSpace>
+inline LanczosLowestResult lanczos_lowest(
+    const MatrixFreeHamiltonian<ExecSpace>& H,
+    int n_eig = 1,
+    int maxiter = 200,
+    Real tol = 1.0e-12,
+    bool compute_eigenvectors = true,
+    const HostVector& initial_vector = {}
+) {
+    return solvers::lanczos_lowest(H, {n_eig, maxiter, tol, compute_eigenvectors, initial_vector});
 }
 
 } // namespace QKRYLOV_PRECISION_NAMESPACE
 
 using QKRYLOV_PRECISION_NAMESPACE::lanczos_ground_state;
 using QKRYLOV_PRECISION_NAMESPACE::lanczos_two_pass;
+using QKRYLOV_PRECISION_NAMESPACE::lanczos_lowest;
 } // namespace qkrylov
 
 namespace std {

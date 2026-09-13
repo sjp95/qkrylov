@@ -2,8 +2,6 @@
 
 #include "qkrylov/core/types.hpp"
 
-#include "../core/types.hpp"
-
 namespace qkrylov {
 namespace QKRYLOV_PRECISION_NAMESPACE {
 

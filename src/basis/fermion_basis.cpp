@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <bit>
+#include <algorithm>
 
 namespace qkrylov {
 namespace QKRYLOV_PRECISION_NAMESPACE {
@@ -41,19 +42,26 @@ StateID FermionBasis::state(Index i) const
 
 Index FermionBasis::index(StateID s) const
 {
-    auto it = lookup_.find(s);
+    if (!sector_.use_n) {
+        if (s < static_cast<StateID>(states_.size())) {
+            return static_cast<Index>(s);
+        }
+        throw std::runtime_error("State not present in basis");
+    }
 
-    if(it == lookup_.end())
-        throw std::runtime_error(
-            "State not present in basis"
-        );
-
-    return it->second;
+    auto it = std::lower_bound(states_.begin(), states_.end(), s);
+    if (it == states_.end() || *it != s) {
+        throw std::runtime_error("State not present in basis");
+    }
+    return static_cast<Index>(std::distance(states_.begin(), it));
 }
 
 bool FermionBasis::contains(StateID s) const
 {
-    return lookup_.find(s) != lookup_.end();
+    if (!sector_.use_n) {
+        return s < static_cast<StateID>(states_.size());
+    }
+    return std::binary_search(states_.begin(), states_.end(), s);
 }
 
 void FermionBasis::build_full_basis()
@@ -64,7 +72,6 @@ void FermionBasis::build_full_basis()
 
     for(StateID s = 0; s < dim; ++s)
     {
-        lookup_[s] = states_.size();
         states_.push_back(s);
     }
 }
@@ -74,18 +81,16 @@ void FermionBasis::build_n_basis()
     const StateID dim =
         StateID(1) << N_;
 
-    states_.reserve(dim);
+    states_.reserve(dim / 2);
 
     for(StateID s = 0; s < dim; ++s)
     {
         if(popcount(s) == sector_.n)
         {
-            lookup_[s] =
-                states_.size();
-
             states_.push_back(s);
         }
     }
+    states_.shrink_to_fit();
 }
 
 

@@ -18,6 +18,7 @@ set(QKRYLOV_TESTS
     test_c_api
     test_spin1_correction_vector
     test_m1_core
+    test_lanczos_lowest
 )
 
 foreach(test_name IN LISTS QKRYLOV_TESTS)
@@ -27,3 +28,20 @@ foreach(test_name IN LISTS QKRYLOV_TESTS)
     add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()
 
+# FP32 unit tests to ensure solvers and bases deflate and converge under single precision
+set(QKRYLOV_FP32_TESTS
+    test_lanczos_2site
+    test_lanczos_ritz
+    test_davidson
+    test_dynamics
+    test_ftlm
+    test_m1_core
+)
+
+foreach(test_name IN LISTS QKRYLOV_FP32_TESTS)
+    set(target_name "${test_name}_fp32")
+    add_executable(${target_name} ${test_name}.cpp)
+    target_link_libraries(${target_name} PRIVATE qkrylov::qkrylov)
+    target_compile_definitions(${target_name} PRIVATE QKRYLOV_SINGLE_PRECISION)
+    add_test(NAME ${target_name} COMMAND ${target_name})
+endforeach()

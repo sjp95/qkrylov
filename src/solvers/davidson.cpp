@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cmath>
+#include <limits>
 #include <Kokkos_Core.hpp>
 
 namespace qkrylov {
@@ -25,6 +26,8 @@ SmallEigensystem solve_small_hermitian(const std::vector<std::vector<Complex>>& 
     std::vector<std::vector<Complex>> V(n, std::vector<Complex>(n, 0.0));
     for (int i = 0; i < n; ++i) V[i][i] = 1.0;
 
+    const Real jacobi_tol = std::numeric_limits<Real>::epsilon() * Real(10.0);
+
     for (int iter = 0; iter < 1000; ++iter) {
         Real max_off = 0.0;
         int p = 0, q = 0;
@@ -37,7 +40,7 @@ SmallEigensystem solve_small_hermitian(const std::vector<std::vector<Complex>>& 
             }
         }
 
-        if (max_off < 1e-15) break;
+        if (max_off < jacobi_tol) break;
 
         Complex app = A[p][p];
         Complex aqq = A[q][q];
@@ -114,6 +117,8 @@ DavidsonResult davidson_lowest(
         return diag_host(i).real() < diag_host(j).real();
     });
 
+    const Real lin_indep_tol = std::numeric_limits<Real>::epsilon() * Real(100.0);
+
     for (int i = 0; i < n_eig; ++i) {
         VectorView<ExecSpace> v("v", dim);
         auto v_host = Kokkos::create_mirror_view(v);
@@ -123,7 +128,7 @@ DavidsonResult davidson_lowest(
         // Orthogonalize against previous V
         for (const auto& v_prev : V) axpy(-dot(v_prev, v), v_prev, v);
         Real nrm = norm(v);
-        if (nrm < 1e-10) {
+        if (nrm < lin_indep_tol) {
             // Fallback to random if unit vector is not linearly independent
             for (Index j = 0; j < dim; ++j) v_host(j) = KComplex(dist(rng), dist(rng));
             Kokkos::deep_copy(v, v_host);
@@ -137,6 +142,8 @@ DavidsonResult davidson_lowest(
         H.apply(v, hv);
         HV.push_back(hv);
     }
+
+    const Real denom_cutoff = std::numeric_limits<Real>::epsilon() * Real(100.0);
 
     for (int iter = 0; iter < 100; ++iter) {
         int m = V.size();
@@ -170,7 +177,7 @@ DavidsonResult davidson_lowest(
                 VectorView<ExecSpace> t("t", dim);
                 Kokkos::parallel_for("davidson_precond", dim, KOKKOS_LAMBDA(const Index i) {
                     KComplex diff = diag_dev(i) - lambda;
-                    if (Kokkos::abs(diff) < 1e-10) diff = (diff.real() >= 0) ? 1e-10 : -1e-10;
+                    if (Kokkos::abs(diff) < denom_cutoff) diff = (diff.real() >= Real(0.0)) ? denom_cutoff : -denom_cutoff;
                     t(i) = r(i) / diff;
                 });
                 next_corrections.push_back(t);
@@ -213,7 +220,7 @@ DavidsonResult davidson_lowest(
         for (auto& t : next_corrections) {
             for (const auto& v : V) axpy(-dot(v, t), v, t);
             Real nrm = norm(t);
-            if (nrm > 1e-10) {
+            if (nrm > lin_indep_tol) {
                 scal(1.0/nrm, t);
                 V.push_back(t);
                 VectorView<ExecSpace> ht("ht", dim);

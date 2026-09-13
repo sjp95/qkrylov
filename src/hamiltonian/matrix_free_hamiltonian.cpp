@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <algorithm>
 
 namespace qkrylov {
 namespace QKRYLOV_PRECISION_NAMESPACE {
@@ -33,8 +34,8 @@ MatrixFreeHamiltonian<ExecSpace>::MatrixFreeHamiltonian(
     //          hash-map lookups from the per-apply hot path.
     // ----------------------------------------------------------------
 
-    std::vector<int>      h_row_offsets(dim + 1);
-    std::vector<int>      h_col_indices;
+    std::vector<Index>   h_row_offsets(dim + 1);
+    std::vector<Index>   h_col_indices;
     std::vector<KComplex> h_values;
     std::vector<KComplex> h_diagonal(dim, KComplex(0.0, 0.0));
 
@@ -42,8 +43,12 @@ MatrixFreeHamiltonian<ExecSpace>::MatrixFreeHamiltonian(
     h_col_indices.reserve(dim * ops_.size());
     h_values.reserve(dim * ops_.size());
 
+    std::vector<std::pair<Index, KComplex>> row_entries;
+    row_entries.reserve(ops_.size());
+
     for (Index alpha = 0; alpha < dim; ++alpha) {
-        h_row_offsets[alpha] = static_cast<int>(h_col_indices.size());
+        h_row_offsets[alpha] = h_col_indices.size();
+        row_entries.clear();
         const StateID initial_state = basis_->state(alpha);
 
         for (const auto& term : ops_.terms()) {
@@ -80,18 +85,38 @@ MatrixFreeHamiltonian<ExecSpace>::MatrixFreeHamiltonian(
             // with no atomics (each thread writes only to its own y element).
             KComplex val(amp.real(), -amp.imag());  // conj(amp)
 
-            h_col_indices.push_back(static_cast<int>(beta));
-            h_values.push_back(val);
+            row_entries.emplace_back(beta, val);
+        }
 
-            // Accumulate diagonal
-            if (beta == alpha) {
-                h_diagonal[alpha] += val;
+        if (!row_entries.empty()) {
+            std::sort(row_entries.begin(), row_entries.end(),
+                [](const auto& a, const auto& b) {
+                    return a.first < b.first;
+                });
+
+            for (size_t k = 0; k < row_entries.size(); ) {
+                Index col = row_entries[k].first;
+                KComplex sum_val = row_entries[k].second;
+                size_t next = k + 1;
+                while (next < row_entries.size() && row_entries[next].first == col) {
+                    sum_val += row_entries[next].second;
+                    ++next;
+                }
+
+                h_col_indices.push_back(col);
+                h_values.push_back(sum_val);
+
+                // Accumulate diagonal
+                if (col == alpha) {
+                    h_diagonal[alpha] = sum_val;
+                }
+                k = next;
             }
         }
     }
-    h_row_offsets[dim] = static_cast<int>(h_col_indices.size());
+    h_row_offsets[dim] = h_col_indices.size();
 
-    const int nnz = static_cast<int>(h_col_indices.size());
+    const Index nnz = h_col_indices.size();
 
     // ----------------------------------------------------------------
     // Phase 2: Deep-copy the CSR arrays to device memory.
@@ -99,20 +124,20 @@ MatrixFreeHamiltonian<ExecSpace>::MatrixFreeHamiltonian(
 
     using MemSpace = typename ExecSpace::memory_space;
 
-    row_offsets_ = Kokkos::View<int*, MemSpace>("qkrylov::row_offsets", dim + 1);
-    col_indices_ = Kokkos::View<int*, MemSpace>("qkrylov::col_indices", nnz);
+    row_offsets_ = Kokkos::View<Index*, MemSpace>("qkrylov::row_offsets", dim + 1);
+    col_indices_ = Kokkos::View<Index*, MemSpace>("qkrylov::col_indices", nnz);
     values_      = Kokkos::View<KComplex*, MemSpace>("qkrylov::values", nnz);
     diagonal_    = VectorView<ExecSpace>("qkrylov::diagonal", dim);
 
     // Wrap host std::vectors as unmanaged Kokkos HostSpace views, then
     // deep_copy into the device views.
     {
-        auto h_ro = Kokkos::View<const int*,
+        auto h_ro = Kokkos::View<const Index*,
                                  Kokkos::HostSpace,
                                  Kokkos::MemoryUnmanaged>(
             h_row_offsets.data(), dim + 1);
 
-        auto h_ci = Kokkos::View<const int*,
+        auto h_ci = Kokkos::View<const Index*,
                                  Kokkos::HostSpace,
                                  Kokkos::MemoryUnmanaged>(
             h_col_indices.data(), nnz);
@@ -143,23 +168,20 @@ void MatrixFreeHamiltonian<ExecSpace>::apply(
     VectorView<ExecSpace>& y
 ) const
 {
-    const int dim = static_cast<int>(dim_);
+    const Index dim = dim_;
     auto rows = row_offsets_;
     auto cols = col_indices_;
     auto vals = values_;
 
-    // Zero the output vector
-    Kokkos::deep_copy(ExecSpace(), y, KComplex(0.0, 0.0));
-
     // Gather-based SpMV:  y[alpha] = sum_j vals[j] * x[cols[j]]
     // Each thread owns its y[alpha] — no atomics needed.
     Kokkos::parallel_for("qkrylov::H_apply",
-        Kokkos::RangePolicy<ExecSpace>(0, dim),
-        KOKKOS_LAMBDA(const int alpha) {
+        Kokkos::RangePolicy<ExecSpace, Index>(0, dim),
+        KOKKOS_LAMBDA(const Index alpha) {
             KComplex sum(0.0, 0.0);
-            const int row_begin = rows(alpha);
-            const int row_end   = rows(alpha + 1);
-            for (int j = row_begin; j < row_end; ++j) {
+            const Index row_begin = rows(alpha);
+            const Index row_end   = rows(alpha + 1);
+            for (Index j = row_begin; j < row_end; ++j) {
                 sum += vals(j) * x(cols(j));
             }
             y(alpha) = sum;

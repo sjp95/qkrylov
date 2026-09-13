@@ -6,7 +6,6 @@
 #include "../symmetry/sector.hpp"
 
 #include <vector>
-#include <unordered_map>
 #include <memory>
 
 namespace qkrylov {
@@ -65,8 +64,6 @@ private:
     Sector sector_;
 
     std::vector<StateID> states_;
-
-    std::unordered_map<StateID, Index> lookup_;
 };
 
 } // namespace QKRYLOV_PRECISION_NAMESPACE

@@ -26,13 +26,36 @@ int main()
         return 1;
     }
 
-    for(Index i = 0; i < 10 && i < basis.size(); ++i)
-    {
-        std::cout
-            << i
-            << "  "
-            << basis.state(i)
-            << '\n';
+    // Check contains and index roundtrip for Sz=0 basis
+    for(Index i = 0; i < basis.size(); ++i) {
+        StateID s = basis.state(i);
+        if (!basis.contains(s)) {
+            std::cerr << "Sz basis should contain state " << s << std::endl;
+            return 1;
+        }
+        if (basis.index(s) != i) {
+            std::cerr << "Index mismatch for state " << s << ": expected " << i << ", got " << basis.index(s) << std::endl;
+            return 1;
+        }
+    }
+
+    // State with all ones (1023) has Sz=10, not Sz=0
+    if (basis.contains(1023)) {
+        std::cerr << "Sz=0 basis should not contain state 1023" << std::endl;
+        return 1;
+    }
+
+    // Check contains and index for unconstrained basis
+    for(Index i = 0; i < b_full.size(); ++i) {
+        StateID s = b_full.state(i);
+        if (!b_full.contains(s) || b_full.index(s) != i) {
+            std::cerr << "Unconstrained basis index mismatch for state " << s << std::endl;
+            return 1;
+        }
+    }
+    if (b_full.contains(999)) {
+        std::cerr << "Unconstrained basis of 4 sites should not contain state 999" << std::endl;
+        return 1;
     }
 
     return 0;

@@ -262,12 +262,24 @@ using QuantumKrylov
         @test isapprox(sol_tp_no_state.value, -2.0, atol=1e-6)
         @test_throws ErrorException sol_tp_no_state.u
 
-        # 4. ExcitedStatesProblem with Davidson
+        # 4. ExcitedStatesProblem with Davidson and Lanczos
         ex_prob = ExcitedStatesProblem(H, 2)
         @test ex_prob isa AbstractQuantumProblem
         sol_dav = solve(ex_prob, Davidson(n_eig=2, max_subspace=10, tol=1e-6))
         @test length(sol_dav.eigenvalues) == 2
         @test isapprox(sol_dav.eigenvalues[1], -2.0, atol=1e-5)
+
+        sol_lanczos_ex = solve(ex_prob, Lanczos(maxiter=50, tol=1e-8))
+        @test length(sol_lanczos_ex.eigenvalues) == 2
+        @test isapprox(sol_lanczos_ex.eigenvalues[1], -2.0, atol=1e-5)
+        @test isapprox(sol_lanczos_ex.eigenvalues[2], -1.0, atol=1e-5)
+        @test length(sol_lanczos_ex.eigenvectors) == 2
+        @test isapprox(sol_lanczos_ex.energy, -2.0, atol=1e-5)
+
+        # Direct lanczos_lowest with warm-starting
+        lowest_direct = lanczos_lowest(H; n_eig=2, maxiter=50, tol=1e-8, initial_vector=psi)
+        @test length(lowest_direct.eigenvalues) == 2
+        @test isapprox(lowest_direct.eigenvalues[1], -2.0, atol=1e-5)
 
         # 5. ThermalProblem with FTLM
         th_prob = ThermalProblem(H, 1.0)

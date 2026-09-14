@@ -10,9 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://sjp95.github.io/qkrylov/source/api/">
+        <link rel="canonical" href="https://sjp95.github.io/qkrylov/getting_started/ecosystem/">
       
       
+        <link rel="prev" href="../tutorial_hamiltonian/">
+      
+      
+        <link rel="next" href="../sciml_julia/">
       
       
         
@@ -23,7 +27,7 @@
     
     
       
-        <title>API Reference - qkrylov</title>
+        <title>Ecosystem Interop (NumPy/SciPy/Torch) - qkrylov</title>
       
     
     
@@ -79,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#api-reference" class="md-skip">
+        <a href="#ecosystem-integration" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API Reference
+              Ecosystem Interop (NumPy/SciPy/Torch)
             
           </span>
         </div>
@@ -267,8 +271,10 @@
       
   
   
+    
   
   
+  
     
     
     
@@ -279,11 +285,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
@@ -303,7 +309,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -347,7 +353,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting_started/tutorial_hamiltonian/" class="md-nav__link">
+      <a href="../tutorial_hamiltonian/" class="md-nav__link">
         
   
   
@@ -371,10 +377,36 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../getting_started/ecosystem/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Ecosystem Interop (NumPy/SciPy/Torch)
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
         
   
   
@@ -389,6 +421,60 @@
   
 
       </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#numpy-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        NumPy Integration
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scipy-sparse-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        SciPy Sparse Matrix
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pytorch-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        PyTorch Integration
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -401,7 +487,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting_started/sciml_julia/" class="md-nav__link">
+      <a href="../sciml_julia/" class="md-nav__link">
         
   
   
@@ -936,113 +1022,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#classes" class="md-nav__link">
+  <a href="#numpy-integration" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Classes
+        NumPy Integration
       </span>
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Classes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sector" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Sector
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#basis" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Basis
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#site" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Site
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#matrixfreehamiltonian" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        MatrixFreeHamiltonian
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#solvers" class="md-nav__link">
+  <a href="#scipy-sparse-matrix" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Solvers
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Solvers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#lanczos" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Lanczos
+        SciPy Sparse Matrix
       </span>
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#davidson" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#pytorch-integration" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Davidson
+        PyTorch Integration
       </span>
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#dynamics" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Dynamics
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1064,6 +1072,51 @@
   
 
 
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+    
+    
+    
+      <li class="md-path__item">
+        <a href="../../quickstart/" class="md-path__link">
+          
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
               
               <article class="md-content__inner md-typeset">
                 
@@ -1072,43 +1125,34 @@
   
 
 
-<h1 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
-<h2 id="classes">Classes<a class="headerlink" href="#classes" title="Permanent link">&para;</a></h2>
-<h3 id="sector">Sector<a class="headerlink" href="#sector" title="Permanent link">&para;</a></h3>
-<p>Defines symmetry sectors for basis construction.
-- <code>use_sz</code>, <code>sz2</code>: Spin-Z conservation (2*Sz).
-- <code>use_n</code>, <code>n</code>: Total particle number (Fermions).
-- <code>use_nup</code>, <code>nup</code>, <code>use_ndn</code>, <code>ndn</code>: Spin-resolved particle numbers.</p>
-<h3 id="basis">Basis<a class="headerlink" href="#basis" title="Permanent link">&para;</a></h3>
-<p>Abstract base class for Hilbert space bases.
-- <code>SpinHalfBasis(N, sector)</code>
-- <code>FermionBasis(N, sector)</code>
-- <code>HubbardBasis(N, sector)</code>
-- <code>TJBasis(N, sector)</code></p>
-<h3 id="site">Site<a class="headerlink" href="#site" title="Permanent link">&para;</a></h3>
-<p>Defines local operators for a site.
-- <code>SpinHalfSite()</code>: "Sz", "Sp", "Sm", "Sx", "Sy".
-- <code>FermionSite()</code>: "C", "Cdag", "N", "Id".
-- <code>HubbardSite()</code>: "CUp", "CDn", "CdagUp", "CdagDn", "Nup", "Ndn", "Nupdn".
-- <code>TJSite()</code>: Same as Hubbard but excludes double occupancy.</p>
-<h3 id="matrixfreehamiltonian">MatrixFreeHamiltonian<a class="headerlink" href="#matrixfreehamiltonian" title="Permanent link">&para;</a></h3>
-<p>Handles the action of a Hamiltonian on a vector.
-- <code>apply(vin, vout)</code>: Computes <span class="arithmatex">\(H|v_{in}\rangle\)</span>.
-- <code>diagonal()</code>: Returns the diagonal of the Hamiltonian.</p>
-<h2 id="solvers">Solvers<a class="headerlink" href="#solvers" title="Permanent link">&para;</a></h2>
-<h3 id="lanczos">Lanczos<a class="headerlink" href="#lanczos" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>lanczos_ground_state(H, maxiter, tol)</code>: Returns <code>LanczosResult</code> (energy, eigenvector).</li>
-</ul>
-<h3 id="davidson">Davidson<a class="headerlink" href="#davidson" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>davidson_lowest(H, n_eig, max_subspace, tol)</code>: Returns <code>DavidsonResult</code> (eigenvalues, eigenvectors).</li>
-</ul>
-<h3 id="dynamics">Dynamics<a class="headerlink" href="#dynamics" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>continued_fraction_coeffs(H, phi0, n_iter)</code>: Computes Lanczos coefficients for CF expansion.</li>
-<li><code>evaluate_spectral_function(res, omega, E0, eta)</code>: Evaluates the spectral function.</li>
-</ul>
+<h1 id="ecosystem-integration">Ecosystem Integration<a class="headerlink" href="#ecosystem-integration" title="Permanent link">&para;</a></h1>
+<p><code>qkrylov</code> play nice with ecosystem. After find ground state of 1D Heisenberg model, easy convert state vectors and operators.</p>
+<h2 id="numpy-integration">NumPy Integration<a class="headerlink" href="#numpy-integration" title="Permanent link">&para;</a></h2>
+<p>Convert solved eigenvector to NumPy array.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">qkrylov.solvers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lanczos</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Solve H</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">solver</span> <span class="o">=</span> <span class="n">Lanczos</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">E0</span><span class="p">,</span> <span class="n">psi0</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">get_ground_state</span><span class="p">()</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Convert state to NumPy</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">psi_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">psi0</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="scipy-sparse-matrix">SciPy Sparse Matrix<a class="headerlink" href="#scipy-sparse-matrix" title="Permanent link">&para;</a></h2>
+<p>Extract Hamiltonian as SciPy sparse matrix.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># Get CSR sparse matrix</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">H_sparse</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">to_scipy_sparse</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">"csr"</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="pytorch-integration">PyTorch Integration<a class="headerlink" href="#pytorch-integration" title="Permanent link">&para;</a></h2>
+<p>Move state vectors to PyTorch tensors for downstream pipelines.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Convert qkrylov state to torch.Tensor</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">psi_torch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">psi0</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="s1">'cuda'</span><span class="p">)</span>
+</span></code></pre></div>
 
 
 
@@ -1143,6 +1187,44 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../tutorial_hamiltonian/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Building the Hamiltonian">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Building the Hamiltonian
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../sciml_julia/" class="md-footer__link md-footer__link--next" aria-label="Next: The SciML Workflow (Julia)">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                The SciML Workflow (Julia)
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

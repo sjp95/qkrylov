@@ -10,10 +10,40 @@
         <loc>https://sjp95.github.io/qkrylov/getting_started/tutorial_hamiltonian/</loc>
       </url>
       <url>
+        <loc>https://sjp95.github.io/qkrylov/getting_started/ecosystem/</loc>
+      </url>
+      <url>
+        <loc>https://sjp95.github.io/qkrylov/getting_started/sciml_julia/</loc>
+      </url>
+      <url>
+        <loc>https://sjp95.github.io/qkrylov/replications/</loc>
+      </url>
+      <url>
         <loc>https://sjp95.github.io/qkrylov/benchmarks/</loc>
       </url>
       <url>
+        <loc>https://sjp95.github.io/qkrylov/theory/matrix_free_spmv/</loc>
+      </url>
+      <url>
+        <loc>https://sjp95.github.io/qkrylov/theory/lanczos_memory/</loc>
+      </url>
+      <url>
+        <loc>https://sjp95.github.io/qkrylov/theory/precision_stability/</loc>
+      </url>
+      <url>
         <loc>https://sjp95.github.io/qkrylov/api/</loc>
+      </url>
+      <url>
+        <loc>https://sjp95.github.io/qkrylov/api/python/</loc>
+      </url>
+      <url>
+        <loc>https://sjp95.github.io/qkrylov/api/julia/</loc>
+      </url>
+      <url>
+        <loc>https://sjp95.github.io/qkrylov/api/cpp/</loc>
+      </url>
+      <url>
+        <loc>https://sjp95.github.io/qkrylov/api/c-abi/</loc>
       </url>
       <url>
         <loc>https://sjp95.github.io/qkrylov/contributing/</loc>

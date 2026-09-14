@@ -10,9 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://sjp95.github.io/qkrylov/source/api/">
+        <link rel="canonical" href="https://sjp95.github.io/qkrylov/theory/lanczos_memory/">
       
       
+        <link rel="prev" href="../matrix_free_spmv/">
+      
+      
+        <link rel="next" href="../precision_stability/">
       
       
         
@@ -23,7 +27,7 @@
     
     
       
-        <title>API Reference - qkrylov</title>
+        <title>Single-Pass vs Two-Pass Lanczos - qkrylov</title>
       
     
     
@@ -79,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#api-reference" class="md-skip">
+        <a href="#the-memory-wall-single-pass-vs-two-pass-lanczos" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API Reference
+              Single-Pass vs Two-Pass Lanczos
             
           </span>
         </div>
@@ -543,8 +547,10 @@
       
   
   
+    
   
   
+  
     
     
     
@@ -555,11 +561,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
           <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
@@ -579,7 +585,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -596,7 +602,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../theory/matrix_free_spmv/" class="md-nav__link">
+      <a href="../matrix_free_spmv/" class="md-nav__link">
         
   
   
@@ -620,10 +626,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../theory/lanczos_memory/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
         
   
   
@@ -638,6 +653,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -650,7 +666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../theory/precision_stability/" class="md-nav__link">
+      <a href="../precision_stability/" class="md-nav__link">
         
   
   
@@ -912,11 +928,6 @@
                       
                     
                     
-                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-                      <div class="md-sidebar-button__wrapper">
-                        <label class="md-sidebar-button" for="__toc"></label>
-                      </div>
-                    
                   
                   <div class="md-sidebar__inner">
                     
@@ -928,125 +939,6 @@
   
     
   
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#classes" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Classes
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Classes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sector" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Sector
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#basis" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Basis
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#site" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Site
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#matrixfreehamiltonian" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        MatrixFreeHamiltonian
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#solvers" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Solvers
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Solvers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#lanczos" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Lanczos
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#davidson" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Davidson
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#dynamics" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Dynamics
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
   
 </nav>
                   </div>
@@ -1064,6 +956,51 @@
   
 
 
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+    
+    
+    
+      <li class="md-path__item">
+        <a href="../matrix_free_spmv/" class="md-path__link">
+          
+  
+  <span class="md-ellipsis">
+    Theory of Algorithms
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
               
               <article class="md-content__inner md-typeset">
                 
@@ -1072,43 +1009,9 @@
   
 
 
-<h1 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
-<h2 id="classes">Classes<a class="headerlink" href="#classes" title="Permanent link">&para;</a></h2>
-<h3 id="sector">Sector<a class="headerlink" href="#sector" title="Permanent link">&para;</a></h3>
-<p>Defines symmetry sectors for basis construction.
-- <code>use_sz</code>, <code>sz2</code>: Spin-Z conservation (2*Sz).
-- <code>use_n</code>, <code>n</code>: Total particle number (Fermions).
-- <code>use_nup</code>, <code>nup</code>, <code>use_ndn</code>, <code>ndn</code>: Spin-resolved particle numbers.</p>
-<h3 id="basis">Basis<a class="headerlink" href="#basis" title="Permanent link">&para;</a></h3>
-<p>Abstract base class for Hilbert space bases.
-- <code>SpinHalfBasis(N, sector)</code>
-- <code>FermionBasis(N, sector)</code>
-- <code>HubbardBasis(N, sector)</code>
-- <code>TJBasis(N, sector)</code></p>
-<h3 id="site">Site<a class="headerlink" href="#site" title="Permanent link">&para;</a></h3>
-<p>Defines local operators for a site.
-- <code>SpinHalfSite()</code>: "Sz", "Sp", "Sm", "Sx", "Sy".
-- <code>FermionSite()</code>: "C", "Cdag", "N", "Id".
-- <code>HubbardSite()</code>: "CUp", "CDn", "CdagUp", "CdagDn", "Nup", "Ndn", "Nupdn".
-- <code>TJSite()</code>: Same as Hubbard but excludes double occupancy.</p>
-<h3 id="matrixfreehamiltonian">MatrixFreeHamiltonian<a class="headerlink" href="#matrixfreehamiltonian" title="Permanent link">&para;</a></h3>
-<p>Handles the action of a Hamiltonian on a vector.
-- <code>apply(vin, vout)</code>: Computes <span class="arithmatex">\(H|v_{in}\rangle\)</span>.
-- <code>diagonal()</code>: Returns the diagonal of the Hamiltonian.</p>
-<h2 id="solvers">Solvers<a class="headerlink" href="#solvers" title="Permanent link">&para;</a></h2>
-<h3 id="lanczos">Lanczos<a class="headerlink" href="#lanczos" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>lanczos_ground_state(H, maxiter, tol)</code>: Returns <code>LanczosResult</code> (energy, eigenvector).</li>
-</ul>
-<h3 id="davidson">Davidson<a class="headerlink" href="#davidson" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>davidson_lowest(H, n_eig, max_subspace, tol)</code>: Returns <code>DavidsonResult</code> (eigenvalues, eigenvectors).</li>
-</ul>
-<h3 id="dynamics">Dynamics<a class="headerlink" href="#dynamics" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>continued_fraction_coeffs(H, phi0, n_iter)</code>: Computes Lanczos coefficients for CF expansion.</li>
-<li><code>evaluate_spectral_function(res, omega, E0, eta)</code>: Evaluates the spectral function.</li>
-</ul>
+<h1 id="the-memory-wall-single-pass-vs-two-pass-lanczos">The Memory Wall: Single-Pass vs Two-Pass Lanczos<a class="headerlink" href="#the-memory-wall-single-pass-vs-two-pass-lanczos" title="Permanent link">&para;</a></h1>
+<p>Standard Lanczos (Single-Pass) store all Krylov vectors. Cost memory O(k*N) for k iterations. Hit memory wall fast for big L.</p>
+<p>Two-Pass Lanczos save memory. First pass compute tridiagonal matrix T, only keep 3 vectors in memory. Cost O(N). Second pass recompute vectors to build ground state. Trade compute for memory, break memory wall.</p>
 
 
 
@@ -1143,6 +1046,44 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../matrix_free_spmv/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Matrix-Free SpMV on GPUs">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Matrix-Free SpMV on GPUs
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../precision_stability/" class="md-footer__link md-footer__link--next" aria-label="Next: Dual-Precision (FP32&#x2f;FP64) Stability">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Dual-Precision (FP32/FP64) Stability
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

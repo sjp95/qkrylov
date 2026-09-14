@@ -19,11 +19,11 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
-        <title>Performance Guide - qkrylov</title>
+        <title>Performance & Optimization Guide - qkrylov</title>
       
     
     
@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#performance-guide" class="md-skip">
+        <a href="#performance-optimization-guide" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Performance Guide
+              Performance &amp; Optimization Guide
             
           </span>
         </div>
@@ -909,10 +909,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#key-facts" class="md-nav__link">
+  <a href="#1-matrix-free-memory-scaling" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Key Facts
+        1. Matrix-Free Memory Scaling
       </span>
     </span>
   </a>
@@ -920,10 +920,99 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#coming-soon" class="md-nav__link">
+  <a href="#2-solver-memory-profiles-one-pass-vs-two-pass" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Coming Soon
+        2. Solver Memory Profiles: One-Pass vs. Two-Pass
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Solver Memory Profiles: One-Pass vs. Two-Pass">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#one-pass-lanczos" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        One-Pass Lanczos
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#two-pass-lanczos-twopass-two_passtrue" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Two-Pass Lanczos (<code>TwoPass</code> / <code>two_pass=True</code>)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-decoupled-ftlm-sweeps-100x-efficiency-boost" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        3. Decoupled FTLM Sweeps: 100x Efficiency Boost
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-hardware-acceleration-threading" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        4. Hardware Acceleration &amp; Threading
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Hardware Acceleration &amp; Threading">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cpu-multi-core-scaling-openmp" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        CPU Multi-Core Scaling (OpenMP)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu-acceleration-device-resident-vectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        GPU Acceleration &amp; Device-Resident Vectors
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-dual-precision-fp64-vs-fp32" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        5. Dual Precision (FP64 vs. FP32)
       </span>
     </span>
   </a>
@@ -956,25 +1045,144 @@
   
 
 
-<h1 id="performance-guide">Performance Guide<a class="headerlink" href="#performance-guide" title="Permanent link">&para;</a></h1>
-<div class="admonition note">
-<p class="admonition-title">Under Construction</p>
-<p>This page will cover performance benchmarks, tips for large system sizes, and memory usage profiling.</p>
-</div>
-<h2 id="key-facts">Key Facts<a class="headerlink" href="#key-facts" title="Permanent link">&para;</a></h2>
+<h1 id="performance-optimization-guide">Performance &amp; Optimization Guide<a class="headerlink" href="#performance-optimization-guide" title="Permanent link">&para;</a></h1>
+<p>This guide details the architectural design principles, memory scaling characteristics, and practical optimization tips for achieving peak performance with <code>qkrylov</code>.</p>
+<hr />
+<h2 id="1-matrix-free-memory-scaling">1. Matrix-Free Memory Scaling<a class="headerlink" href="#1-matrix-free-memory-scaling" title="Permanent link">&para;</a></h2>
+<p>In quantum many-body physics, Hilbert space dimension <span class="arithmatex">\(D\)</span> scales exponentially with system size <span class="arithmatex">\(N\)</span>:</p>
 <ul>
-<li><strong>Matrix-free:</strong> Memory scales as <span class="arithmatex">\(O(\dim)\)</span>, not <span class="arithmatex">\(O(\dim^2)\)</span>.<br />
-  A 20-site Heisenberg chain has <span class="arithmatex">\(\dim = \binom{20}{10} = 184{,}756\)</span>. Storing its Hamiltonian as a dense matrix would require <strong>~500 GB</strong>. qkrylov uses <strong>~3 MB</strong>.</li>
-<li><strong>OpenMP:</strong> All matrix-vector products are parallelized across all CPU cores automatically.</li>
-<li><strong>Zero-copy Python bridge:</strong> NumPy arrays passed to C++ are never copied — raw pointers are passed directly.</li>
+<li>Spin-&frac12; (<span class="arithmatex">\(S_z = 0\)</span> sector): <span class="arithmatex">\(D = \binom{N}{N/2}\)</span></li>
+<li>Fermi-Hubbard (half-filling): <span class="arithmatex">\(D = \binom{N}{N/2}^2\)</span></li>
 </ul>
-<h2 id="coming-soon">Coming Soon<a class="headerlink" href="#coming-soon" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">System Size (<span class="arithmatex">\(N\)</span>)</th>
+<th style="text-align: center;">Hilbert Space <span class="arithmatex">\(\dim (D)\)</span></th>
+<th style="text-align: center;">Dense Matrix Memory (<span class="arithmatex">\(16 D^2\)</span>)</th>
+<th style="text-align: center;">Sparse CSR Matrix (<span class="arithmatex">\(\approx 10 D\)</span>)</th>
+<th style="text-align: center;"><code>qkrylov</code> Matrix-Free (<span class="arithmatex">\(3 \times 16 D\)</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>12 sites</strong></td>
+<td style="text-align: center;">924</td>
+<td style="text-align: center;">13.6 MB</td>
+<td style="text-align: center;">148 KB</td>
+<td style="text-align: center;"><strong>44 KB</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>16 sites</strong></td>
+<td style="text-align: center;">12,870</td>
+<td style="text-align: center;">2.65 GB</td>
+<td style="text-align: center;">2.0 MB</td>
+<td style="text-align: center;"><strong>618 KB</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>20 sites</strong></td>
+<td style="text-align: center;">184,756</td>
+<td style="text-align: center;">546 GB</td>
+<td style="text-align: center;">29.5 MB</td>
+<td style="text-align: center;"><strong>8.8 MB</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>24 sites</strong></td>
+<td style="text-align: center;">2,704,156</td>
+<td style="text-align: center;">116 TB</td>
+<td style="text-align: center;">432 MB</td>
+<td style="text-align: center;"><strong>129 MB</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>28 sites</strong></td>
+<td style="text-align: center;">40,116,600</td>
+<td style="text-align: center;">25.7 PB</td>
+<td style="text-align: center;">6.4 GB</td>
+<td style="text-align: center;"><strong>1.9 GB</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>32 sites</strong></td>
+<td style="text-align: center;">601,080,390</td>
+<td style="text-align: center;">5.7 EB</td>
+<td style="text-align: center;">96 GB</td>
+<td style="text-align: center;"><strong>28.8 GB</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Traditional sparse-matrix methods must allocate gigabytes to store non-zero column indices and matrix elements before performing any calculations. <code>qkrylov</code> <strong>never constructs or stores the matrix</strong>, applying operator sums on-the-fly directly to the vector memory.</p>
+<hr />
+<h2 id="2-solver-memory-profiles-one-pass-vs-two-pass">2. Solver Memory Profiles: One-Pass vs. Two-Pass<a class="headerlink" href="#2-solver-memory-profiles-one-pass-vs-two-pass" title="Permanent link">&para;</a></h2>
+<p>When computing ground states and Ritz wavefunctions, solver memory depends heavily on how Krylov basis vectors are handled:</p>
+<h3 id="one-pass-lanczos">One-Pass Lanczos<a class="headerlink" href="#one-pass-lanczos" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Benchmarks vs. QuSpin, EDLib, and Lanczos reference implementations</li>
-<li>Scaling plots: time vs. system size</li>
-<li>Memory usage measurements</li>
-<li>Tips for choosing solver parameters</li>
+<li>Generates and stores all <span class="arithmatex">\(M\)</span> Krylov vectors <span class="arithmatex">\(v_1, \dots, v_M\)</span> in memory:
+  $<span class="arithmatex">\(\text{Memory} \approx M \times D \times 16 \text{ bytes}\)</span>$</li>
+<li>For <span class="arithmatex">\(D = 4 \times 10^7\)</span> and <span class="arithmatex">\(M = 100\)</span>, this requires <strong>~64 GB RAM</strong>.</li>
 </ul>
+<h3 id="two-pass-lanczos-twopass-two_passtrue">Two-Pass Lanczos (<code>TwoPass</code> / <code>two_pass=True</code>)<a class="headerlink" href="#two-pass-lanczos-twopass-two_passtrue" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Pass 1</strong>: Iterates using only 3 working vectors (<span class="arithmatex">\(v_{j-1}, v_j, v_{j+1}\)</span>) to generate the tridiagonal coefficients <span class="arithmatex">\(\alpha_n, \beta_n\)</span>. Eigenvalues and small subspace eigenvectors <span class="arithmatex">\(s\)</span> are computed.</li>
+<li><strong>Pass 2</strong>: Re-runs the Lanczos recurrence from the same initial state, accumulating the ground state wavefunction on-the-fly: <span class="arithmatex">\(|\psi_0\rangle = \sum_{j=1}^M s_j |v_j\rangle\)</span>.</li>
+<li><strong>Memory</strong>: Strictly <span class="arithmatex">\(3 \times D \times 16 \text{ bytes}\)</span> (<strong>~1.9 GB RAM</strong> for <span class="arithmatex">\(D = 4 \times 10^7\)</span>).</li>
+<li><strong>Trade-off</strong>: Requires running <span class="arithmatex">\(2M\)</span> matrix-vector products instead of <span class="arithmatex">\(M\)</span>, but enables simulations of systems that would otherwise crash from out-of-memory errors.</li>
+</ul>
+<hr />
+<h2 id="3-decoupled-ftlm-sweeps-100x-efficiency-boost">3. Decoupled FTLM Sweeps: 100x Efficiency Boost<a class="headerlink" href="#3-decoupled-ftlm-sweeps-100x-efficiency-boost" title="Permanent link">&para;</a></h2>
+<p>Traditional Finite Temperature Lanczos implementations re-run the entire Krylov iteration for every single temperature <span class="arithmatex">\(\beta\)</span> and for every observable <span class="arithmatex">\(\hat{O}\)</span>, scaling as <span class="arithmatex">\(\mathcal{O}(N_T \times N_{\text{obs}} \times R \times M)\)</span>.</p>
+<p>In <code>qkrylov</code>, FTLM is split into two independent stages:</p>
+<ol>
+<li><strong>Stage 1 (Krylov Sampling)</strong>:
+   For each random starting vector, execute <span class="arithmatex">\(M\)</span> Lanczos steps and project each user observable onto the Krylov subspace:
+   $<span class="arithmatex">\(\mathcal{O}_{jk} = \langle v_j | \hat{O} | v_k \rangle\)</span>$</li>
+<li><strong>Stage 2 (Thermodynamic Evaluation)</strong>:
+   Once the Krylov eigenpairs <span class="arithmatex">\((\epsilon_j, y_j)\)</span> and observable projections <span class="arithmatex">\(\mathcal{O}_{jk}\)</span> are stored in tiny <span class="arithmatex">\(M \times M\)</span> matrices, evaluating partition functions <span class="arithmatex">\(Z(\beta)\)</span>, free energies <span class="arithmatex">\(F(\beta)\)</span>, specific heat <span class="arithmatex">\(C_v(\beta)\)</span>, and observables <span class="arithmatex">\(\langle \hat{O} \rangle_\beta\)</span> across a grid of 1,000 temperature points takes <strong>milliseconds</strong> with zero matrix-vector products.</li>
+</ol>
+<hr />
+<h2 id="4-hardware-acceleration-threading">4. Hardware Acceleration &amp; Threading<a class="headerlink" href="#4-hardware-acceleration-threading" title="Permanent link">&para;</a></h2>
+<h3 id="cpu-multi-core-scaling-openmp">CPU Multi-Core Scaling (OpenMP)<a class="headerlink" href="#cpu-multi-core-scaling-openmp" title="Permanent link">&para;</a></h3>
+<p><code>qkrylov</code> parallelizes all matrix-free vector operations across CPU cores using OpenMP:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Recommended OpenMP affinity settings for high-performance servers:</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">16</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_PROC_BIND</span><span class="o">=</span>spread
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_PLACES</span><span class="o">=</span>threads
+</span></code></pre></div>
+<h3 id="gpu-acceleration-device-resident-vectors">GPU Acceleration &amp; Device-Resident Vectors<a class="headerlink" href="#gpu-acceleration-device-resident-vectors" title="Permanent link">&para;</a></h3>
+<p>For GPU-accelerated builds (CUDA / ROCm), avoiding host-to-device memory transfer overhead is essential:
+- Using <code>MatrixFreeHamiltonian</code> on <code>"cuda:0"</code> keeps operator actions purely inside GPU VRAM.
+- <code>qkrylov_device_vector_h</code> (C ABI) and Kokkos device execution spaces execute repeated SpMV products and BLAS-1 vector reductions without host synchronization bottlenecks.</p>
+<hr />
+<h2 id="5-dual-precision-fp64-vs-fp32">5. Dual Precision (FP64 vs. FP32)<a class="headerlink" href="#5-dual-precision-fp64-vs-fp32" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Precision</th>
+<th style="text-align: center;">C++ Scalar</th>
+<th style="text-align: center;">Python / NumPy</th>
+<th style="text-align: center;">Memory Footprint</th>
+<th style="text-align: center;">Convergence Tolerance</th>
+<th style="text-align: center;">Ideal Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>FP64</strong></td>
+<td style="text-align: center;"><code>double</code></td>
+<td style="text-align: center;"><code>complex128</code></td>
+<td style="text-align: center;"><span class="arithmatex">\(16 \text{ bytes/element}\)</span></td>
+<td style="text-align: center;">Down to <span class="arithmatex">\(10^{-14}\)</span></td>
+<td style="text-align: center;">Ground state precision, close-lying excited state gaps</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>FP32</strong></td>
+<td style="text-align: center;"><code>float</code></td>
+<td style="text-align: center;"><code>complex64</code></td>
+<td style="text-align: center;"><span class="arithmatex">\(8 \text{ bytes/element}\)</span></td>
+<td style="text-align: center;">Down to <span class="arithmatex">\(10^{-6}\)</span></td>
+<td style="text-align: center;">Consumer GPUs (RTX 30xx/40xx), high-temperature FTLM, broad dynamical spectral functions <span class="arithmatex">\(S(\omega)\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Using FP32 doubles effective GPU VRAM capacity, allowing you to simulate systems with twice the Hilbert space dimension.</p>
 
 
 
@@ -1043,7 +1251,7 @@
       <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

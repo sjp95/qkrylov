@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
@@ -429,10 +429,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-build-the-matrixfreehamiltonian" class="md-nav__link">
+  <a href="#step-4-construct-the-matrixfreehamiltonian" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Step 4: Build the MatrixFreeHamiltonian
+        Step 4: Construct the MatrixFreeHamiltonian
       </span>
     </span>
   </a>
@@ -440,10 +440,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-5-solve-for-ground-state-energy-lanczos" class="md-nav__link">
+  <a href="#step-5-solve-for-ground-state-lanczos" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Step 5: Solve for Ground State Energy (Lanczos)
+        Step 5: Solve for Ground State (Lanczos)
       </span>
     </span>
   </a>
@@ -451,13 +451,41 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-6-scipy-integration-python-only" class="md-nav__link">
+  <a href="#step-6-scipy-sciml-ecosystem-integration" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Step 6: SciPy Integration (Python Only)
+        Step 6: SciPy &amp; SciML Ecosystem Integration
       </span>
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Step 6: SciPy &amp; SciML Ecosystem Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-scipy-linearoperator" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Python: SciPy <code>LinearOperator</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#julia-sciml-solveprob-alg" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Julia: SciML <code>solve(prob, alg)</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1094,10 +1122,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-build-the-matrixfreehamiltonian" class="md-nav__link">
+  <a href="#step-4-construct-the-matrixfreehamiltonian" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Step 4: Build the MatrixFreeHamiltonian
+        Step 4: Construct the MatrixFreeHamiltonian
       </span>
     </span>
   </a>
@@ -1105,10 +1133,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-5-solve-for-ground-state-energy-lanczos" class="md-nav__link">
+  <a href="#step-5-solve-for-ground-state-lanczos" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Step 5: Solve for Ground State Energy (Lanczos)
+        Step 5: Solve for Ground State (Lanczos)
       </span>
     </span>
   </a>
@@ -1116,13 +1144,41 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-6-scipy-integration-python-only" class="md-nav__link">
+  <a href="#step-6-scipy-sciml-ecosystem-integration" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Step 6: SciPy Integration (Python Only)
+        Step 6: SciPy &amp; SciML Ecosystem Integration
       </span>
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Step 6: SciPy &amp; SciML Ecosystem Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-scipy-linearoperator" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Python: SciPy <code>LinearOperator</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#julia-sciml-solveprob-alg" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Julia: SciML <code>solve(prob, alg)</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1209,251 +1265,230 @@
 
 
 <h1 id="quickstart-heisenberg-model-in-5-minutes">Quickstart: Heisenberg Model in 5 Minutes<a class="headerlink" href="#quickstart-heisenberg-model-in-5-minutes" title="Permanent link">&para;</a></h1>
-<p>Welcome to <strong>qkrylov</strong>! In this guide, we'll walk you through solving the quantum Heisenberg model step-by-step. By the end of this tutorial, you'll know how to define a Hilbert space, build operators, construct a matrix-free Hamiltonian, and find its ground state.</p>
+<p>Welcome to <strong>qkrylov</strong>! In this guide, we'll walk you through solving the quantum Heisenberg model step-by-step across <strong>Python</strong>, <strong>Julia</strong>, and <strong>C++</strong>.</p>
+<p>By the end of this tutorial, you'll know how to define a Hilbert space, build operators, construct a matrix-free Hamiltonian, and find its ground state.</p>
+<hr />
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<p>Before we begin, ensure you have installed the library for your preferred environment:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">🐍 Python (Pip)</label><label for="__tabbed_1_2">🔴 Julia (Pkg)</label><label for="__tabbed_1_3">⚙️ C++ (Source)</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">CPU Only</label><label for="__tabbed_2_2">CUDA 12 (Linux)</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>qkrylov
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Standard CPU (OpenMP accelerated)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>qkrylov
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># NVIDIA CUDA 12</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>pip<span class="w"> </span>install<span class="w"> </span>qkrylov<span class="w"> </span>--extra-index-url<span class="w"> </span>https://peithonking.github.io/qkrylov-wheels/cuda
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># AMD ROCm 6</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>pip<span class="w"> </span>install<span class="w"> </span>qkrylov<span class="w"> </span>--extra-index-url<span class="w"> </span>https://peithonking.github.io/qkrylov-wheels/rocm
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>qkrylov<span class="o">[</span>cuda<span class="o">]</span><span class="w"> </span>--extra-index-url<span class="w"> </span>https://sjp95.github.io/qkrylov/whl/cu12
-</span></code></pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="tabbed-block">
-<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">CPU Only</label><label for="__tabbed_3_2">CUDA 12 (Linux)</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-julia highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">using</span><span class="w"> </span><span class="n">Pkg</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s">"https://github.com/sjp95/qkrylov.git"</span><span class="p">,</span><span class="w"> </span><span class="n">subdir</span><span class="o">=</span><span class="s">"bindings/julia"</span><span class="p">)</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">using</span><span class="w"> </span><span class="n">Pkg</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c"># Automatically downloads prebuilt native binaries (CPU or CUDA 12 on Linux)</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s">"https://github.com/sjp95/qkrylov.git"</span><span class="p">,</span><span class="w"> </span><span class="n">rev</span><span class="o">=</span><span class="s">"julia-latest"</span><span class="p">,</span><span class="w"> </span><span class="n">subdir</span><span class="o">=</span><span class="s">"bindings/julia"</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-julia highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">using</span><span class="w"> </span><span class="n">Pkg</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c"># Julia automatically detects CUDA on Linux and downloads the GPU binary</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s">"https://github.com/sjp95/qkrylov.git"</span><span class="p">,</span><span class="w"> </span><span class="n">subdir</span><span class="o">=</span><span class="s">"bindings/julia"</span><span class="p">)</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/sjp95/qkrylov.git
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>qkrylov
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>mkdir<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>cmake<span class="w"> </span>..<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>make<span class="w"> </span>-j4
 </span></code></pre></div>
 </div>
 </div>
 </div>
-</div>
-<div class="tabbed-block">
-<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">CPU Only</label><label for="__tabbed_4_2">CUDA 12 (Linux)</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdir<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>cmake<span class="w"> </span>..<span class="w"> </span>-DKokkos_ENABLE_OPENMP<span class="o">=</span>ON
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>make<span class="w"> </span>-j4
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mkdir<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>cmake<span class="w"> </span>..<span class="w"> </span>-DKokkos_ENABLE_CUDA<span class="o">=</span>ON<span class="w"> </span>-DCMAKE_CUDA_COMPILER<span class="o">=</span><span class="k">$(</span>which<span class="w"> </span>nvcc<span class="k">)</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>make<span class="w"> </span>-j4
-</span></code></pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+<hr />
 <h2 id="step-1-define-the-hilbert-space-basis">Step 1: Define the Hilbert Space (Basis)<a class="headerlink" href="#step-1-define-the-hilbert-space-basis" title="Permanent link">&para;</a></h2>
-<p>The first step in any exact diagonalization calculation is defining the Hilbert space. In qkrylov, this is done using a <code>Basis</code> object. For a spin-&frac12; system, we use <code>SpinHalfBasis</code>.</p>
-<p>We can restrict our Hilbert space to a specific quantum number sector. For the Heisenberg model, the total magnetization (<span class="arithmatex">\(S_z\)</span>) is conserved. Restricting the calculation to a specific <span class="arithmatex">\(S_z\)</span> sector drastically reduces the dimension of the Hilbert space.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Python</label><label for="__tabbed_5_2">C++</label><label for="__tabbed_5_3">Julia</label></div>
+<p>In <code>qkrylov</code>, the Hilbert space is defined using a <code>Basis</code> object. For a spin-&frac12; system, we use <code>SpinHalfBasis</code>.</p>
+<p>Restricting the calculation to a conserved symmetry sector (like total <span class="arithmatex">\(S_z = 0\)</span>) drastically reduces the dimension of the Hilbert space:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Python</label><label for="__tabbed_2_2">Julia</label><label for="__tabbed_2_3">C++</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">qk</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># A system of N=4 sites, restricting to the total Sz = 0 sector.</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">N</span> <span class="o">=</span> <span class="mi">4</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">basis</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">sz</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Without quantum number sectors, it would just be:</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="c1"># full_basis = qk.SpinHalfBasis(N=N)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">qk</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># A system of N=4 sites, restricting to the total Sz = 0 sector.</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">N</span> <span class="o">=</span> <span class="mi">4</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">sector</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sector</span><span class="p">()</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">sector</span><span class="o">.</span><span class="n">set_sz</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">basis</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">sector</span><span class="p">)</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Sector dimension: </span><span class="si">{</span><span class="n">basis</span><span class="o">.</span><span class="n">dimension</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># 6 states</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov.hpp&gt;</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1">// Create a sector for Sz = 0</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">qk</span><span class="o">::</span><span class="n">Sector</span><span class="w"> </span><span class="n">sector</span><span class="p">;</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="n">sector</span><span class="p">.</span><span class="n">use_sz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="n">sector</span><span class="p">.</span><span class="n">sz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="n">qk</span><span class="o">::</span><span class="n">SpinHalfBasis</span><span class="w"> </span><span class="nf">basis</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QuantumKrylov</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sector</span><span class="p">()</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">set_sz!</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="n">println</span><span class="p">(</span><span class="s">"Sector dimension: "</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="p">(</span><span class="n">basis</span><span class="p">))</span><span class="w">  </span><span class="c"># 6 states</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../">roadmap</a>.</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/qkrylov.hpp&gt;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">auto</span><span class="w"> </span><span class="n">sector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">qkrylov</span><span class="o">::</span><span class="n">Sector</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">sector</span><span class="o">-&gt;</span><span class="n">set_sz</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="k">auto</span><span class="w"> </span><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">qkrylov</span><span class="o">::</span><span class="n">SpinHalfBasis</span><span class="o">&gt;</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Sector dimension: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">basis</span><span class="o">-&gt;</span><span class="n">dimension</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></code></pre></div>
 </div>
 </div>
 </div>
-</div>
+<hr />
 <h2 id="step-2-define-the-local-physics-site">Step 2: Define the Local Physics (Site)<a class="headerlink" href="#step-2-define-the-local-physics-site" title="Permanent link">&para;</a></h2>
-<p>Next, we define the local physical degrees of freedom. A <code>Site</code> object defines what operators are available at each site. For spin-&frac12;, <code>SpinHalfSite</code> provides the basic spin operators: <code>Sz</code>, <code>Sp</code> (<span class="arithmatex">\(S^+\)</span>), and <code>Sm</code> (<span class="arithmatex">\(S^-\)</span>).</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="6:3"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Python</label><label for="__tabbed_6_2">C++</label><label for="__tabbed_6_3">Julia</label></div>
+<p>A <code>Site</code> object defines what local operators are available at each lattice site. For spin-&frac12; systems, <code>SpinHalfSite</code> provides the spin operators: <code>Sz</code>, <code>Sp</code> (<span class="arithmatex">\(S^+\)</span>), and <code>Sm</code> (<span class="arithmatex">\(S^-\)</span>).</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:3"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Python</label><label for="__tabbed_3_2">Julia</label><label for="__tabbed_3_3">C++</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">site</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfSite</span><span class="p">()</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">site</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfSite</span><span class="p">()</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">qk</span><span class="o">::</span><span class="n">SpinHalfSite</span><span class="w"> </span><span class="n">site</span><span class="p">;</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">site</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfSite</span><span class="p">()</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c"># Note: When constructing MatrixFreeHamiltonian, site is automatically inferred if omitted</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../">roadmap</a>.</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">site</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">qkrylov</span><span class="o">::</span><span class="n">SpinHalfSite</span><span class="o">&gt;</span><span class="p">();</span>
+</span></code></pre></div>
 </div>
 </div>
 </div>
-</div>
+<hr />
 <h2 id="step-3-build-the-hamiltonian-opsum">Step 3: Build the Hamiltonian (OpSum)<a class="headerlink" href="#step-3-build-the-hamiltonian-opsum" title="Permanent link">&para;</a></h2>
-<p>We represent our Hamiltonian as a sum of local operator terms using <code>OpSum</code>. 
-The Heisenberg chain Hamiltonian is:
-<span class="arithmatex">\(H = J \sum_i \left[ S^z_i S^z_{i+1} + \frac{1}{2} \left( S^+_i S^-_{i+1} + S^-_i S^+_{i+1} \right) \right]\)</span></p>
-<p>In qkrylov, we build this up by appending tuples to our <code>OpSum</code> object. The tuple convention is: <code>(coefficient, operator_name_1, site_index_1, operator_name_2, site_index_2, ...)</code></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="7:3"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><input id="__tabbed_7_3" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Python</label><label for="__tabbed_7_2">C++</label><label for="__tabbed_7_3">Julia</label></div>
+<p>We represent our Hamiltonian as a sum of local operator terms using <code>OpSum</code>.
+The 1D Heisenberg antiferromagnet Hamiltonian is:</p>
+<div class="arithmatex">\[H = J \sum_{i=0}^{N-2} \left[ S^z_i S^z_{i+1} + \frac{1}{2} \left( S^+_i S^-_{i+1} + S^-_i S^+_{i+1} \right) \right]\]</div>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:3"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><input id="__tabbed_4_3" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Python</label><label for="__tabbed_4_2">Julia</label><label for="__tabbed_4_3">C++</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">ops</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">OpSum</span><span class="p">()</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">J</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Coupling constant</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="c1"># Sz Sz term</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="n">ops</span> <span class="o">+=</span> <span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="s1">'Sz'</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">'Sz'</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="c1"># 1/2 (Sp Sm + Sm Sp) terms</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="n">ops</span> <span class="o">+=</span> <span class="p">(</span><span class="n">J</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">'Sp'</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">'Sm'</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="n">ops</span> <span class="o">+=</span> <span class="p">(</span><span class="n">J</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">'Sm'</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">'Sp'</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">ops</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">J</span> <span class="o">=</span> <span class="mf">1.0</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">ops</span> <span class="o">+=</span> <span class="n">J</span><span class="p">,</span> <span class="s1">'Sz'</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">'Sz'</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="n">ops</span> <span class="o">+=</span> <span class="n">J</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">'Sp'</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">'Sm'</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="n">ops</span> <span class="o">+=</span> <span class="n">J</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">'Sm'</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">'Sp'</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">qk</span><span class="o">::</span><span class="n">OpSum</span><span class="w"> </span><span class="n">ops</span><span class="p">;</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">J</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="p">(</span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="k">global</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">J</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="k">end</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">qkrylov</span><span class="o">::</span><span class="n">OpSum</span><span class="w"> </span><span class="n">ops</span><span class="p">;</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kt">double</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">ops</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">});</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="n">ops</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="n">J</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">});</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="n">ops</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="n">J</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">});</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">ops</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="n">ops</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="n">J</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="n">ops</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="n">J</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
 </span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="p">}</span>
 </span></code></pre></div>
 </div>
-<div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../">roadmap</a>.</p>
 </div>
 </div>
-</div>
-</div>
-<h2 id="step-4-build-the-matrixfreehamiltonian">Step 4: Build the MatrixFreeHamiltonian<a class="headerlink" href="#step-4-build-the-matrixfreehamiltonian" title="Permanent link">&para;</a></h2>
-<p>With the basis, site, and operators defined, we can construct the <code>MatrixFreeHamiltonian</code>.</p>
-<p><strong>The Zero-Copy Philosophy:</strong> qkrylov operates completely matrix-free. The full Hamiltonian matrix is <em>never</em> stored in RAM. Instead, action of the Hamiltonian on a vector is computed on-the-fly. This allows you to simulate much larger systems than standard sparse matrix methods. Numpy arrays in Python are passed directly into C++ without any memory copying.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="8:3"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><input id="__tabbed_8_3" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">Python</label><label for="__tabbed_8_2">C++</label><label for="__tabbed_8_3">Julia</label></div>
+<hr />
+<h2 id="step-4-construct-the-matrixfreehamiltonian">Step 4: Construct the MatrixFreeHamiltonian<a class="headerlink" href="#step-4-construct-the-matrixfreehamiltonian" title="Permanent link">&para;</a></h2>
+<p>The full Hamiltonian matrix is <strong>never materialized in memory</strong>. Instead, matrix-vector products <span class="arithmatex">\(y = H x\)</span> are computed directly on-the-fly, scaling memory strictly as <span class="arithmatex">\(\mathcal{O}(\text{dim})\)</span>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Python</label><label for="__tabbed_5_2">Julia</label><label for="__tabbed_5_3">C++</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">H</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">ops</span><span class="p">)</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Hilbert space dimension: </span><span class="si">{</span><span class="n">H</span><span class="o">.</span><span class="n">dimension</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1"># You can apply the Hamiltonian directly to a numpy array x</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1"># import numpy as np</span>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1"># x = np.random.rand(H.dimension)</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c1"># y = H.apply(x) </span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
-</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="c1"># Or get its diagonal elements</span>
-</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="c1"># diag = H.diagonal()</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Hamiltonian dimension: </span><span class="si">{</span><span class="n">H</span><span class="o">.</span><span class="n">dimension</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Matrix-vector multiplication (zero-copy NumPy interop):</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">dimension</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="n">y</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="c1"># Extract diagonal elements:</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="n">diag</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">qk</span><span class="o">::</span><span class="n">MatrixFreeHamiltonian</span><span class="w"> </span><span class="nf">H</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">ops</span><span class="p">);</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Hilbert space dimension: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">H</span><span class="p">.</span><span class="n">dimension</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="c1">// std::vector&lt;double&gt; x(H.dimension(), 1.0);</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="c1">// std::vector&lt;double&gt; y = H.apply(x);</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">)</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">println</span><span class="p">(</span><span class="s">"Hamiltonian dimension: "</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c"># Matrix-vector multiplication (zero-copy):</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">(</span><span class="kt">ComplexF64</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="c"># Extract diagonal elements:</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="n">diag_H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">diagonal</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../">roadmap</a>.</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">qkrylov</span><span class="o">::</span><span class="n">MatrixFreeHamiltonian</span><span class="w"> </span><span class="nf">H</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">ops</span><span class="p">);</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Hamiltonian dimension: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">H</span><span class="p">.</span><span class="n">dimension</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></code></pre></div>
 </div>
 </div>
 </div>
-</div>
-<h2 id="step-5-solve-for-ground-state-energy-lanczos">Step 5: Solve for Ground State Energy (Lanczos)<a class="headerlink" href="#step-5-solve-for-ground-state-energy-lanczos" title="Permanent link">&para;</a></h2>
-<p>To find the ground state, we use the Lanczos algorithm. <code>lanczos_ground_state</code> returns the ground state energy and the eigenvector. Let's verify that the ground state energy for a 2-site Heisenberg model is -0.75.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="9:3"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><input id="__tabbed_9_3" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">Python</label><label for="__tabbed_9_2">C++</label><label for="__tabbed_9_3">Julia</label></div>
+<hr />
+<h2 id="step-5-solve-for-ground-state-lanczos">Step 5: Solve for Ground State (Lanczos)<a class="headerlink" href="#step-5-solve-for-ground-state-lanczos" title="Permanent link">&para;</a></h2>
+<p>Use the Lanczos algorithm to compute the ground-state energy and Ritz eigenvector:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:3"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Python</label><label for="__tabbed_6_2">Julia</label><label for="__tabbed_6_3">C++</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">energy</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Ground State Energy: </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">res</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">compute_eigenvectors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Ground State Energy: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">energy</span><span class="si">:</span><span class="s2">.10f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># -1.6160254038</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Iterations: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">iterations</span><span class="si">}</span><span class="s2">, Converged: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">converged</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">psi0</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">eigenvector</span>  <span class="c1"># 1D numpy array</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">energy</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qk</span><span class="o">::</span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">);</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Ground State Energy: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">energy</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c"># Functional interface:</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">;</span><span class="w"> </span><span class="n">return_state</span><span class="o">=</span><span class="nb">true</span><span class="p">)</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">println</span><span class="p">(</span><span class="s">"Ground State Energy: "</span><span class="p">,</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span><span class="w">  </span><span class="c"># -1.6160254038</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">println</span><span class="p">(</span><span class="s">"Iterations: "</span><span class="p">,</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="s">", Converged: "</span><span class="p">,</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span class="n">converged</span><span class="p">)</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">psi0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span class="n">state</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="c"># SciML CommonSolve interface:</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">GroundStateProblem</span><span class="p">(</span><span class="n">H</span><span class="p">),</span><span class="w"> </span><span class="n">Lanczos</span><span class="p">(</span><span class="n">compute_eigenvector</span><span class="o">=</span><span class="nb">true</span><span class="p">))</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="n">println</span><span class="p">(</span><span class="s">"SciML Energy: "</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../">roadmap</a>.</p>
-</div>
-</div>
-</div>
-</div>
-<h2 id="step-6-scipy-integration-python-only">Step 6: SciPy Integration (Python Only)<a class="headerlink" href="#step-6-scipy-integration-python-only" title="Permanent link">&para;</a></h2>
-<p>While qkrylov's matrix-free engine provides built-in solvers like Lanczos and Davidson, you can also seamlessly integrate it with the Python ecosystem.</p>
-<p><code>MatrixFreeHamiltonian</code> can be cast to a SciPy <code>LinearOperator</code>, allowing you to use SciPy's sparse linear algebra tools. If your system is small enough, you can also extract the full sparse matrix.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="10:3"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><input id="__tabbed_10_3" name="__tabbed_10" type="radio" /><div class="tabbed-labels"><label for="__tabbed_10_1">Python</label><label for="__tabbed_10_2">C++</label><label for="__tabbed_10_3">Julia</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sla</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="c1"># Use with SciPy's eigensolver</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">lin_op</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">aslinearoperator</span><span class="p">()</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">evals</span><span class="p">,</span> <span class="n">evecs</span> <span class="o">=</span> <span class="n">sla</span><span class="o">.</span><span class="n">eigsh</span><span class="p">(</span><span class="n">lin_op</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">'SA'</span><span class="p">)</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"SciPy Ground State Energy: </span><span class="si">{</span><span class="n">evals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="c1"># For very small systems, you can build the explicit sparse matrix</span>
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="n">sparse_mat</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">to_sparse</span><span class="p">()</span>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">energy</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov</span><span class="o">::</span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">);</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Ground State Energy: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">energy</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 </span></code></pre></div>
 </div>
-<div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Python Only Feature</p>
-<p>SciPy integration is only available in the Python interface.</p>
 </div>
 </div>
-<div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../">roadmap</a>.</p>
-</div>
-</div>
-</div>
-</div>
+<hr />
+<h2 id="step-6-scipy-sciml-ecosystem-integration">Step 6: SciPy &amp; SciML Ecosystem Integration<a class="headerlink" href="#step-6-scipy-sciml-ecosystem-integration" title="Permanent link">&para;</a></h2>
+<h3 id="python-scipy-linearoperator">Python: SciPy <code>LinearOperator</code><a class="headerlink" href="#python-scipy-linearoperator" title="Permanent link">&para;</a></h3>
+<p><code>MatrixFreeHamiltonian</code> can be wrapped directly as a SciPy <code>LinearOperator</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sla</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">lin_op</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">as_linear_operator</span><span class="p">()</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">evals</span><span class="p">,</span> <span class="n">evecs</span> <span class="o">=</span> <span class="n">sla</span><span class="o">.</span><span class="n">eigsh</span><span class="p">(</span><span class="n">lin_op</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">'SA'</span><span class="p">)</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"SciPy Ground State: </span><span class="si">{</span><span class="n">evals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="julia-sciml-solveprob-alg">Julia: SciML <code>solve(prob, alg)</code><a class="headerlink" href="#julia-sciml-solveprob-alg" title="Permanent link">&para;</a></h3>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QuantumKrylov</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GroundStateProblem</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">Lanczos</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">))</span>
+</span></code></pre></div>
+<hr />
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
-<p>Now that you have a basic understanding of the qkrylov workflow, check out:</p>
+<p>Explore the specialized solvers in <code>qkrylov</code>:</p>
 <ul>
-<li><strong>Advanced Models:</strong> Learn how to simulate Fermion, Hubbard, and t-J models.</li>
-<li><strong>Dynamical Properties:</strong> See how to calculate spectral functions and continue fractions.</li>
-<li><strong>Finite Temperature:</strong> Explore Finite Temperature Lanczos Method (FTLM) for thermodynamics.</li>
+<li><strong><a href="../solvers/lanczos/">Lanczos Algorithm</a></strong>: Two-pass memory-frugal ground states and lowest-<span class="arithmatex">\(k\)</span> eigenpairs.</li>
+<li><strong><a href="../solvers/davidson/">Davidson Algorithm</a></strong>: Subspace iteration with diagonal preconditioning for multiple excited states.</li>
+<li><strong><a href="../solvers/dynamics/">Spectral Functions &amp; Dynamics</a></strong>: Continued-fraction expansions and correction vector methods for <span class="arithmatex">\(S(\omega)\)</span>.</li>
+<li><strong><a href="../solvers/ftlm/">Finite Temperature Lanczos (FTLM)</a></strong>: Multi-temperature sweeps of thermodynamic equations of state (<span class="arithmatex">\(Z, F, E, C_v, S\)</span>) and physical observables.</li>
 </ul>
 
 
@@ -1561,7 +1596,7 @@ The Heisenberg chain Hamiltonian is:
       <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

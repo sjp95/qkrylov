@@ -19,11 +19,11 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
-        <title>Lanczos Algorithm - qkrylov</title>
+        <title>Lanczos Eigensolver - qkrylov</title>
       
     
     
@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#lanczos-algorithm" class="md-skip">
+        <a href="#lanczos-eigensolver" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Lanczos Algorithm
+              Lanczos Eigensolver
             
           </span>
         </div>
@@ -909,22 +909,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#function-signature" class="md-nav__link">
+  <a href="#1-compile-time-policies" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Function Signature
+        1. Compile-Time Policies
       </span>
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Function Signature">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-configuration-return-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        2. Configuration &amp; Return Types
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Configuration &amp; Return Types">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#c-lanczosconfig" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Parameters
+        C++ <code>LanczosConfig</code>
       </span>
     </span>
   </a>
@@ -932,10 +943,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#returns" class="md-nav__link">
+  <a href="#structured-bindings" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Returns
+        Structured Bindings
       </span>
     </span>
   </a>
@@ -948,10 +959,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-usage" class="md-nav__link">
+  <a href="#3-multi-language-usage-examples" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Example Usage
+        3. Multi-Language Usage Examples
       </span>
     </span>
   </a>
@@ -984,105 +995,180 @@
   
 
 
-<h1 id="lanczos-algorithm">Lanczos Algorithm<a class="headerlink" href="#lanczos-algorithm" title="Permanent link">&para;</a></h1>
-<p>The Lanczos algorithm is a Krylov subspace method designed to find extremal eigenvalues (typically the ground state) of large, sparse Hermitian matrices. By constructing an orthogonal basis for the Krylov subspace iteratively, <code>qkrylov</code> avoids building the full dense Hamiltonian matrix in memory.</p>
-<p><strong>Note:</strong> <code>qkrylov</code> leverages OpenMP parallelism during matrix-vector multiplications in the Lanczos iterations to drastically reduce computation time.</p>
-<h2 id="function-signature">Function Signature<a class="headerlink" href="#function-signature" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Python</label><label for="__tabbed_1_2">C++</label><label for="__tabbed_1_3">Julia</label></div>
+<h1 id="lanczos-eigensolver">Lanczos Eigensolver<a class="headerlink" href="#lanczos-eigensolver" title="Permanent link">&para;</a></h1>
+<p>The Lanczos algorithm is an iterative Krylov subspace method designed to find extremal eigenvalues and eigenvectors of large, sparse Hermitian quantum systems without building the dense <span class="arithmatex">\(D \times D\)</span> Hamiltonian in memory.</p>
+<p>In <code>qkrylov</code>, the Lanczos solver is unified into a modern C++20 engine <code>solvers::lanczos&lt;Policy, ExecSpace&gt;</code> governed by compile-time execution policies that select optimal memory bounds and orthogonalization strategies.</p>
+<hr />
+<h2 id="1-compile-time-policies">1. Compile-Time Policies<a class="headerlink" href="#1-compile-time-policies" title="Permanent link">&para;</a></h2>
+<p><code>qkrylov</code> provides 4 specialized policies defined in <code>qkrylov::solvers::policy</code>:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Policy</th>
+<th style="text-align: center;">Memory Bound</th>
+<th style="text-align: center;">State Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong><code>OnePass</code></strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(\mathcal{O}(D)\)</span></td>
+<td style="text-align: center;">Ground state only (energy)</td>
+<td style="text-align: left;">Keeps only 3 Krylov vectors in flight. Ideal when only the ground-state energy is required.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>OnePass_DKGS</code></strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(\mathcal{O}(m \cdot D)\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(k\)</span> low-lying states</td>
+<td style="text-align: left;">Implements Daniel-Gragg-Kaufman-Stewart (DKGS) full reorthogonalization to compute <span class="arithmatex">\(k\)</span> lowest eigenvalues and eigenvectors without spurious ghost eigenvalues.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>OnePass_full</code></strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(\mathcal{O}(m \cdot D)\)</span></td>
+<td style="text-align: center;">Ground state (with wavefunction)</td>
+<td style="text-align: left;">Retains the Krylov basis in memory to reconstruct the ground-state eigenvector in a single pass.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>TwoPass</code></strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(\mathcal{O}(D)\)</span></td>
+<td style="text-align: center;">Ground state (with wavefunction)</td>
+<td style="text-align: left;">Minimal memory bound. Pass 1 finds tridiagonal eigenvalues. Pass 2 reconstructs the eigenvector without storing the Krylov basis.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-configuration-return-types">2. Configuration &amp; Return Types<a class="headerlink" href="#2-configuration-return-types" title="Permanent link">&para;</a></h2>
+<h3 id="c-lanczosconfig">C++ <code>LanczosConfig</code><a class="headerlink" href="#c-lanczosconfig" title="Permanent link">&para;</a></h3>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">LanczosConfig</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">n_eig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">                               </span><span class="c1">// Number of lowest eigenpairs to compute (OnePass_DKGS)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">maxiter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">;</span><span class="w">                           </span><span class="c1">// Maximum Krylov iterations</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">min_iterations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">                      </span><span class="c1">// Minimum iterations before checking convergence</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">check_interval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">                      </span><span class="c1">// Convergence check stride</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="n">Real</span><span class="w"> </span><span class="n">tol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Real</span><span class="p">(</span><span class="mf">1.0e-12</span><span class="p">);</span><span class="w">                    </span><span class="c1">// Convergence tolerance</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="n">Real</span><span class="w"> </span><span class="n">breakdown_tol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Real</span><span class="p">(</span><span class="mf">0.0</span><span class="p">);</span><span class="w">              </span><span class="c1">// Subspace breakdown tolerance (0 =&gt; 4 * eps)</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">optional</span><span class="o">&lt;</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="w"> </span><span class="n">seed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">nullopt</span><span class="p">;</span><span class="w"> </span><span class="c1">// Deterministic PRNG seed</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="n">HostVector</span><span class="w"> </span><span class="n">initial_vector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span><span class="w">              </span><span class="c1">// Warm-starting trial vector</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">compute_eigenvectors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w">            </span><span class="c1">// Compute state vectors when policy supports it</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">};</span>
+</span></code></pre></div>
+<h3 id="structured-bindings">Structured Bindings<a class="headerlink" href="#structured-bindings" title="Permanent link">&para;</a></h3>
+<p><code>LanczosResult</code> supports C++17 structured bindings:
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">energy</span><span class="p">,</span><span class="w"> </span><span class="n">psi0</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solvers</span><span class="o">::</span><span class="n">lanczos</span><span class="o">&lt;</span><span class="n">solvers</span><span class="o">::</span><span class="n">policy</span><span class="o">::</span><span class="n">OnePass_full</span><span class="o">&gt;</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">);</span>
+</span></code></pre></div></p>
+<hr />
+<h2 id="3-multi-language-usage-examples">3. Multi-Language Usage Examples<a class="headerlink" href="#3-multi-language-usage-examples" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Julia</label><label for="__tabbed_1_2">Python</label><label for="__tabbed_1_3">C++</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">):</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="sd">"""</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="sd">    Compute the ground state energy and eigenvector.</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="sd">    """</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">...</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QuantumKrylov</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c"># 1. Define 8-site Heisenberg model</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sector</span><span class="p">()</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">set_sz!</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">site</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfSite</span><span class="p">()</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">op</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="mi">7</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="n">next_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mod</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="k">end</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">)</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="c"># 2. SciML Problem-Algorithm Interface</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="c"># Ground State with One-Pass</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GroundStateProblem</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">Lanczos</span><span class="p">(</span><span class="n">variation</span><span class="o">=</span><span class="n">OnePass</span><span class="p">(),</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span><span class="w"> </span><span class="n">return_state</span><span class="o">=</span><span class="nb">true</span><span class="p">))</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="n">println</span><span class="p">(</span><span class="s">"Ground state energy: "</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="n">println</span><span class="p">(</span><span class="s">"Wavefunction length: "</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">sol</span><span class="o">.</span><span class="n">eigenvector</span><span class="p">))</span>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="c"># Low-memory Two-Pass for large Hilbert spaces</span>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="n">sol_tp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">Lanczos</span><span class="p">(</span><span class="n">variation</span><span class="o">=</span><span class="n">TwoPass</span><span class="p">(),</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">))</span>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="n">println</span><span class="p">(</span><span class="s">"Two-pass energy: "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_tp</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="c"># Multiple low-lying excited states via DKGS</span>
+</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="n">exc_prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ExcitedStatesProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="n">sol_lowest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">exc_prob</span><span class="p">,</span><span class="w"> </span><span class="n">Lanczos</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="n">return_state</span><span class="o">=</span><span class="nb">true</span><span class="p">))</span>
+</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="n">println</span><span class="p">(</span><span class="s">"Lowest 3 energies: "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_lowest</span><span class="o">.</span><span class="n">eigenvalues</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="o">&amp;</span><span class="w"> </span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">);</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">qk</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># 1. Define 8-site Heisenberg model</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">basis</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">sz</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">site</span>  <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfSite</span><span class="p">()</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">op</span>    <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">op</span> <span class="o">+=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sz</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">qk</span><span class="o">.</span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sm</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sp</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">H</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1"># 2. Single-Pass Ground State (OOP interface)</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="n">solver</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">Lanczos</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">)</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="n">res</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Ground State Energy: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">energy</span><span class="si">:</span><span class="s2">.8f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Iterations: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">iterations</span><span class="si">}</span><span class="s2">, Converged: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">converged</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="c1"># Tuple unpacking</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="n">e0</span><span class="p">,</span> <span class="n">psi0</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="c1"># 3. Two-Pass Ground State (minimal memory bound)</span>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="n">solver_tp</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">LanczosTwoPass</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="n">e0_tp</span><span class="p">,</span> <span class="n">psi0_tp</span> <span class="o">=</span> <span class="n">solver_tp</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">e0</span><span class="p">,</span> <span class="n">e0_tp</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../">roadmap</a>.</p>
-</div>
-</div>
-</div>
-</div>
-<h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>H</code>: A <code>MatrixFreeHamiltonian</code> instance.</li>
-<li><code>maxiter</code>: Maximum number of Lanczos iterations allowed.</li>
-<li><code>tol</code>: Convergence tolerance for the eigenvalue residual.</li>
-</ul>
-<h3 id="returns">Returns<a class="headerlink" href="#returns" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>energy</code>: The scalar ground state energy.</li>
-<li><code>eigenvector</code>: The corresponding ground state wave function array.</li>
-</ul>
-<h2 id="example-usage">Example Usage<a class="headerlink" href="#example-usage" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Python</label><label for="__tabbed_2_2">C++</label><label for="__tabbed_2_3">Julia</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinHalfBasis</span><span class="p">,</span> <span class="n">SpinHalfSite</span><span class="p">,</span> <span class="n">Sector</span><span class="p">,</span> <span class="n">OpSum</span><span class="p">,</span> <span class="n">MatrixFreeHamiltonian</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="kn">import</span> <span class="n">lanczos_ground_state</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">basis</span> <span class="o">=</span> <span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">Sector</span><span class="p">(</span><span class="n">use_sz</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sz2</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">site</span> <span class="o">=</span> <span class="n">SpinHalfSite</span><span class="p">()</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">opsum</span> <span class="o">=</span> <span class="n">OpSum</span><span class="p">()</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1"># 1D Heisenberg model setup</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">opsum</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sz</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sz</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">opsum</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sp</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sm</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">opsum</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sm</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sp</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">H</span> <span class="o">=</span> <span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">opsum</span><span class="p">)</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="n">E0</span><span class="p">,</span> <span class="n">psi0</span> <span class="o">=</span> <span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">)</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Ground State Energy: </span><span class="si">{</span><span class="n">E0</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/qkrylov.hpp&gt;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">qkrylov</span><span class="p">;</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">qkrylov</span><span class="o">::</span><span class="nn">fp64</span><span class="p">;</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="n">Sector</span><span class="w"> </span><span class="n">sec</span><span class="p">;</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="n">sec</span><span class="p">.</span><span class="n">use_sz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="n">sec</span><span class="p">.</span><span class="n">sz2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="n">SpinHalfBasis</span><span class="w"> </span><span class="n">basis</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">sec</span><span class="p">);</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="n">SpinHalfSite</span><span class="w"> </span><span class="n">site</span><span class="p">;</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="n">OpSum</span><span class="w"> </span><span class="n">op</span><span class="p">;</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">        </span><span class="n">op</span><span class="p">.</span><span class="n">add_term</span><span class="p">({</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">}}});</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">        </span><span class="n">op</span><span class="p">.</span><span class="n">add_term</span><span class="p">({</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">}}});</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">        </span><span class="n">op</span><span class="p">.</span><span class="n">add_term</span><span class="p">({</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">}}});</span>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">    </span><span class="n">MatrixFreeHamiltonian</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">DefaultExecutionSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">);</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">    </span><span class="c1">// Ground-state with OnePass_full policy</span>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">    </span><span class="n">LanczosConfig</span><span class="w"> </span><span class="n">cfg</span><span class="p">;</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">    </span><span class="n">cfg</span><span class="p">.</span><span class="n">maxiter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="w">    </span><span class="n">cfg</span><span class="p">.</span><span class="n">tol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1e-12</span><span class="p">;</span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">e0</span><span class="p">,</span><span class="w"> </span><span class="n">psi0</span><span class="p">,</span><span class="w"> </span><span class="n">iters</span><span class="p">,</span><span class="w"> </span><span class="n">conv</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solvers</span><span class="o">::</span><span class="n">lanczos</span><span class="o">&lt;</span><span class="n">solvers</span><span class="o">::</span><span class="n">policy</span><span class="o">::</span><span class="n">OnePass_full</span><span class="o">&gt;</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">);</span>
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Energy: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e0</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">" after "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">iters</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">" iterations (converged: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">conv</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">")</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>
+</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="w">    </span><span class="c1">// Multiple low-lying eigenvalues with OnePass_DKGS</span>
+</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="w">    </span><span class="n">LanczosConfig</span><span class="w"> </span><span class="n">dkgs_cfg</span><span class="p">;</span>
+</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="w">    </span><span class="n">dkgs_cfg</span><span class="p">.</span><span class="n">n_eig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="w">    </span><span class="n">dkgs_cfg</span><span class="p">.</span><span class="n">maxiter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+</span><span id="__span-4-37"><a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">res_dkgs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solvers</span><span class="o">::</span><span class="n">lanczos</span><span class="o">&lt;</span><span class="n">solvers</span><span class="o">::</span><span class="n">policy</span><span class="o">::</span><span class="n">OnePass_DKGS</span><span class="o">&gt;</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">dkgs_cfg</span><span class="p">);</span>
+</span><span id="__span-4-38"><a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">res_dkgs</span><span class="p">.</span><span class="n">eigenvalues</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-39"><a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Level "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">": "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">res_dkgs</span><span class="p">.</span><span class="n">eigenvalues</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+</span><span id="__span-4-40"><a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-4-41"><a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a>
+</span><span id="__span-4-42"><a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-4-43"><a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a><span class="p">}</span>
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/models/spin_half.hpp&gt;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/core/hamiltonian.hpp&gt;</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/solvers/lanczos.hpp&gt;</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">qkrylov</span><span class="p">;</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="n">Sector</span><span class="w"> </span><span class="n">sector</span><span class="p">;</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="n">sector</span><span class="p">.</span><span class="n">use_sz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="n">sector</span><span class="p">.</span><span class="n">sz2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="n">SpinHalfBasis</span><span class="w"> </span><span class="n">basis</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="n">SpinHalfSite</span><span class="w"> </span><span class="n">site</span><span class="p">;</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">    </span><span class="n">OpSum</span><span class="w"> </span><span class="n">opsum</span><span class="p">;</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">        </span><span class="n">opsum</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sz</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sz</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">});</span>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">        </span><span class="n">opsum</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sp</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sm</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">});</span>
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="w">        </span><span class="n">opsum</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sm</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sp</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">});</span>
-</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>
-</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="w">    </span><span class="n">MatrixFreeHamiltonian</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
-</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>
-</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">E0</span><span class="p">,</span><span class="w"> </span><span class="n">psi0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-12</span><span class="p">);</span>
-</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Ground State Energy: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">E0</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>
-</span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-</span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a><span class="p">}</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../">roadmap</a>.</p>
-</div>
 </div>
 </div>
 </div>
@@ -1154,7 +1240,7 @@
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

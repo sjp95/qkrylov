@@ -19,11 +19,11 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
-        <title>Spectral Functions - qkrylov</title>
+        <title>Spectral Functions & Dynamical Response - qkrylov</title>
       
     
     
@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spectral-functions" class="md-skip">
+        <a href="#spectral-functions-dynamical-response" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Spectral Functions
+              Spectral Functions &amp; Dynamical Response
             
           </span>
         </div>
@@ -885,6 +885,11 @@
                       
                     
                     
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
                   
                   <div class="md-sidebar__inner">
                     
@@ -896,6 +901,75 @@
   
     
   
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-zero-temperature-greens-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        1. Zero-Temperature Green's Functions
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-continued-fraction-expansion" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        2. Continued Fraction Expansion
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Continued Fraction Expansion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-advantages" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Key Advantages
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-correction-vector-alternative" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        3. The Correction Vector Alternative
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        See Also
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -921,11 +995,41 @@
   
 
 
-<h1 id="spectral-functions">Spectral Functions<a class="headerlink" href="#spectral-functions" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>Note:</strong> This page is under construction.</p>
-</blockquote>
-<p>This page will describe how dynamical correlation functions and spectral functions are computed using a continued fraction expansion. It will show the derivation of the tridiagonal coefficients and the role of artificial broadening <span class="arithmatex">\(\eta\)</span>.</p>
+<h1 id="spectral-functions-dynamical-response">Spectral Functions &amp; Dynamical Response<a class="headerlink" href="#spectral-functions-dynamical-response" title="Permanent link">&para;</a></h1>
+<p>Dynamical correlation functions provide direct theoretical predictions for experimental spectroscopies, including inelastic neutron scattering (INS), resonant inelastic X-ray scattering (RIXS), and angle-resolved photoemission spectroscopy (ARPES).</p>
+<hr />
+<h2 id="1-zero-temperature-greens-functions">1. Zero-Temperature Green's Functions<a class="headerlink" href="#1-zero-temperature-greens-functions" title="Permanent link">&para;</a></h2>
+<p>Given a Hamiltonian <span class="arithmatex">\(H\)</span>, ground state <span class="arithmatex">\(|\psi_0\rangle\)</span>, and ground-state energy <span class="arithmatex">\(E_0\)</span>, the zero-temperature retarded Green's function for an operator <span class="arithmatex">\(\hat{O}\)</span> is:</p>
+<div class="arithmatex">\[G(\omega) = \langle \psi_0 | \hat{O}^\dagger \frac{1}{\omega + E_0 - H + i\eta} \hat{O} | \psi_0 \rangle\]</div>
+<p>The corresponding <strong>spectral function</strong> (or dynamical structure factor) is given by:</p>
+<div class="arithmatex">\[A(\omega) = -\frac{1}{\pi} \operatorname{Im} G(\omega) = \sum_{n} |\langle n | \hat{O} | \psi_0 \rangle|^2 \frac{\eta/\pi}{(\omega - (E_n - E_0))^2 + \eta^2}\]</div>
+<p>In the limit <span class="arithmatex">\(\eta \to 0^+\)</span>, this reproduces the discrete Lehmann representation <span class="arithmatex">\(\sum_n |\langle n | \hat{O} | \psi_0 \rangle|^2 \delta(\omega - (E_n - E_0))\)</span>. The small positive parameter <span class="arithmatex">\(\eta &gt; 0\)</span> acts as a Lorentzian broadening factor corresponding to experimental finite resolution or lifetime.</p>
+<hr />
+<h2 id="2-continued-fraction-expansion">2. Continued Fraction Expansion<a class="headerlink" href="#2-continued-fraction-expansion" title="Permanent link">&para;</a></h2>
+<p>To compute <span class="arithmatex">\(G(z)\)</span> where <span class="arithmatex">\(z = \omega + E_0 + i\eta\)</span> without diagonalizing the full spectrum of <span class="arithmatex">\(H\)</span>, we initialize the Lanczos algorithm using the perturbed state:</p>
+<div class="arithmatex">\[|v_1\rangle = \frac{\hat{O} |\psi_0\rangle}{\|\hat{O} |\psi_0\rangle\|}\]</div>
+<p>Projecting <span class="arithmatex">\(z - H\)</span> onto the resulting Krylov subspace yields the tridiagonal matrix <span class="arithmatex">\(z I - T_m\)</span>. Using the recursive Cramer's rule for tridiagonal matrices, the resolvent matrix element <span class="arithmatex">\(G(z) = \langle \phi_0 | (z - H)^{-1} | \phi_0 \rangle\)</span> expands into a <strong>continued fraction</strong>:</p>
+<div class="arithmatex">\[G(z) = \frac{\langle \phi_0 | \phi_0 \rangle}{z - \alpha_1 - \cfrac{\beta_1^2}{z - \alpha_2 - \cfrac{\beta_2^2}{z - \alpha_3 - \dots}}}\]</div>
+<p>where <span class="arithmatex">\(\alpha_n\)</span> and <span class="arithmatex">\(\beta_n\)</span> are the standard Lanczos recurrence coefficients.</p>
+<h3 id="key-advantages">Key Advantages<a class="headerlink" href="#key-advantages" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Single Krylov Run</strong>: Once the coefficients <span class="arithmatex">\(\{\alpha_n, \beta_n\}_{n=1}^M\)</span> are computed, <span class="arithmatex">\(G(z)\)</span> and <span class="arithmatex">\(A(\omega)\)</span> can be evaluated across thousands of frequency points <span class="arithmatex">\(\omega\)</span> in milliseconds.</li>
+<li><strong>Adjustable Broadening</strong>: The broadening parameter <span class="arithmatex">\(\eta\)</span> can be interactively varied during post-processing without re-running matrix operations.</li>
+</ul>
+<hr />
+<h2 id="3-the-correction-vector-alternative">3. The Correction Vector Alternative<a class="headerlink" href="#3-the-correction-vector-alternative" title="Permanent link">&para;</a></h2>
+<p>While continued fractions are ideal for broad frequency sweeps, high numbers of Lanczos steps (<span class="arithmatex">\(M &gt; 100\)</span>) can develop ghost peaks due to loss of orthogonality in the Krylov basis.</p>
+<p>For ultra-high resolution at specific target frequencies <span class="arithmatex">\(\omega\)</span>, <code>qkrylov</code> also implements the <strong>correction vector method</strong>:</p>
+<div class="arithmatex">\[(H - E_0 - \omega - i\eta) |x(\omega, \eta)\rangle = \hat{O} |\psi_0\rangle\]</div>
+<p>The spectral function is recovered directly via:</p>
+<div class="arithmatex">\[A(\omega) = -\frac{1}{\pi} \operatorname{Im} \langle \hat{O} \psi_0 | x(\omega, \eta) \rangle = \frac{\eta}{\pi} \|x(\omega, \eta)\|^2\]</div>
+<p>This shifts the problem to an iterative linear system solve, providing certified accuracy within the residual tolerance <code>tol</code>.</p>
+<hr />
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../solvers/dynamics/">Dynamics Solver API &amp; Code Examples</a></li>
+<li><a href="../../solvers/lanczos/">Lanczos Algorithm Documentation</a></li>
+</ul>
 
 
 
@@ -994,7 +1098,7 @@
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

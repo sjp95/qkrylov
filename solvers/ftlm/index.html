@@ -19,11 +19,11 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
-        <title>Finite Temperature Lanczos Method (FTLM) - qkrylov</title>
+        <title>Finite-Temperature Lanczos Method (FTLM) - qkrylov</title>
       
     
     
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Finite Temperature Lanczos Method (FTLM)
+              Finite-Temperature Lanczos Method (FTLM)
             
           </span>
         </div>
@@ -909,10 +909,60 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#1-mathematical-formulation" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Overview
+        1. Mathematical Formulation
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Mathematical Formulation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-stochastic-trace-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        A. Stochastic Trace Estimation
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-krylov-subspace-projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        B. Krylov Subspace Projection
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-low-temperature-stability-e_min-shifting" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        C. Low-Temperature Stability (<span class="arithmatex">\(E_{\min}\)</span> Shifting)
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-decoupled-two-stage-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        2. Decoupled Two-Stage Architecture
       </span>
     </span>
   </a>
@@ -920,10 +970,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api" class="md-nav__link">
+  <a href="#3-computed-thermodynamic-quantities" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        API
+        3. Computed Thermodynamic Quantities
       </span>
     </span>
   </a>
@@ -931,10 +981,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#coming-soon" class="md-nav__link">
+  <a href="#4-multi-language-usage-examples" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Coming Soon
+        4. Multi-Language Usage Examples
       </span>
     </span>
   </a>
@@ -967,45 +1017,204 @@
   
 
 
-<h1 id="finite-temperature-lanczos-method-ftlm">Finite Temperature Lanczos Method (FTLM)<a class="headerlink" href="#finite-temperature-lanczos-method-ftlm" title="Permanent link">&para;</a></h1>
-<div class="admonition note">
-<p class="admonition-title">Under Construction</p>
-<p>This page will cover the FTLM solver for computing thermodynamic properties.</p>
-</div>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The Finite Temperature Lanczos Method (FTLM) computes thermodynamic observables such as partition function, internal energy, and specific heat <strong>without explicit full diagonalization</strong>. It uses stochastic sampling over random initial vectors combined with Lanczos iteration.</p>
-<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Python</label><label for="__tabbed_1_2">C++</label><label for="__tabbed_1_3">Julia</label></div>
+<h1 id="finite-temperature-lanczos-method-ftlm">Finite-Temperature Lanczos Method (FTLM)<a class="headerlink" href="#finite-temperature-lanczos-method-ftlm" title="Permanent link">&para;</a></h1>
+<p>The Finite-Temperature Lanczos Method (FTLM) computes thermodynamic equations of state and arbitrary quantum observables (<span class="arithmatex">\(\hat{O} \neq \hat{H}\)</span>) without requiring full diagonalization of the Hamiltonian matrix. </p>
+<p>By combining stochastic trace sampling over random initial vectors with Krylov subspace expansions, <code>qkrylov</code> computes thermal averages efficiently for systems with Hilbert space dimensions far exceeding the limits of full exact diagonalization.</p>
+<hr />
+<h2 id="1-mathematical-formulation">1. Mathematical Formulation<a class="headerlink" href="#1-mathematical-formulation" title="Permanent link">&para;</a></h2>
+<p>Thermal expectation values of an observable <span class="arithmatex">\(\hat{O}\)</span> at inverse temperature <span class="arithmatex">\(\beta = 1 / (k_B T)\)</span> are given by:
+$<span class="arithmatex">\(\langle \hat{O} \rangle_\beta = \frac{\text{Tr}\left( e^{-\beta \hat{H}} \hat{O} \right)}{\text{Tr}\left( e^{-\beta \hat{H}} \right)} = \frac{1}{Z(\beta)} \text{Tr}\left( e^{-\beta \hat{H}/2} \hat{O} e^{-\beta \hat{H}/2} \right)\)</span>$</p>
+<h3 id="a-stochastic-trace-estimation">A. Stochastic Trace Estimation<a class="headerlink" href="#a-stochastic-trace-estimation" title="Permanent link">&para;</a></h3>
+<p>The trace over the <span class="arithmatex">\(D\)</span>-dimensional Hilbert space is approximated by an average over <span class="arithmatex">\(R\)</span> random normalized vectors <span class="arithmatex">\(\{|r\rangle\}_{r=1}^R\)</span>:
+$<span class="arithmatex">\(\text{Tr}(\hat{A}) \approx \frac{D}{R} \sum_{r=1}^R \langle r | \hat{A} | r \rangle\)</span>$</p>
+<h3 id="b-krylov-subspace-projection">B. Krylov Subspace Projection<a class="headerlink" href="#b-krylov-subspace-projection" title="Permanent link">&para;</a></h3>
+<p>For each random sample <span class="arithmatex">\(|r\rangle\)</span>, an <span class="arithmatex">\(M\)</span>-step Lanczos iteration constructs an orthonormal basis <span class="arithmatex">\(\{|v_k^{(r)}\rangle\}_{k=0}^{M-1}\)</span>. The tridiagonal projection <span class="arithmatex">\(\mathbf{T}^{(r)}\)</span> yields eigenvalues <span class="arithmatex">\(\{\epsilon_m^{(r)}\}\)</span> and eigenvectors <span class="arithmatex">\(\{y_m^{(r)}\}\)</span>.</p>
+<p>For arbitrary quantum operators <span class="arithmatex">\(\hat{O}\)</span>, <code>qkrylov</code> computes the projected matrix elements:
+$<span class="arithmatex">\(\mathcal{O}_{jk}^{(r)} = \langle v_j^{(r)} | \hat{O} | v_k^{(r)} \rangle\)</span>$</p>
+<p>The thermal expectation value of <span class="arithmatex">\(\hat{O}\)</span> for sample <span class="arithmatex">\(r\)</span> is:
+$<span class="arithmatex">\(\langle \hat{O} \rangle_r(\beta) = \frac{\mathbf{c}(\beta)^\dagger \mathcal{O}^{(r)} \mathbf{c}(\beta)}{Z_r(\beta)}, \quad \text{where } c_j(\beta) = \sum_{m=0}^{M-1} (y_m^{(r)})_0 \, y_{jm}^{(r)} \, e^{-\beta \epsilon_m^{(r)} / 2}\)</span>$</p>
+<h3 id="c-low-temperature-stability-e_min-shifting">C. Low-Temperature Stability (<span class="arithmatex">\(E_{\min}\)</span> Shifting)<a class="headerlink" href="#c-low-temperature-stability-e_min-shifting" title="Permanent link">&para;</a></h3>
+<p>To prevent exponential overflow at low temperatures (<span class="arithmatex">\(\beta \to \infty\)</span>), the entire spectrum across all samples is shifted by the lowest observed Ritz value <span class="arithmatex">\(E_{\min} = \min_{r,m} \epsilon_m^{(r)}\)</span>:
+$<span class="arithmatex">\(e^{-\beta (\epsilon_m - E_{\min})}\)</span>$
+Because <span class="arithmatex">\(e^{\beta E_{\min}}\)</span> cancels identically between the numerator and denominator, this guarantees exact invariance with zero numerical overflow.</p>
+<hr />
+<h2 id="2-decoupled-two-stage-architecture">2. Decoupled Two-Stage Architecture<a class="headerlink" href="#2-decoupled-two-stage-architecture" title="Permanent link">&para;</a></h2>
+<p><code>qkrylov</code> implements a decoupled architecture that separates computationally heavy matrix-vector multiplications from thermal temperature evaluations:</p>
+<ol>
+<li><strong>Stage 1 (<code>ftlm_sample</code>)</strong>: Runs <span class="arithmatex">\(R\)</span> Lanczos expansions of length <span class="arithmatex">\(M\)</span>, diagonalizes the tridiagonal matrices, and evaluates the projected observable matrices <span class="arithmatex">\(\mathcal{O}_{jk}\)</span>.</li>
+<li><strong>Stage 2 (<code>ftlm_evaluate_sweep</code>)</strong>: Decoupled from sample generation. Takes an arbitrary grid of inverse temperatures <span class="arithmatex">\(\vec{\beta} = (\beta_1, \beta_2, \dots, \beta_K)\)</span> and evaluates the full thermodynamic equation of state and all observable expectations with <strong>zero additional SpMV iterations</strong>.</li>
+</ol>
+<hr />
+<h2 id="3-computed-thermodynamic-quantities">3. Computed Thermodynamic Quantities<a class="headerlink" href="#3-computed-thermodynamic-quantities" title="Permanent link">&para;</a></h2>
+<p>For every temperature <span class="arithmatex">\(\beta\)</span> on the grid, <code>qkrylov</code> computes:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Quantity</th>
+<th style="text-align: center;">Symbol</th>
+<th style="text-align: left;">Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Partition Function</strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(Z(\beta)\)</span></td>
+<td style="text-align: left;">$\frac{D}{R} \sum_{r,m}</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Free Energy</strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(F(\beta)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(-\frac{1}{\beta} \ln Z(\beta)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Internal Energy</strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(E(\beta)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\langle \hat{H} \rangle_\beta = -\frac{\partial \ln Z}{\partial \beta}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Specific Heat</strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(C_v(\beta)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\beta^2 \left( \langle \hat{H}^2 \rangle_\beta - \langle \hat{H} \rangle_\beta^2 \right)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Entropy</strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(S(\beta)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\beta \left( E(\beta) - F(\beta) \right)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Observable Expectation</strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(\langle \hat{O} \rangle_\beta\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\frac{1}{Z(\beta)} \frac{D}{R} \sum_r \mathbf{c}_r(\beta)^\dagger \mathcal{O}^{(r)} \mathbf{c}_r(\beta)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Statistical Error Bar</strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(\sigma_{\langle O \rangle}(\beta)\)</span></td>
+<td style="text-align: left;">Sample standard error <span class="arithmatex">\(\approx \frac{\text{std}(\langle O \rangle_r)}{\sqrt{R}}\)</span></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-multi-language-usage-examples">4. Multi-Language Usage Examples<a class="headerlink" href="#4-multi-language-usage-examples" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Julia</label><label for="__tabbed_1_2">Python</label><label for="__tabbed_1_3">C++</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">qk</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QuantumKrylov</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">ftlm</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">n_random</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Z = </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">partition_function</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"E = </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">internal_energy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cv = </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">specific_heat</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c"># 1. Construct Hamiltonian and observables</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">Sector</span><span class="p">())</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">site</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfSite</span><span class="p">()</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">op_H</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">op_Sz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c"># 1D Heisenberg model</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="mi">5</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="n">next_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mod</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op_H</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op_H</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op_H</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="k">end</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c"># Spin-spin correlation observable: S^z_0 S^z_1</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">add_term!</span><span class="p">(</span><span class="n">op_Sz</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="n">H</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op_H</span><span class="p">)</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="n">Sz01</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op_Sz</span><span class="p">)</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="c"># 2. Solve using SciML ThermalProblem</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="n">betas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">]</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ThermalProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">betas</span><span class="p">;</span><span class="w"> </span><span class="n">observables</span><span class="o">=</span><span class="p">[</span><span class="n">Sz01</span><span class="p">])</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="n">sweep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">FTLM</span><span class="p">(</span><span class="n">n_random</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">n_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">))</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="c"># 3. Inspect thermodynamics &amp; observables</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">enumerate</span><span class="p">(</span><span class="n">sweep</span><span class="o">.</span><span class="n">beta_grid</span><span class="p">)</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">"beta = </span><span class="si">$b</span><span class="s"> | E = </span><span class="si">$</span><span class="p">(</span><span class="n">sweep</span><span class="o">.</span><span class="n">internal_energies</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="s"> | Cv = </span><span class="si">$</span><span class="p">(</span><span class="n">sweep</span><span class="o">.</span><span class="n">specific_heats</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="s"> | &lt;SzSz&gt; = </span><span class="si">$</span><span class="p">(</span><span class="n">sweep</span><span class="o">.</span><span class="n">observable_expectations</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">])</span><span class="s"> +/- </span><span class="si">$</span><span class="p">(</span><span class="n">sweep</span><span class="o">.</span><span class="n">observable_errors</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">])</span><span class="s">"</span><span class="p">)</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="k">end</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="c"># 4. Decoupled Workflow (Zero SpMV Re-evaluation)</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="n">samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ftlm_sample</span><span class="p">(</span><span class="n">H</span><span class="p">;</span><span class="w"> </span><span class="n">observables</span><span class="o">=</span><span class="p">[</span><span class="n">Sz01</span><span class="p">],</span><span class="w"> </span><span class="n">n_random</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">n_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="n">sweep_dense</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ftlm_evaluate_sweep</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="o">:</span><span class="mf">0.05</span><span class="o">:</span><span class="mf">10.0</span><span class="p">)</span><span class="w"> </span><span class="c"># Zero additional SpMVs!</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="n">sweep_sciml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ThermalProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="o">:</span><span class="mf">0.5</span><span class="o">:</span><span class="mf">20.0</span><span class="p">),</span><span class="w"> </span><span class="n">samples</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ftlm</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="cm">/*beta=*/</span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*n_random=*/</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="cm">/*n_steps=*/</span><span class="mi">100</span><span class="p">);</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Z = "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">partition_function</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"E = "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">internal_energy</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">qk</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># 1. Construct Hamiltonian and observables</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">basis</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">site</span>  <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfSite</span><span class="p">()</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">os_H</span>  <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">os_Sz</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">6</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="n">os_H</span> <span class="o">+=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sz</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">qk</span><span class="o">.</span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sm</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sp</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">os_Sz</span> <span class="o">+=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sz</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sz</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="n">H</span>   <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">os_H</span><span class="p">)</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="n">Sz01</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">os_Sz</span><span class="p">)</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="c1"># 2. Multi-temperature sweep with observables</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="n">betas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="n">solver</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">solvers</span><span class="o">.</span><span class="n">FTLM</span><span class="p">(</span><span class="n">n_random</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="n">res</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="n">betas</span><span class="p">,</span> <span class="n">observables</span><span class="o">=</span><span class="p">[</span><span class="n">Sz01</span><span class="p">])</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="c1"># 3. Access vectorized NumPy properties</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Beta grid:"</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">beta_grid</span><span class="p">)</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Internal energies:"</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">internal_energies</span><span class="p">)</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Heat capacities:"</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">specific_heats</span><span class="p">)</span>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"&lt;Sz0 Sz1&gt; expectation:"</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">observable_expectations</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"&lt;Sz0 Sz1&gt; error bars:"</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">observable_errors</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="c1"># 4. Decoupled Workflow (Zero SpMV Re-evaluation)</span>
+</span><span id="__span-1-31"><a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="n">samples</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">observables</span><span class="o">=</span><span class="p">[</span><span class="n">Sz01</span><span class="p">])</span>
+</span><span id="__span-1-32"><a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="c1"># Re-evaluate anywhere instantly with zero SpMVs:</span>
+</span><span id="__span-1-33"><a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="n">res_dense</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">evaluate_sweep</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../../../contributing/">roadmap</a>.</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/qkrylov.hpp&gt;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">qkrylov</span><span class="p">;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">qkrylov</span><span class="o">::</span><span class="nn">fp64</span><span class="p">;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="n">SpinHalfBasis</span><span class="w"> </span><span class="n">basis</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="n">SpinHalfSite</span><span class="w"> </span><span class="n">site</span><span class="p">;</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="n">OpSum</span><span class="w"> </span><span class="n">op_H</span><span class="p">,</span><span class="w"> </span><span class="n">op_Sz</span><span class="p">;</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">        </span><span class="n">op_H</span><span class="p">.</span><span class="n">add_term</span><span class="p">({</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">}}});</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">        </span><span class="n">op_H</span><span class="p">.</span><span class="n">add_term</span><span class="p">({</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">}}});</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">        </span><span class="n">op_H</span><span class="p">.</span><span class="n">add_term</span><span class="p">({</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">}}});</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="n">op_Sz</span><span class="p">.</span><span class="n">add_term</span><span class="p">({</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">}}});</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="n">MatrixFreeHamiltonian</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">DefaultExecutionSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op_H</span><span class="p">);</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="n">MatrixFreeHamiltonian</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">DefaultExecutionSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Sz01</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op_Sz</span><span class="p">);</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">    </span><span class="c1">// Stage 1: Generate Krylov subspace samples &amp; project observables</span>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ftlm_sample</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="n">Sz01</span><span class="p">},</span><span class="w"> </span><span class="cm">/*n_random=*/</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="cm">/*n_steps=*/</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="cm">/*seed=*/</span><span class="mi">42</span><span class="p">);</span>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">    </span><span class="c1">// Stage 2: Evaluate thermodynamic sweep on temperature grid</span>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Real</span><span class="o">&gt;</span><span class="w"> </span><span class="n">beta_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">};</span>
+</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">sweep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ftlm_evaluate_sweep</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span><span class="w"> </span><span class="n">beta_grid</span><span class="p">);</span>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>
+</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">beta_grid</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"beta = "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">beta_grid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="w">                  </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">" | E = "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">sweep</span><span class="p">.</span><span class="n">internal_energies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="w">                  </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">" | Cv = "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">sweep</span><span class="p">.</span><span class="n">specific_heats</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span><span id="__span-2-34"><a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="w">                  </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">" | &lt;SzSz&gt; = "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">sweep</span><span class="p">.</span><span class="n">observable_expectations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+</span><span id="__span-2-35"><a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="w">                  </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">" +/- "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">sweep</span><span class="p">.</span><span class="n">observable_errors</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+</span><span id="__span-2-36"><a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-37"><a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a>
+</span><span id="__span-2-38"><a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-2-39"><a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a><span class="p">}</span>
+</span></code></pre></div>
 </div>
 </div>
 </div>
-</div>
-<h2 id="coming-soon">Coming Soon<a class="headerlink" href="#coming-soon" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Parameter guide: choosing <code>n_random</code> and <code>n_steps</code></li>
-<li>Error estimation and convergence</li>
-<li>Temperature sweeps and thermodynamic curves</li>
-</ul>
 
 
 
@@ -1074,7 +1283,7 @@
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

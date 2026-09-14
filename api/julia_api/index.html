@@ -19,11 +19,11 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
-        <title>Julia API Documentation (QKrylov.jl) - qkrylov</title>
+        <title>Julia API Documentation (QuantumKrylov.jl) - qkrylov</title>
       
     
     
@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#julia-api-documentation-qkrylovjl" class="md-skip">
+        <a href="#julia-api-documentation-quantumkrylovjl" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Julia API Documentation (QKrylov.jl)
+              Julia API Documentation (QuantumKrylov.jl)
             
           </span>
         </div>
@@ -909,15 +909,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-module-overview-package-setup" class="md-nav__link">
+  <a href="#1-package-installation-module-setup" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        1. Module Overview &amp; Package Setup
+        1. Package Installation &amp; Module Setup
       </span>
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="1. Module Overview &amp; Package Setup">
+    <nav class="md-nav" aria-label="1. Package Installation &amp; Module Setup">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -949,52 +949,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#function-usage" class="md-nav__link">
+  <a href="#methods" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Function Usage
+        Methods
       </span>
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Function Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sector" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>Sector()</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#set_szsecsector-sz2integer" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>set_sz!(sec::Sector, sz2::Integer)</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#set_hubbard_particlessecsector-nupinteger-ndninteger" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>set_hubbard_particles!(sec::Sector, nup::Integer, ndn::Integer)</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1012,23 +973,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3. Site Definitions (AbstractSite)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#types-constructors" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Types &amp; Constructors
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1044,63 +988,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#constructors" class="md-nav__link">
+  <a href="#inspection-methods" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Constructors
+        Inspection Methods
       </span>
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Methods
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Methods">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#dimensionbabstractbasisuint64" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>dimension(b::AbstractBasis)::UInt64</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#nsitesbabstractbasisint" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>nsites(b::AbstractBasis)::Int</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#basesizebabstractbasis" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>Base.size(b::AbstractBasis)</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1110,75 +1004,25 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-operator-terms-opsum" class="md-nav__link">
+  <a href="#5-operator-expressions-opsum" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        5. Operator Terms (<code>OpSum</code>)
+        5. Operator Expressions (<code>OpSum</code>)
       </span>
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Operator Terms (OpSum)">
+    <nav class="md-nav" aria-label="5. Operator Expressions (OpSum)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#function-usage_1" class="md-nav__link">
+  <a href="#supported-operator-symbols" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Function Usage
+        Supported Operator Symbols
       </span>
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Function Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#opsum" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>OpSum()</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#add_termopopsum-coeffnumber-op1abstractstring-site1integer" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>add_term!(op::OpSum, coeff::Number, op1::AbstractString, site1::Integer)</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#add_termopopsum-coeffnumber-op1abstractstring-site1integer-op2abstractstring-site2integer" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>add_term!(op::OpSum, coeff::Number, op1::AbstractString, site1::Integer, op2::AbstractString, site2::Integer)</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#clearopopsum" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>clear!(op::OpSum)</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1196,26 +1040,25 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="6. Matrix-Free Hamiltonian (MatrixFreeHamiltonian)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-sciml-commonsolve-interface-solveprob-alg" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        7. SciML CommonSolve Interface (<code>solve(prob, alg)</code>)
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. SciML CommonSolve Interface (solve(prob, alg))">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#constructor-methods" class="md-nav__link">
+  <a href="#a-ground-state-groundstateproblem" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Constructor &amp; Methods
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Constructor &amp; Methods">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#matrixfreehamiltonianbasisabstractbasis-siteabstractsite-opsumopsum" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>MatrixFreeHamiltonian(basis::AbstractBasis, site::AbstractSite, opsum::OpSum)</code>
+        A. Ground State (<code>GroundStateProblem</code>)
       </span>
     </span>
   </a>
@@ -1223,10 +1066,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dimensionhmatrixfreehamiltonianuint64" class="md-nav__link">
+  <a href="#b-low-lying-excited-states-excitedstatesproblem" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        <code>dimension(H::MatrixFreeHamiltonian)::UInt64</code>
+        B. Low-Lying Excited States (<code>ExcitedStatesProblem</code>)
       </span>
     </span>
   </a>
@@ -1234,18 +1077,24 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#basehmatrixfreehamiltonian-xabstractvectornumbervectorcomplexf64" class="md-nav__link">
+  <a href="#c-thermodynamics-multi-temperature-sweeps-thermalproblem" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        <code>Base.:*(H::MatrixFreeHamiltonian, x::AbstractVector{&lt;:Number})::Vector{ComplexF64}</code>
+        C. Thermodynamics &amp; Multi-Temperature Sweeps (<code>ThermalProblem</code>)
       </span>
     </span>
   </a>
   
 </li>
         
-      </ul>
-    </nav>
+          <li class="md-nav__item">
+  <a href="#d-dynamical-response-dynamicalproblem-correctionvectorproblem" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        D. Dynamical Response (<code>DynamicalProblem</code> &amp; <code>CorrectionVectorProblem</code>)
+      </span>
+    </span>
+  </a>
   
 </li>
         
@@ -1255,55 +1104,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-solvers-lanczos_ground_state" class="md-nav__link">
+  <a href="#8-functional-solvers-reference" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        7. Solvers (<code>lanczos_ground_state</code>)
+        8. Functional Solvers Reference
       </span>
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="7. Solvers (lanczos_ground_state)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#function-usage_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Function Usage
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Function Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#lanczos_ground_statehmatrixfreehamiltonian-maxiterinteger100-tolreal1e-12lanczosresult" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        <code>lanczos_ground_state(H::MatrixFreeHamiltonian; maxiter::Integer=100, tol::Real=1e-12)::LanczosResult</code>
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-full-end-to-end-code-example" class="md-nav__link">
+  <a href="#9-hardware-accelerator-queries" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        8. Full End-to-End Code Example
+        9. Hardware &amp; Accelerator Queries
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-complete-end-to-end-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        10. Complete End-to-End Example
       </span>
     </span>
   </a>
@@ -1336,208 +1162,261 @@
   
 
 
-<h1 id="julia-api-documentation-qkrylovjl">Julia API Documentation (<code>QKrylov.jl</code>)<a class="headerlink" href="#julia-api-documentation-qkrylovjl" title="Permanent link">&para;</a></h1>
-<p><code>QKrylov.jl</code> provides native Julia bindings for <code>qkrylov</code> via zero-copy C ABI calls (<code>ccall</code>).</p>
+<h1 id="julia-api-documentation-quantumkrylovjl">Julia API Documentation (<code>QuantumKrylov.jl</code>)<a class="headerlink" href="#julia-api-documentation-quantumkrylovjl" title="Permanent link">&para;</a></h1>
+<p><code>QuantumKrylov.jl</code> provides idiomatic, high-performance Julia bindings for <code>qkrylov</code> via zero-copy C ABI calls (<code>ccall</code>) and full integration with the <strong>SciML CommonSolve</strong> dispatch interface (<code>solve(prob, alg)</code>).</p>
 <hr />
-<h2 id="1-module-overview-package-setup">1. Module Overview &amp; Package Setup<a class="headerlink" href="#1-module-overview-package-setup" title="Permanent link">&para;</a></h2>
-<p>To use <code>QKrylov.jl</code> in your Julia environment:</p>
-<div class="language-julia highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QKrylov</span>
+<h2 id="1-package-installation-module-setup">1. Package Installation &amp; Module Setup<a class="headerlink" href="#1-package-installation-module-setup" title="Permanent link">&para;</a></h2>
+<p>In the Julia REPL (press <code>]</code> to enter Pkg mode):</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">pkg</span><span class="o">&gt;</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="n">https</span><span class="o">://</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">sjp95</span><span class="o">/</span><span class="n">qkrylov</span><span class="o">.</span><span class="n">git</span><span class="c">#julia-latest:bindings/julia</span>
+</span></code></pre></div>
+<p>Or in Julia code:</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QuantumKrylov</span>
 </span></code></pre></div>
 <h3 id="shared-library-loading">Shared Library Loading<a class="headerlink" href="#shared-library-loading" title="Permanent link">&para;</a></h3>
-<p><code>QKrylov.jl</code> automatically locates <code>libqkrylov.so</code> in your build tree. If custom library placement is used, set the environment variable:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">QKRYLOV_LIB_PATH</span><span class="o">=</span>/path/to/libqkrylov.so
+<p><code>QuantumKrylov.jl</code> automatically locates prebuilt <code>qkrylov_jll</code> binary artifacts or local build artifacts (<code>libqkrylov.so</code>, <code>libqkrylov.dylib</code>, <code>qkrylov.dll</code>). To specify a custom shared library path:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">QKRYLOV_LIB_PATH</span><span class="o">=</span>/path/to/libqkrylov.so
 </span></code></pre></div></p>
 <hr />
 <h2 id="2-symmetry-sectors-sector">2. Symmetry Sectors (<code>Sector</code>)<a class="headerlink" href="#2-symmetry-sectors-sector" title="Permanent link">&para;</a></h2>
-<p>Symmetry sectors restrict the Hilbert space dimension to specific quantum number sectors.</p>
-<div class="language-julia highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sector</span><span class="p">()</span>
+<p>Symmetry sectors restrict the many-body Hilbert space to target quantum numbers.</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sector</span><span class="p">()</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">set_sz!</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="c"># Enforces Sz = 0 (pass 2 * Sz)</span>
 </span></code></pre></div>
-<h3 id="function-usage">Function Usage<a class="headerlink" href="#function-usage" title="Permanent link">&para;</a></h3>
-<h4 id="sector"><code>Sector()</code><a class="headerlink" href="#sector" title="Permanent link">&para;</a></h4>
+<h3 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Description</strong>: Allocates a new quantum symmetry sector object.</li>
-<li><strong>Returns</strong>: <code>Sector</code> object with automatic GC finalizer.</li>
-</ul>
-<h4 id="set_szsecsector-sz2integer"><code>set_sz!(sec::Sector, sz2::Integer)</code><a class="headerlink" href="#set_szsecsector-sz2integer" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Restricts to a total spin projection <span class="arithmatex">\(S_z\)</span>. Note that <code>sz2</code> represents <span class="arithmatex">\(2 \times S_z\)</span>.</li>
-<li><strong>Arguments</strong>:</li>
-<li><code>sec::Sector</code>: Sector object to modify.</li>
-<li><code>sz2::Integer</code>: Twice the <span class="arithmatex">\(S_z\)</span> quantum number (e.g. <code>0</code> for <span class="arithmatex">\(S_z=0\)</span>, <code>1</code> for <span class="arithmatex">\(S_z=1/2\)</span>, <code>-2</code> for <span class="arithmatex">\(S_z=-1\)</span>).</li>
-<li><strong>Returns</strong>: <code>sec::Sector</code></li>
-</ul>
-<h4 id="set_hubbard_particlessecsector-nupinteger-ndninteger"><code>set_hubbard_particles!(sec::Sector, nup::Integer, ndn::Integer)</code><a class="headerlink" href="#set_hubbard_particlessecsector-nupinteger-ndninteger" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Restricts particle counts for Fermi-Hubbard and <span class="arithmatex">\(t\)</span>-<span class="arithmatex">\(J\)</span> models.</li>
-<li><strong>Arguments</strong>:</li>
-<li><code>sec::Sector</code>: Sector object to modify.</li>
-<li><code>nup::Integer</code>: Number of spin-up particles (<span class="arithmatex">\(N_{\uparrow}\)</span>).</li>
-<li><code>ndn::Integer</code>: Number of spin-down particles (<span class="arithmatex">\(N_{\downarrow}\)</span>).</li>
-<li><strong>Returns</strong>: <code>sec::Sector</code></li>
+<li><code>Sector()</code>: Allocates a symmetry sector handle with automatic GC finalizer.</li>
+<li><code>set_sz!(sec::Sector, sz2::Integer)</code>: Restricts total <span class="arithmatex">\(S_z\)</span> projection (<span class="arithmatex">\(2 \times S_z\)</span>). For <span class="arithmatex">\(S_z=0\)</span>, pass <code>0</code>; for <span class="arithmatex">\(S_z=1/2\)</span>, pass <code>1</code>.</li>
+<li><code>set_hubbard_particles!(sec::Sector, nup::Integer, ndn::Integer)</code>: Restricts spin-up (<span class="arithmatex">\(N_\uparrow\)</span>) and spin-down (<span class="arithmatex">\(N_\downarrow\)</span>) electron counts.</li>
+<li><code>set_n!(sec::Sector, n::Integer)</code>: Restricts total particle number for spinless fermions.</li>
+<li><code>set_nb!(sec::Sector, nb::Integer)</code>: Restricts total boson particle number.</li>
 </ul>
 <hr />
 <h2 id="3-site-definitions-abstractsite">3. Site Definitions (<code>AbstractSite</code>)<a class="headerlink" href="#3-site-definitions-abstractsite" title="Permanent link">&para;</a></h2>
-<p>Site types describe local site degrees of freedom and state spaces.</p>
-<div class="language-julia highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfSite</span><span class="p">()</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FermionSite</span><span class="p">()</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">s3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HubbardSite</span><span class="p">()</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">s4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TJSite</span><span class="p">()</span>
+<p>Site models describe local degrees of freedom and local operator algebras:</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfSite</span><span class="p">()</span><span class="w">      </span><span class="c"># Spin-1/2 (dim 2: |up&gt;, |down&gt;)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinSSite</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span><span class="w">       </span><span class="c"># Spin-S (e.g. S=1, dim 3: |+1&gt;, |0&gt;, |-1&gt;)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">s3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FermionSite</span><span class="p">()</span><span class="w">       </span><span class="c"># Spinless fermion (dim 2: |0&gt;, |1&gt;)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">s4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HubbardSite</span><span class="p">()</span><span class="w">       </span><span class="c"># Spinful Fermi-Hubbard (dim 4: |0&gt;, |up&gt;, |down&gt;, |up down&gt;)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">s5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TJSite</span><span class="p">()</span><span class="w">            </span><span class="c"># t-J model (dim 3: |0&gt;, |up&gt;, |down&gt;, no double occupancy)</span>
 </span></code></pre></div>
-<h3 id="types-constructors">Types &amp; Constructors<a class="headerlink" href="#types-constructors" title="Permanent link">&para;</a></h3>
+<hr />
+<h2 id="4-hilbert-space-bases-abstractbasis">4. Hilbert Space Bases (<code>AbstractBasis</code>)<a class="headerlink" href="#4-hilbert-space-bases-abstractbasis" title="Permanent link">&para;</a></h2>
+<p>Constructs many-body basis representations across <span class="arithmatex">\(N\)</span> lattice sites:</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">b1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">sz</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="w">                 </span><span class="c"># Spin-1/2 basis (Sz = 0)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinSBasis</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="n">sector</span><span class="o">=</span><span class="n">sec</span><span class="p">)</span><span class="w">         </span><span class="c"># Spin-1 basis</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">b3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FermionBasis</span><span class="p">(</span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="w">                   </span><span class="c"># Spinless fermion basis with 2 particles</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">b4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HubbardBasis</span><span class="p">(</span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">nup</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">ndn</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="w">          </span><span class="c"># Fermi-Hubbard basis (1 up, 1 down)</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">b5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TJBasis</span><span class="p">(</span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">nup</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">ndn</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="w">               </span><span class="c"># t-J basis</span>
+</span></code></pre></div>
+<h3 id="inspection-methods">Inspection Methods<a class="headerlink" href="#inspection-methods" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>dimension(b::AbstractBasis)::UInt64</code>: Total Hilbert space dimension.</li>
+<li><code>nsites(b::AbstractBasis)::Int</code>: Number of physical sites.</li>
+<li><code>state(b::AbstractBasis, index::Integer)::UInt64</code>: Integer bitstring representation at 0-based index.</li>
+<li><code>basis_index(b::AbstractBasis, bitstring::Unsigned)::Int64</code>: 0-based basis index for a given bitstring (or <code>-1</code>).</li>
+<li><code>bitstring in basis</code>: Returns <code>true</code> if <code>bitstring</code> belongs to the basis.</li>
+<li><code>b[i]</code>: 1-based indexing returning state bitstring at index <code>i</code>.</li>
+</ul>
+<hr />
+<h2 id="5-operator-expressions-opsum">5. Operator Expressions (<code>OpSum</code>)<a class="headerlink" href="#5-operator-expressions-opsum" title="Permanent link">&para;</a></h2>
+<p><code>OpSum</code> constructs Hamiltonian and observable expressions using natural operator algebra:</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c"># Spin-1/2 Heisenberg chain</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="k">global</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="k">end</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="c"># Hubbard interaction: t-V hopping + onsite U</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="k">global</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">CdagUp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">CUp</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">CdagDn</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">CDn</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">end</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="k">global</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">4.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Nupdn</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="k">end</span>
+</span></code></pre></div>
+<h3 id="supported-operator-symbols">Supported Operator Symbols<a class="headerlink" href="#supported-operator-symbols" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Spin-&frac12;</strong>: <code>Sz(i)</code>, <code>Sp(i)</code>, <code>Sm(i)</code>, <code>Sx(i)</code>, <code>Sy(i)</code></li>
+<li><strong>Fermions</strong>: <code>c(i)</code>, <code>cdag(i)</code>, <code>n(i)</code></li>
+<li><strong>Hubbard</strong>: <code>CdagUp(i)</code>, <code>CUp(i)</code>, <code>CdagDn(i)</code>, <code>CDn(i)</code>, <code>Nup(i)</code>, <code>Ndn(i)</code>, <code>Nupdn(i)</code></li>
+<li><strong>Bosons</strong>: <code>Bdag(i)</code>, <code>B(i)</code>, <code>N(i)</code></li>
+</ul>
+<hr />
+<h2 id="6-matrix-free-hamiltonian-matrixfreehamiltonian">6. Matrix-Free Hamiltonian (<code>MatrixFreeHamiltonian</code>)<a class="headerlink" href="#6-matrix-free-hamiltonian-matrixfreehamiltonian" title="Permanent link">&para;</a></h2>
+<p>Evaluates <span class="arithmatex">\(y = H x\)</span> on-the-fly without materializing the matrix in memory:</p>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c"># Constructs MatrixFreeHamiltonian (site model inferred from basis)</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c"># Targets GPU if available, otherwise CPU:</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">is_gpu_build</span><span class="p">()</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"cuda:0"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"cpu"</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">;</span><span class="w"> </span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c"># Zero-copy matrix-vector multiplication</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">(</span><span class="kt">ComplexF64</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c"># Extract matrix diagonal</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">diag_H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">diagonal</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h2 id="7-sciml-commonsolve-interface-solveprob-alg">7. SciML CommonSolve Interface (<code>solve(prob, alg)</code>)<a class="headerlink" href="#7-sciml-commonsolve-interface-solveprob-alg" title="Permanent link">&para;</a></h2>
+<p><code>QuantumKrylov.jl</code> implements standard SciML problem/algorithm dispatches:</p>
+<h3 id="a-ground-state-groundstateproblem">A. Ground State (<code>GroundStateProblem</code>)<a class="headerlink" href="#a-ground-state-groundstateproblem" title="Permanent link">&para;</a></h3>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GroundStateProblem</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c"># One-pass Lanczos</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">Lanczos</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span><span class="w"> </span><span class="n">compute_eigenvector</span><span class="o">=</span><span class="nb">true</span><span class="p">))</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">println</span><span class="p">(</span><span class="s">"Ground state energy: "</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">println</span><span class="p">(</span><span class="s">"Wavefunction:        "</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="c"># Two-pass Lanczos (memory frugal: saves only 3 working vectors during Lanczos pass)</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">sol_tp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">Lanczos</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span><span class="w"> </span><span class="n">compute_eigenvector</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">two_pass</span><span class="o">=</span><span class="nb">true</span><span class="p">))</span>
+</span></code></pre></div>
+<h3 id="b-low-lying-excited-states-excitedstatesproblem">B. Low-Lying Excited States (<code>ExcitedStatesProblem</code>)<a class="headerlink" href="#b-low-lying-excited-states-excitedstatesproblem" title="Permanent link">&para;</a></h3>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ExcitedStatesProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="c"># Davidson subspace solver</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">sol_dav</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">Davidson</span><span class="p">(</span><span class="n">n_eig</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">max_subspace</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span><span class="w"> </span><span class="n">compute_eigenvectors</span><span class="o">=</span><span class="nb">true</span><span class="p">))</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">println</span><span class="p">(</span><span class="s">"Lowest 3 energies: "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_dav</span><span class="o">.</span><span class="n">eigenvalues</span><span class="p">)</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">println</span><span class="p">(</span><span class="s">"Eigenvectors:      "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_dav</span><span class="o">.</span><span class="n">eigenvectors</span><span class="p">)</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="c"># Lanczos lowest-k solver</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">sol_lanc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">Lanczos</span><span class="p">(</span><span class="n">n_eig</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">))</span>
+</span></code></pre></div>
+<h3 id="c-thermodynamics-multi-temperature-sweeps-thermalproblem">C. Thermodynamics &amp; Multi-Temperature Sweeps (<code>ThermalProblem</code>)<a class="headerlink" href="#c-thermodynamics-multi-temperature-sweeps-thermalproblem" title="Permanent link">&para;</a></h3>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c"># Single temperature</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">prob_single</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ThermalProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">)</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">sol_single</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob_single</span><span class="p">,</span><span class="w"> </span><span class="n">FTLM</span><span class="p">(</span><span class="n">n_random</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="n">n_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">))</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">println</span><span class="p">(</span><span class="s">"Z(beta=1.0) = "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_single</span><span class="o">.</span><span class="n">partition_function</span><span class="p">)</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">println</span><span class="p">(</span><span class="s">"E(beta=1.0) = "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_single</span><span class="o">.</span><span class="n">internal_energy</span><span class="p">)</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c"># Multi-temperature grid with arbitrary observables</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">betas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0</span><span class="p">]</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="n">prob_sweep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ThermalProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">betas</span><span class="p">;</span><span class="w"> </span><span class="n">observables</span><span class="o">=</span><span class="p">[</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">Sz0_H</span><span class="p">])</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="n">sol_sweep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob_sweep</span><span class="p">,</span><span class="w"> </span><span class="n">FTLM</span><span class="p">(</span><span class="n">n_random</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">n_steps</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">))</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="n">println</span><span class="p">(</span><span class="s">"Free energies:     "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_sweep</span><span class="o">.</span><span class="n">free_energies</span><span class="p">)</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="n">println</span><span class="p">(</span><span class="s">"Specific heats:    "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_sweep</span><span class="o">.</span><span class="n">specific_heats</span><span class="p">)</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="n">println</span><span class="p">(</span><span class="s">"Entropies:         "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_sweep</span><span class="o">.</span><span class="n">entropies</span><span class="p">)</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="n">println</span><span class="p">(</span><span class="s">"Observable &lt;O&gt;:    "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_sweep</span><span class="o">.</span><span class="n">observable_expectations</span><span class="p">)</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="n">println</span><span class="p">(</span><span class="s">"Observable error:  "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_sweep</span><span class="o">.</span><span class="n">observable_errors</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="d-dynamical-response-dynamicalproblem-correctionvectorproblem">D. Dynamical Response (<code>DynamicalProblem</code> &amp; <code>CorrectionVectorProblem</code>)<a class="headerlink" href="#d-dynamical-response-dynamicalproblem-correctionvectorproblem" title="Permanent link">&para;</a></h3>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c"># Continued Fraction</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">prob_dyn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DynamicalProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">phi0</span><span class="p">;</span><span class="w"> </span><span class="n">e0</span><span class="o">=</span><span class="n">E0</span><span class="p">)</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">sol_dyn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob_dyn</span><span class="p">,</span><span class="w"> </span><span class="n">ContinuedFraction</span><span class="p">(</span><span class="n">n_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">))</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">A_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">evaluate_spectral_function</span><span class="p">(</span><span class="n">sol_dyn</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">E0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.05</span><span class="p">)</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="c"># Correction Vector (Shifted Linear Solve)</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">prob_cv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CorrectionVectorProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">phi0</span><span class="p">;</span><span class="w"> </span><span class="n">e0</span><span class="o">=</span><span class="n">E0</span><span class="p">,</span><span class="w"> </span><span class="n">omega</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">eta</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="n">sol_cv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob_cv</span><span class="p">,</span><span class="w"> </span><span class="n">CorrectionVector</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span><span class="w"> </span><span class="n">return_vector</span><span class="o">=</span><span class="nb">true</span><span class="p">))</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="n">println</span><span class="p">(</span><span class="s">"Spectral weight: "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_cv</span><span class="o">.</span><span class="n">spectral_function</span><span class="p">)</span>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="n">println</span><span class="p">(</span><span class="s">"Correction vec:  "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_cv</span><span class="o">.</span><span class="n">vector</span><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h2 id="8-functional-solvers-reference">8. Functional Solvers Reference<a class="headerlink" href="#8-functional-solvers-reference" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Type</th>
-<th>Parent Type</th>
-<th>Description</th>
-<th>Local Dimension</th>
+<th style="text-align: left;">Function</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Key Arguments</th>
+<th style="text-align: left;">Return Type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>SpinHalfSite()</code></td>
-<td><code>AbstractSite</code></td>
-<td>Spin-&frac12; local site ($</td>
-<td>\uparrow\rangle,</td>
+<td style="text-align: left;"><code>lanczos_ground_state(H; ...)</code></td>
+<td style="text-align: left;">Ground state energy &amp; wavefunction</td>
+<td style="text-align: left;"><code>maxiter=100</code>, <code>tol=1e-12</code>, <code>return_state=false</code>, <code>two_pass=false</code></td>
+<td style="text-align: left;"><code>LanczosResult</code></td>
 </tr>
 <tr>
-<td><code>FermionSite()</code></td>
-<td><code>AbstractSite</code></td>
-<td>Spinless fermion site ($</td>
-<td>0\rangle,</td>
+<td style="text-align: left;"><code>davidson_lowest(H; ...)</code></td>
+<td style="text-align: left;">Subspace Davidson eigensolver</td>
+<td style="text-align: left;"><code>n_eig=1</code>, <code>max_subspace=20</code>, <code>tol=1e-8</code>, <code>compute_eigenvectors=true</code></td>
+<td style="text-align: left;"><code>DavidsonResult</code></td>
 </tr>
 <tr>
-<td><code>HubbardSite()</code></td>
-<td><code>AbstractSite</code></td>
-<td>Spinful Fermi-Hubbard site ($</td>
-<td>0\rangle,</td>
+<td style="text-align: left;"><code>lanczos_lowest(H; ...)</code></td>
+<td style="text-align: left;">Thick-restart / full Lanczos lowest <span class="arithmatex">\(k\)</span></td>
+<td style="text-align: left;"><code>n_eig=1</code>, <code>maxiter=100</code>, <code>tol=1e-8</code>, <code>compute_eigenvectors=true</code></td>
+<td style="text-align: left;"><code>LanczosLowestResult</code></td>
 </tr>
 <tr>
-<td><code>TJSite()</code></td>
-<td><code>AbstractSite</code></td>
-<td><span class="arithmatex">\(t\)</span>-<span class="arithmatex">\(J\)</span> model site without double occupancy ($</td>
-<td>0\rangle,</td>
+<td style="text-align: left;"><code>ftlm_sweep(H, beta_grid; ...)</code></td>
+<td style="text-align: left;">Multi-temperature FTLM sweep with observables</td>
+<td style="text-align: left;"><code>observables=[]</code>, <code>n_random=10</code>, <code>n_steps=50</code>, <code>seed=0</code></td>
+<td style="text-align: left;"><code>FTLMSweepResult</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>ftlm(H; beta, ...)</code></td>
+<td style="text-align: left;">Single-temperature FTLM</td>
+<td style="text-align: left;"><code>beta=1.0</code>, <code>n_random=10</code>, <code>n_steps=50</code></td>
+<td style="text-align: left;"><code>FTLMResult</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>continued_fraction_coeffs(H, phi0; ...)</code></td>
+<td style="text-align: left;">Continued fraction Lanczos <span class="arithmatex">\(\alpha, \beta\)</span> coefficients</td>
+<td style="text-align: left;"><code>n_iter=100</code></td>
+<td style="text-align: left;"><code>ContinuedFractionResult</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>evaluate_spectral_function(cfr, w, E0, eta)</code></td>
+<td style="text-align: left;">Continued fraction Green's function evaluation</td>
+<td style="text-align: left;"><code>w</code>, <code>E0</code>, <code>eta</code></td>
+<td style="text-align: left;"><code>Float64</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>solver_correction_vector(H, phi0; ...)</code></td>
+<td style="text-align: left;">Correction vector linear system solve</td>
+<td style="text-align: left;"><code>e0</code>, <code>omega</code>, <code>eta=0.1</code>, <code>maxiter=500</code>, <code>tol=1e-8</code>, <code>return_vector=false</code></td>
+<td style="text-align: left;"><code>CorrectionVectorResult</code></td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="4-hilbert-space-bases-abstractbasis">4. Hilbert Space Bases (<code>AbstractBasis</code>)<a class="headerlink" href="#4-hilbert-space-bases-abstractbasis" title="Permanent link">&para;</a></h2>
-<p>Basis classes construct quantum state representations across <span class="arithmatex">\(N\)</span> lattice sites.</p>
-<h3 id="constructors">Constructors<a class="headerlink" href="#constructors" title="Permanent link">&para;</a></h3>
-<div class="language-julia highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">b1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="n">num_sites</span><span class="o">::</span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Sector</span><span class="p">,</span><span class="w"> </span><span class="kt">Nothing</span><span class="p">}</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FermionBasis</span><span class="p">(</span><span class="n">num_sites</span><span class="o">::</span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Sector</span><span class="p">,</span><span class="w"> </span><span class="kt">Nothing</span><span class="p">}</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">b3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HubbardBasis</span><span class="p">(</span><span class="n">num_sites</span><span class="o">::</span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Sector</span><span class="p">,</span><span class="w"> </span><span class="kt">Nothing</span><span class="p">}</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">b4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TJBasis</span><span class="p">(</span><span class="n">num_sites</span><span class="o">::</span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Sector</span><span class="p">,</span><span class="w"> </span><span class="kt">Nothing</span><span class="p">}</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span>
+<h2 id="9-hardware-accelerator-queries">9. Hardware &amp; Accelerator Queries<a class="headerlink" href="#9-hardware-accelerator-queries" title="Permanent link">&para;</a></h2>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QuantumKrylov</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c"># Check if compiled with GPU acceleration (CUDA, HIP, SYCL)</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">is_gpu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">is_gpu_build</span><span class="p">()</span><span class="w"> </span><span class="c"># Bool</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c"># Active GPU backend name ("cuda", "hip", "sycl", or nothing)</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="n">gpu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">find_gpu</span><span class="p">()</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="c"># Available physical GPU count</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gpu_count</span><span class="p">()</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="c"># Explicitly initialize device runtime target</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="n">initialize_device!</span><span class="p">(</span><span class="s">"cuda:0"</span><span class="p">)</span>
 </span></code></pre></div>
-<h3 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h3>
-<h4 id="dimensionbabstractbasisuint64"><code>dimension(b::AbstractBasis)::UInt64</code><a class="headerlink" href="#dimensionbabstractbasisuint64" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Returns the total dimension of the Hilbert space.</li>
-<li><strong>Example</strong>:
-  <div class="language-julia highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dimension</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
-</span></code></pre></div></li>
-</ul>
-<h4 id="nsitesbabstractbasisint"><code>nsites(b::AbstractBasis)::Int</code><a class="headerlink" href="#nsitesbabstractbasisint" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Returns the number of physical lattice sites.</li>
-<li><strong>Example</strong>:
-  <div class="language-julia highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">sites</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nsites</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
-</span></code></pre></div></li>
-</ul>
-<h4 id="basesizebabstractbasis"><code>Base.size(b::AbstractBasis)</code><a class="headerlink" href="#basesizebabstractbasis" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Overloads Julia <code>size()</code> to return matrix dimensions <code>(dim, dim)</code>.</li>
-</ul>
 <hr />
-<h2 id="5-operator-terms-opsum">5. Operator Terms (<code>OpSum</code>)<a class="headerlink" href="#5-operator-terms-opsum" title="Permanent link">&para;</a></h2>
-<p><code>OpSum</code> constructs Hamiltonian operator expressions from 1-body and 2-body local site operators.</p>
-<div class="language-julia highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
-</span></code></pre></div>
-<h3 id="function-usage_1">Function Usage<a class="headerlink" href="#function-usage_1" title="Permanent link">&para;</a></h3>
-<h4 id="opsum"><code>OpSum()</code><a class="headerlink" href="#opsum" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Creates a new operator sum container.</li>
-</ul>
-<h4 id="add_termopopsum-coeffnumber-op1abstractstring-site1integer"><code>add_term!(op::OpSum, coeff::Number, op1::AbstractString, site1::Integer)</code><a class="headerlink" href="#add_termopopsum-coeffnumber-op1abstractstring-site1integer" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Adds a 1-body operator term <span class="arithmatex">\(\text{coeff} \cdot \hat{O}_{1, \text{site1}}\)</span>.</li>
-<li><strong>Arguments</strong>:</li>
-<li><code>op::OpSum</code>: Target operator sum object.</li>
-<li><code>coeff::Number</code>: Coupling constant (real or complex).</li>
-<li><code>op1::AbstractString</code>: Name of local site operator (e.g. <code>"Sz"</code>, <code>"Sp"</code>, <code>"Sm"</code>, <code>"n"</code>).</li>
-<li><code>site1::Integer</code>: 0-indexed site location.</li>
-</ul>
-<h4 id="add_termopopsum-coeffnumber-op1abstractstring-site1integer-op2abstractstring-site2integer"><code>add_term!(op::OpSum, coeff::Number, op1::AbstractString, site1::Integer, op2::AbstractString, site2::Integer)</code><a class="headerlink" href="#add_termopopsum-coeffnumber-op1abstractstring-site1integer-op2abstractstring-site2integer" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Adds a 2-body interaction term <span class="arithmatex">\(\text{coeff} \cdot \hat{O}_{1, \text{site1}} \hat{O}_{2, \text{site2}}\)</span>.</li>
-<li><strong>Arguments</strong>:</li>
-<li><code>op::OpSum</code>: Target operator sum object.</li>
-<li><code>coeff::Number</code>: Coupling constant.</li>
-<li><code>op1::AbstractString</code>, <code>op2::AbstractString</code>: Names of local site operators.</li>
-<li><code>site1::Integer</code>, <code>site2::Integer</code>: 0-indexed site locations.</li>
-</ul>
-<h4 id="clearopopsum"><code>clear!(op::OpSum)</code><a class="headerlink" href="#clearopopsum" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Clears all terms stored inside <code>op</code>.</li>
-</ul>
-<hr />
-<h2 id="6-matrix-free-hamiltonian-matrixfreehamiltonian">6. Matrix-Free Hamiltonian (<code>MatrixFreeHamiltonian</code>)<a class="headerlink" href="#6-matrix-free-hamiltonian-matrixfreehamiltonian" title="Permanent link">&para;</a></h2>
-<p>The <code>MatrixFreeHamiltonian</code> evaluates matrix-vector products <span class="arithmatex">\(y = H \cdot x\)</span> on-the-fly without constructing explicit matrix representations in memory.</p>
-<h3 id="constructor-methods">Constructor &amp; Methods<a class="headerlink" href="#constructor-methods" title="Permanent link">&para;</a></h3>
-<h4 id="matrixfreehamiltonianbasisabstractbasis-siteabstractsite-opsumopsum"><code>MatrixFreeHamiltonian(basis::AbstractBasis, site::AbstractSite, opsum::OpSum)</code><a class="headerlink" href="#matrixfreehamiltonianbasisabstractbasis-siteabstractsite-opsumopsum" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Constructs a matrix-free Hamiltonian wrapper. Automatically retains references to <code>basis</code>, <code>site</code>, and <code>opsum</code> to prevent GC release of dependencies while active.</li>
-</ul>
-<h4 id="dimensionhmatrixfreehamiltonianuint64"><code>dimension(H::MatrixFreeHamiltonian)::UInt64</code><a class="headerlink" href="#dimensionhmatrixfreehamiltonianuint64" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Returns matrix dimension <span class="arithmatex">\(\mathcal{D}\)</span>.</li>
-</ul>
-<h4 id="basehmatrixfreehamiltonian-xabstractvectornumbervectorcomplexf64"><code>Base.:*(H::MatrixFreeHamiltonian, x::AbstractVector{&lt;:Number})::Vector{ComplexF64}</code><a class="headerlink" href="#basehmatrixfreehamiltonian-xabstractvectornumbervectorcomplexf64" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Computes the matrix-vector multiplication <span class="arithmatex">\(y = H \cdot x\)</span> in zero-copy mode.</li>
-<li><strong>Example</strong>:
-  <div class="language-julia highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">(</span><span class="kt">ComplexF64</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">H</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span>
-</span></code></pre></div></li>
-</ul>
-<hr />
-<h2 id="7-solvers-lanczos_ground_state">7. Solvers (<code>lanczos_ground_state</code>)<a class="headerlink" href="#7-solvers-lanczos_ground_state" title="Permanent link">&para;</a></h2>
-<h3 id="function-usage_2">Function Usage<a class="headerlink" href="#function-usage_2" title="Permanent link">&para;</a></h3>
-<h4 id="lanczos_ground_statehmatrixfreehamiltonian-maxiterinteger100-tolreal1e-12lanczosresult"><code>lanczos_ground_state(H::MatrixFreeHamiltonian; maxiter::Integer=100, tol::Real=1e-12)::LanczosResult</code><a class="headerlink" href="#lanczos_ground_statehmatrixfreehamiltonian-maxiterinteger100-tolreal1e-12lanczosresult" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Description</strong>: Computes the ground state energy using Krylov-subspace Lanczos iteration.</li>
-<li><strong>Keyword Arguments</strong>:</li>
-<li><code>maxiter::Integer</code>: Maximum number of Lanczos iterations (default: <code>100</code>).</li>
-<li><code>tol::Real</code>: Residual tolerance (default: <code>1e-12</code>).</li>
-<li><strong>Returns</strong>: <code>LanczosResult(energy::Float64)</code>.</li>
-</ul>
-<hr />
-<h2 id="8-full-end-to-end-code-example">8. Full End-to-End Code Example<a class="headerlink" href="#8-full-end-to-end-code-example" title="Permanent link">&para;</a></h2>
-<div class="language-julia highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QKrylov</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="c"># Create a 6-site Spin-1/2 Heisenberg chain with Sz=0 sector</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sector</span><span class="p">()</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">set_sz!</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">site</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfSite</span><span class="p">()</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="n">op</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="c"># Add Heisenberg terms H = \sum_i (S^z_i S^z_{i+1} + 0.5(S^+_i S^-_{i+1} + S^-_i S^+_{i+1}))</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">    </span><span class="n">next_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mod</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">)</span>
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
-</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
-</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">    </span><span class="n">add_term!</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">next_i</span><span class="p">)</span>
-</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="k">end</span>
-</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>
-</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">)</span>
-</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="n">println</span><span class="p">(</span><span class="s">"Hamiltonian Dimension: "</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
-</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>
-</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="c"># Solve for ground state energy</span>
-</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">)</span>
-</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="n">println</span><span class="p">(</span><span class="s">"Calculated Ground State Energy: "</span><span class="p">,</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+<h2 id="10-complete-end-to-end-example">10. Complete End-to-End Example<a class="headerlink" href="#10-complete-end-to-end-example" title="Permanent link">&para;</a></h2>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QuantumKrylov</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="c"># 1. Setup 6-site Spin-1/2 Heisenberg chain with Sz=0</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">sz</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="k">global</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="k">end</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">is_gpu_build</span><span class="p">()</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"cuda:0"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"cpu"</span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">;</span><span class="w"> </span><span class="n">device</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="c"># 2. Ground state via SciML Lanczos</span>
+</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="n">sol_gs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">GroundStateProblem</span><span class="p">(</span><span class="n">H</span><span class="p">),</span><span class="w"> </span><span class="n">Lanczos</span><span class="p">(</span><span class="n">compute_eigenvector</span><span class="o">=</span><span class="nb">true</span><span class="p">))</span>
+</span><span id="__span-13-16"><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="n">println</span><span class="p">(</span><span class="s">"Ground state energy: "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_gs</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+</span><span id="__span-13-17"><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>
+</span><span id="__span-13-18"><a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a><span class="c"># 3. Excited states via Davidson</span>
+</span><span id="__span-13-19"><a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="n">sol_dav</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ExcitedStatesProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">Davidson</span><span class="p">(</span><span class="n">n_eig</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+</span><span id="__span-13-20"><a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="n">println</span><span class="p">(</span><span class="s">"Lowest 3 energies:   "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_dav</span><span class="o">.</span><span class="n">eigenvalues</span><span class="p">)</span>
+</span><span id="__span-13-21"><a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a>
+</span><span id="__span-13-22"><a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a><span class="c"># 4. Multi-temperature thermodynamic sweep</span>
+</span><span id="__span-13-23"><a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a><span class="n">betas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">]</span>
+</span><span id="__span-13-24"><a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a><span class="n">sol_th</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ThermalProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">betas</span><span class="p">;</span><span class="w"> </span><span class="n">observables</span><span class="o">=</span><span class="p">[</span><span class="n">H</span><span class="p">]),</span><span class="w"> </span><span class="n">FTLM</span><span class="p">(</span><span class="n">n_random</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">n_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">))</span>
+</span><span id="__span-13-25"><a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a><span class="n">println</span><span class="p">(</span><span class="s">"Specific heat Cv:    "</span><span class="p">,</span><span class="w"> </span><span class="n">sol_th</span><span class="o">.</span><span class="n">specific_heats</span><span class="p">)</span>
 </span></code></pre></div>
 
 
@@ -1607,7 +1486,7 @@
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

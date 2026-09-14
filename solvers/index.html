@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
@@ -922,12 +922,12 @@
 
 
 <h1 id="solvers">Solvers<a class="headerlink" href="#solvers" title="Permanent link">&para;</a></h1>
-<p><code>qkrylov</code> includes several highly optimized solvers tailored for matrix-free quantum systems. </p>
+<p><code>qkrylov</code> includes several highly optimized, matrix-free solvers tailored for quantum many-body systems across CPU and GPU hardware backends:</p>
 <ul>
-<li><strong><a href="lanczos/">Lanczos Algorithm</a></strong>: Best for finding the exact ground state and a few of the lowest excited states of large, sparse Hermitian matrices.</li>
-<li><strong><a href="#">Davidson Algorithm</a></strong>: Ideal when you need multiple eigenvalues/eigenvectors simultaneously, offering better convergence properties for clustered spectra.</li>
-<li><strong><a href="dynamics/">Spectral Functions &amp; Dynamics</a></strong>: Tools to compute dynamical correlation functions, density of states (DOS), and spectral functions using continued fraction expansions.</li>
-<li><strong><a href="#">Finite Temperature Lanczos Method (FTLM)</a></strong>: Evaluates thermal expectation values and finite-temperature dynamics without fully diagonalizing the Hamiltonian.</li>
+<li><strong><a href="lanczos/">Lanczos Algorithm</a></strong>: Compile-time policy eigensolver (<code>OnePass</code>, <code>OnePass_DKGS</code>, <code>OnePass_full</code>, <code>TwoPass</code>) for ground-state energy, wavefunctions, and low-lying excited states.</li>
+<li><strong><a href="davidson/">Davidson Algorithm</a></strong>: Subspace expansion with diagonal preconditioning for simultaneous computation of multiple clustered eigenvalues and eigenvectors.</li>
+<li><strong><a href="dynamics/">Spectral Functions &amp; Dynamics</a></strong>: Dynamical response functions <span class="arithmatex">\(A(\omega)\)</span> and Green's functions using continued-fraction expansions and the correction vector method.</li>
+<li><strong><a href="ftlm/">Finite Temperature Lanczos Method (FTLM)</a></strong>: Decoupled two-stage stochastic Krylov sampling for full thermodynamic equations of state (<span class="arithmatex">\(Z, F, E, C_v, S\)</span>) and arbitrary quantum observables (<span class="arithmatex">\(\hat{O} \neq \hat{H}\)</span>) across multi-temperature grids with zero-cost re-evaluation.</li>
 </ul>
 
 
@@ -997,7 +997,7 @@
       <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

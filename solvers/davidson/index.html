@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
@@ -909,10 +909,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#key-features" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Overview
+        Key Features
       </span>
     </span>
   </a>
@@ -920,10 +920,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api" class="md-nav__link">
+  <a href="#mathematical-formulation" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        API
+        Mathematical Formulation
       </span>
     </span>
   </a>
@@ -931,10 +931,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#coming-soon" class="md-nav__link">
+  <a href="#polyglot-usage-examples" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Coming Soon
+        Polyglot Usage Examples
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameter-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Parameter Reference
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-davidson-vs-lanczos" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        When to Use Davidson vs. Lanczos
       </span>
     </span>
   </a>
@@ -968,44 +990,228 @@
 
 
 <h1 id="davidson-algorithm">Davidson Algorithm<a class="headerlink" href="#davidson-algorithm" title="Permanent link">&para;</a></h1>
-<div class="admonition note">
-<p class="admonition-title">Under Construction</p>
-<p>This page will cover the Davidson diagonalization algorithm for computing multiple low-lying eigenvalues.</p>
-</div>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The Davidson algorithm is an iterative diagonalization method that is superior to Lanczos when you need <strong>multiple eigenvalues</strong> simultaneously. It builds a Krylov-like subspace but applies diagonal preconditioning to improve convergence.</p>
-<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Python</label><label for="__tabbed_1_2">C++</label><label for="__tabbed_1_3">Julia</label></div>
+<p>The <strong>Davidson algorithm</strong> is an iterative subspace eigensolver designed to compute multiple low-lying eigenvalues and eigenvectors (<span class="arithmatex">\(\lambda_0, \lambda_1, \dots, \lambda_{k-1}\)</span>) simultaneously.</p>
+<p>While standard Lanczos can suffer from spurious ghost eigenvalues or require expensive full reorthogonalization across large subspaces, Davidson expands the search subspace using <strong>diagonal preconditioning</strong> <span class="arithmatex">\((D - \theta I)^{-1} r\)</span>, accelerating convergence to target states.</p>
+<hr />
+<h2 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Multiple Eigenvalues</strong>: Solves for the lowest <span class="arithmatex">\(k\)</span> eigenpairs simultaneously.</li>
+<li><strong>Diagonal Preconditioning</strong>: Leverages the matrix diagonal <span class="arithmatex">\(D_{ii} = H_{ii}\)</span> directly from the matrix-free representation without full matrix storage.</li>
+<li><strong>Subspace Collapsing / Restart</strong>: Controls subspace growth with <code>max_subspace</code> to bound memory usage.</li>
+<li><strong>Polyglot API</strong>: Fully supported across C++20, Python (<code>nanobind</code>), Julia (<code>QuantumKrylov.jl</code> via SciML <code>solve</code>), and the flat C ABI.</li>
+<li><strong>Dual Precision</strong>: Available in FP64 (<code>double</code>) and FP32 (<code>float</code>).</li>
+</ul>
+<hr />
+<h2 id="mathematical-formulation">Mathematical Formulation<a class="headerlink" href="#mathematical-formulation" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Subspace Projection</strong>: Given an orthonormal search basis <span class="arithmatex">\(V_m = [v_1, \dots, v_m]\)</span>, construct the small subspace Hamiltonian:
+   $<span class="arithmatex">\(H_m = V_m^\dagger H V_m\)</span>$</li>
+<li><strong>Ritz Pairs</strong>: Diagonalize <span class="arithmatex">\(H_m y_i = \theta_i y_i\)</span> to obtain Ritz approximations <span class="arithmatex">\(\tilde{u}_i = V_m y_i\)</span>.</li>
+<li><strong>Residual Vector</strong>: For each unconverged state <span class="arithmatex">\(i &lt; k\)</span>, compute:
+   $<span class="arithmatex">\(r_i = H \tilde{u}_i - \theta_i \tilde{u}_i\)</span>$</li>
+<li><strong>Preconditioned Correction Vector</strong>:
+   $<span class="arithmatex">\(q_i = (D - \theta_i I)^{-1} r_i\)</span>$
+   where <span class="arithmatex">\(D = \text{diag}(H)\)</span>.</li>
+<li><strong>Orthogonalization &amp; Expansion</strong>: Orthonormalize <span class="arithmatex">\(q_i\)</span> against <span class="arithmatex">\(V_m\)</span> via Gram-Schmidt and expand the subspace <span class="arithmatex">\(V_{m+1} = [V_m, q_i]\)</span>. When <span class="arithmatex">\(m \ge \text{max\_subspace}\)</span>, collapse the subspace back to the current <span class="arithmatex">\(k\)</span> best Ritz vectors.</li>
+</ol>
+<hr />
+<h2 id="polyglot-usage-examples">Polyglot Usage Examples<a class="headerlink" href="#polyglot-usage-examples" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Python</label><label for="__tabbed_1_2">Julia</label><label for="__tabbed_1_3">C++</label><label for="__tabbed_1_4">C ABI</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">qk</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">davidson_lowest</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">n_eig</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_subspace</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">eigenvalues</span><span class="p">)</span>   <span class="c1"># first 3 eigenvalues</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">eigenvectors</span><span class="p">)</span>  <span class="c1"># corresponding eigenvectors</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">qkrylov.solvers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Davidson</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Setup Hamiltonian (e.g. 8-site Heisenberg chain)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">basis</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sector</span><span class="p">())</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">op</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">):</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">op</span> <span class="o">+=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">"Sz"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"Sz"</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">op</span> <span class="o">+=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">"Sp"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"Sm"</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">op</span> <span class="o">+=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">"Sm"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"Sp"</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">H</span> <span class="o">=</span> <span class="n">qkrylov</span><span class="o">.</span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">qkrylov</span><span class="o">.</span><span class="n">SpinHalfSite</span><span class="p">(),</span> <span class="n">op</span><span class="p">)</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1"># 1. Functional Interface</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="n">res</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">davidson_lowest</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">n_eig</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_subspace</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Lowest 3 Eigenvalues:"</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">eigenvalues</span><span class="p">)</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Iterations:"</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">iterations</span><span class="p">)</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Converged:"</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">converged</span><span class="p">)</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="c1"># Access eigenvectors (list of numpy 1D arrays)</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="n">psi0</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">eigenvectors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="n">psi1</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">eigenvectors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="c1"># 2. Object-Oriented Solver Interface</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="n">solver</span> <span class="o">=</span> <span class="n">Davidson</span><span class="p">(</span><span class="n">n_eig</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_subspace</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="n">res_oop</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">davidson_lowest</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="cm">/*n_eig=*/</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="cm">/*max_subspace=*/</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="cm">/*tol=*/</span><span class="mf">1e-8</span><span class="p">);</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">eigenvalues</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">}</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QuantumKrylov</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c"># Setup Hamiltonian</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sector</span><span class="p">()</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">set_sz!</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="mi">6</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="k">global</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">end</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">)</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c"># 1. SciML CommonSolve Interface</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ExcitedStatesProblem</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">Davidson</span><span class="p">(</span><span class="n">n_eig</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">max_subspace</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span><span class="w"> </span><span class="n">compute_eigenvectors</span><span class="o">=</span><span class="nb">true</span><span class="p">))</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="n">println</span><span class="p">(</span><span class="s">"Eigenvalues: "</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="o">.</span><span class="n">eigenvalues</span><span class="p">)</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="n">println</span><span class="p">(</span><span class="s">"Iterations:  "</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="o">.</span><span class="n">iterations</span><span class="p">)</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="n">println</span><span class="p">(</span><span class="s">"Converged:   "</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="o">.</span><span class="n">converged</span><span class="p">)</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="c"># 2. Functional Interface</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">davidson_lowest</span><span class="p">(</span><span class="n">H</span><span class="p">;</span><span class="w"> </span><span class="n">n_eig</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">max_subspace</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">E</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">enumerate</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">eigenvalues</span><span class="p">)</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">"E[</span><span class="si">$i</span><span class="s">] = </span><span class="si">$E</span><span class="s">"</span><span class="p">)</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="k">end</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../../../contributing/">roadmap</a>.</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/qkrylov.hpp&gt;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">qkrylov</span><span class="p">;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">sector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">Sector</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="n">sector</span><span class="o">-&gt;</span><span class="n">set_sz</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">SpinHalfBasis</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">site</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">SpinHalfSite</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="n">OpSum</span><span class="w"> </span><span class="n">op</span><span class="p">;</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">7</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">        </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">        </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">        </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">    </span><span class="n">MatrixFreeHamiltonian</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">DefaultExecutionSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">);</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="c1">// Compute 3 lowest eigenvalues and eigenvectors</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">    </span><span class="n">DavidsonResult</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">davidson_lowest</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="cm">/*n_eig=*/</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="cm">/*max_subspace=*/</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="cm">/*tol=*/</span><span class="mf">1e-8</span><span class="p">);</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Converged: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">boolalpha</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">converged</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">" in "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">iterations</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">" iterations</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">eigenvalues</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"  lambda["</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"] = "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">eigenvalues</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-c highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/c_api.h&gt;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kt">int</span><span class="w"> </span><span class="n">n_eig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="kt">int</span><span class="w"> </span><span class="n">max_subspace</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="kt">double</span><span class="w"> </span><span class="n">tol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1e-8</span><span class="p">;</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="kt">double</span><span class="w"> </span><span class="n">eigenvalues</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="kt">uint64_t</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_hamiltonian_dimension</span><span class="p">(</span><span class="n">H</span><span class="p">);</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="kt">double</span><span class="o">*</span><span class="w"> </span><span class="n">eigenvectors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">double</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">n_eig</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">qkrylov_davidson_result_c_t</span><span class="w"> </span><span class="n">info</span><span class="p">;</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="kt">int</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qkrylov_davidson_lowest_complex_fp64</span><span class="p">(</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">    </span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">n_eig</span><span class="p">,</span><span class="w"> </span><span class="n">max_subspace</span><span class="p">,</span><span class="w"> </span><span class="n">tol</span><span class="p">,</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">    </span><span class="n">eigenvalues</span><span class="p">,</span><span class="w"> </span><span class="n">eigenvectors</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">info</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="p">);</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">QKRYLOV_SUCCESS</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"Converged in %d iterations</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">info</span><span class="p">.</span><span class="n">iterations</span><span class="p">);</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n_eig</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="w">        </span><span class="n">printf</span><span class="p">(</span><span class="s">"  E[%d] = %f</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">eigenvalues</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="p">}</span>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="n">free</span><span class="p">(</span><span class="n">eigenvectors</span><span class="p">);</span>
+</span></code></pre></div>
 </div>
 </div>
 </div>
-</div>
-<h2 id="coming-soon">Coming Soon<a class="headerlink" href="#coming-soon" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Full parameter documentation</li>
-<li>Convergence analysis</li>
-<li>Comparison with Lanczos for multiple eigenvalues</li>
-</ul>
+<hr />
+<h2 id="parameter-reference">Parameter Reference<a class="headerlink" href="#parameter-reference" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Default</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>n_eig</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;"><code>1</code></td>
+<td style="text-align: left;">Number of lowest eigenvalues to compute.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>max_subspace</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;"><code>20</code></td>
+<td style="text-align: left;">Maximum dimension of search subspace before restart / collapse. Recommended: <span class="arithmatex">\(\max(2 \times n_{\text{eig}}, 20)\)</span>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>tol</code></td>
+<td style="text-align: left;"><code>Real</code></td>
+<td style="text-align: left;"><code>1e-8</code></td>
+<td style="text-align: left;">Residual 2-norm convergence tolerance <span class="arithmatex">\(\|r_i\|_2 &lt; \text{tol}\)</span>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>compute_eigenvectors</code></td>
+<td style="text-align: left;"><code>bool</code></td>
+<td style="text-align: left;"><code>true</code></td>
+<td style="text-align: left;">(Julia/Python) Whether to compute and return full eigenvectors.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="when-to-use-davidson-vs-lanczos">When to Use Davidson vs. Lanczos<a class="headerlink" href="#when-to-use-davidson-vs-lanczos" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Scenario</th>
+<th style="text-align: left;">Recommended Solver</th>
+<th style="text-align: left;">Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Ground state only (<span class="arithmatex">\(k=1\)</span>)</strong></td>
+<td style="text-align: left;"><a href="../lanczos/"><code>lanczos_ground_state</code></a></td>
+<td style="text-align: left;">Lanczos has minimal memory footprint (3 vectors for <span class="arithmatex">\(E_0\)</span>) and no subspace orthogonalization overhead.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Lowest <span class="arithmatex">\(k\)</span> eigenvalues (<span class="arithmatex">\(k \ge 2\)</span>)</strong></td>
+<td style="text-align: left;"><code>davidson_lowest</code></td>
+<td style="text-align: left;">Davidson computes all <span class="arithmatex">\(k\)</span> states simultaneously with diagonal preconditioning and built-in subspace restart.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Dense spectral distribution</strong></td>
+<td style="text-align: left;"><code>davidson_lowest</code></td>
+<td style="text-align: left;">Preconditioning prevents loss of orthogonality and ghost states.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Dynamical Response <span class="arithmatex">\(S(\omega)\)</span></strong></td>
+<td style="text-align: left;"><a href="../dynamics/"><code>continued_fraction_coeffs</code></a></td>
+<td style="text-align: left;">Requires the tridiagonal Lanczos representation directly.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Thermodynamics (<span class="arithmatex">\(T &gt; 0\)</span>)</strong></td>
+<td style="text-align: left;"><a href="../ftlm/"><code>ftlm_sweep</code></a></td>
+<td style="text-align: left;">Finite Temperature Lanczos handles trace sampling over random states.</td>
+</tr>
+</tbody>
+</table>
 
 
 
@@ -1074,7 +1280,7 @@
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

@@ -19,11 +19,11 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
-        <title>Theory - qkrylov</title>
+        <title>Theoretical Foundations - qkrylov</title>
       
     
     
@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#theory" class="md-skip">
+        <a href="#theoretical-foundations" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Theory
+              Theoretical Foundations
             
           </span>
         </div>
@@ -921,16 +921,16 @@
   
 
 
-<h1 id="theory">Theory<a class="headerlink" href="#theory" title="Permanent link">&para;</a></h1>
-<p>This section details the theoretical foundations behind <code>qkrylov</code>. These pages provide mathematical background and explain the algorithms used under the hood.</p>
+<h1 id="theoretical-foundations">Theoretical Foundations<a class="headerlink" href="#theoretical-foundations" title="Permanent link">&para;</a></h1>
+<p>This section details the theoretical physics and numerical analysis foundations underpinning <code>qkrylov</code>.</p>
+<hr />
 <ul>
-<li><strong><a href="exact_diag/">Exact Diagonalization</a></strong>: Discusses what ED is, the exponential scaling of Hilbert spaces, and its limits.</li>
-<li><strong><a href="krylov/">Krylov Subspace Methods</a></strong>: Explains the Lanczos and Davidson algorithms for finding extremal eigenvalues in sparse systems.</li>
-<li><strong><a href="#">Matrix-Free Methods</a></strong>: Why no matrix is explicitly stored in memory, relying instead on fast action of the Hamiltonian.</li>
-<li><strong><a href="spectral/">Spectral Functions</a></strong>: Details the continued fraction expansion approach for dynamical responses.</li>
-<li><strong><a href="#">Finite Temperature Lanczos Method (FTLM)</a></strong>: Describes how thermal averages are approximated using Krylov subspaces.</li>
+<li><strong><a href="exact_diag/">Exact Diagonalization</a></strong>: Exponential scaling of Hilbert spaces, quantum symmetry reduction, Hamiltonian sparsity, and the matrix-free paradigm.</li>
+<li><strong><a href="krylov/">Krylov Subspace Methods</a></strong>: Mathematical derivation of the Lanczos three-term recurrence, Rayleigh-Ritz projections, Kaniel-Paige-Saad convergence bounds, and finite-precision reorthogonalization strategies.</li>
+<li><strong><a href="../performance/">Performance &amp; Matrix-Free Scaling</a></strong>: Concrete comparison of dense, CSR sparse, and matrix-free memory consumption across lattice sizes <span class="arithmatex">\(N=12 \dots 32\)</span>, two-pass algorithms, and multi-threaded scaling.</li>
+<li><strong><a href="spectral/">Spectral Functions &amp; Dynamics</a></strong>: Zero-temperature Green's functions, continued fraction expansion, and the correction vector shifted-linear solve alternative.</li>
+<li><strong><a href="../solvers/ftlm/">Finite Temperature Lanczos Method (FTLM)</a></strong>: High-temperature random trace estimation, decoupled multi-temperature sweeps, and arbitrary observable projections with error bars.</li>
 </ul>
-<p><em>Note: Most of these pages are currently under construction.</em></p>
 
 
 
@@ -999,7 +999,7 @@
       <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

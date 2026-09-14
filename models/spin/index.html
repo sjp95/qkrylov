@@ -19,11 +19,11 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
-        <title>Spin-½ Models - qkrylov</title>
+        <title>Spin Models - qkrylov</title>
       
     
     
@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spin-12-models" class="md-skip">
+        <a href="#spin-models" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Spin-&frac12; Models
+              Spin Models
             
           </span>
         </div>
@@ -909,6 +909,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#1-spin-12-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        1. Spin-&frac12; Models
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Spin-½ Models">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#basis-and-sectors" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -917,14 +929,13 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Basis and Sectors">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
-  <a href="#sector-table" class="md-nav__link">
+  <a href="#site-operators" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Sector Table
+        Site Operators
       </span>
     </span>
   </a>
@@ -937,10 +948,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#site-operators" class="md-nav__link">
+  <a href="#2-general-spin-s-models" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Site Operators
+        2. General Spin-<span class="arithmatex">\(S\)</span> Models
       </span>
     </span>
   </a>
@@ -960,10 +971,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#heisenberg-chain" class="md-nav__link">
+  <a href="#1d-antiferromagnetic-heisenberg-chain-spin-12" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Heisenberg Chain
+        1D Antiferromagnetic Heisenberg Chain (Spin-&frac12;)
       </span>
     </span>
   </a>
@@ -971,10 +982,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#transverse-field-ising-model" class="md-nav__link">
+  <a href="#spin-1-haldane-chain-general-spin-s" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Transverse Field Ising Model
+        Spin-1 Haldane Chain (General Spin-<span class="arithmatex">\(S\)</span>)
       </span>
     </span>
   </a>
@@ -1012,174 +1023,223 @@
   
 
 
-<h1 id="spin-12-models">Spin-&frac12; Models<a class="headerlink" href="#spin-12-models" title="Permanent link">&para;</a></h1>
-<p>The spin-&frac12; framework in <code>qkrylov</code> is built around the <code>SpinHalfBasis</code> and <code>SpinHalfSite</code> classes.</p>
-<h2 id="basis-and-sectors">Basis and Sectors<a class="headerlink" href="#basis-and-sectors" title="Permanent link">&para;</a></h2>
-<p>The <code>SpinHalfBasis</code> class manages the many-body Hilbert space. </p>
-<p><strong>Constructor Arguments:</strong>
-- <code>N</code>: Number of sites.
-- <code>sector</code>: An optional <code>Sector</code> object.</p>
-<p>The <code>Sector</code> object for spin-&frac12; systems supports the following fields:
-- <code>use_sz</code>: Boolean flag to enable total <span class="arithmatex">\(S^z\)</span> conservation.
-- <code>sz2</code>: Integer value representing <span class="arithmatex">\(2S^z\)</span> (twice the total magnetization, to ensure integer values).</p>
-<h3 id="sector-table">Sector Table<a class="headerlink" href="#sector-table" title="Permanent link">&para;</a></h3>
-<p>Here is a quick reference for <code>sz2</code> values for different numbers of spin-up and spin-down particles:</p>
+<h1 id="spin-models">Spin Models<a class="headerlink" href="#spin-models" title="Permanent link">&para;</a></h1>
+<p><code>qkrylov</code> provides native support for both spin-&frac12; systems and arbitrary general spin-<span class="arithmatex">\(S\)</span> systems.</p>
+<hr />
+<h2 id="1-spin-12-models">1. Spin-&frac12; Models<a class="headerlink" href="#1-spin-12-models" title="Permanent link">&para;</a></h2>
+<p>The spin-&frac12; framework is built around <code>SpinHalfBasis</code> and <code>SpinHalfSite</code>.</p>
+<h3 id="basis-and-sectors">Basis and Sectors<a class="headerlink" href="#basis-and-sectors" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Constructor</strong>: <code>SpinHalfBasis(N, sector)</code></li>
+<li><strong>Local Dimension</strong>: 2 (<span class="arithmatex">\(|\uparrow\rangle, |\downarrow\rangle\)</span>)</li>
+<li><strong>Sector Conservation</strong>: Total magnetization <span class="arithmatex">\(S^z\)</span>. Controlled by <code>set_sz(sz2)</code> where <code>sz2 = 2 * Sz</code>.</li>
+</ul>
 <table>
 <thead>
 <tr>
-<th><span class="arithmatex">\(N_{\uparrow}\)</span></th>
-<th><span class="arithmatex">\(N_{\downarrow}\)</span></th>
-<th>Total <span class="arithmatex">\(N\)</span></th>
-<th><code>sz2</code> (<span class="arithmatex">\(2S^z\)</span>)</th>
+<th style="text-align: center;"><span class="arithmatex">\(N_{\uparrow}\)</span></th>
+<th style="text-align: center;"><span class="arithmatex">\(N_{\downarrow}\)</span></th>
+<th style="text-align: center;">Total <span class="arithmatex">\(N\)</span></th>
+<th style="text-align: center;"><code>sz2</code> (<span class="arithmatex">\(2S^z\)</span>)</th>
+<th style="text-align: center;"><span class="arithmatex">\(S^z\)</span></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>3</td>
-<td>0</td>
-<td>3</td>
-<td>+3</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">+4</td>
+<td style="text-align: center;">+2.0</td>
 </tr>
 <tr>
-<td>2</td>
-<td>1</td>
-<td>3</td>
-<td>+1</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">+2</td>
+<td style="text-align: center;">+1.0</td>
 </tr>
 <tr>
-<td>1</td>
-<td>2</td>
-<td>3</td>
-<td>-1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0.0</td>
 </tr>
 <tr>
-<td>0</td>
-<td>3</td>
-<td>3</td>
-<td>-3</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">-2</td>
+<td style="text-align: center;">-1.0</td>
+</tr>
+<tr>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">-4</td>
+<td style="text-align: center;">-2.0</td>
 </tr>
 </tbody>
 </table>
-<h2 id="site-operators">Site Operators<a class="headerlink" href="#site-operators" title="Permanent link">&para;</a></h2>
-<p>The <code>SpinHalfSite</code> provides local operators:
-- <code>Sz</code>: <span class="arithmatex">\(S^z\)</span> operator.
-- <code>Sp</code>: <span class="arithmatex">\(S^+\)</span> raising operator.
-- <code>Sm</code>: <span class="arithmatex">\(S^-\)</span> lowering operator.</p>
+<h3 id="site-operators">Site Operators<a class="headerlink" href="#site-operators" title="Permanent link">&para;</a></h3>
+<p><code>SpinHalfSite</code> provides the standard spin-&frac12; Pauli operator representations:
+- <code>"Sz"</code>: <span class="arithmatex">\(S^z\)</span> operator (<span class="arithmatex">\(+1/2, -1/2\)</span>)
+- <code>"Sp"</code>: <span class="arithmatex">\(S^+\)</span> raising operator
+- <code>"Sm"</code>: <span class="arithmatex">\(S^-\)</span> lowering operator
+- <code>"Sx"</code>: <span class="arithmatex">\(S^x = \frac{1}{2}(S^+ + S^-)\)</span>
+- <code>"Sy"</code>: <span class="arithmatex">\(S^y = \frac{1}{2i}(S^+ - S^-)\)</span></p>
+<hr />
+<h2 id="2-general-spin-s-models">2. General Spin-<span class="arithmatex">\(S\)</span> Models<a class="headerlink" href="#2-general-spin-s-models" title="Permanent link">&para;</a></h2>
+<p>For arbitrary spin <span class="arithmatex">\(S = 0.5, 1.0, 1.5, 2.0, \dots\)</span>, <code>qkrylov</code> provides <code>SpinSBasis</code> and <code>SpinSSite</code>:
+- <strong>Local Dimension</strong>: <span class="arithmatex">\(2S + 1\)</span>
+- <strong>States</strong>: <span class="arithmatex">\(|S, m\rangle\)</span> for <span class="arithmatex">\(m = -S, -S+1, \dots, +S\)</span>
+- <strong>Example</strong>: For <span class="arithmatex">\(S=1\)</span> and <span class="arithmatex">\(N=4\)</span>, the full space has <span class="arithmatex">\(3^4 = 81\)</span> states; restricting to <span class="arithmatex">\(S^z = 0\)</span> yields <span class="arithmatex">\(\dim = 19\)</span>.</p>
+<hr />
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
-<h3 id="heisenberg-chain">Heisenberg Chain<a class="headerlink" href="#heisenberg-chain" title="Permanent link">&para;</a></h3>
-<p>The canonical anti-ferromagnetic Heisenberg spin chain: <span class="arithmatex">\(H = J \sum_{\langle i, j \rangle} \vec{S}_i \cdot \vec{S}_j\)</span>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Python</label><label for="__tabbed_1_2">C++</label><label for="__tabbed_1_3">Julia</label></div>
+<h3 id="1d-antiferromagnetic-heisenberg-chain-spin-12">1D Antiferromagnetic Heisenberg Chain (Spin-&frac12;)<a class="headerlink" href="#1d-antiferromagnetic-heisenberg-chain-spin-12" title="Permanent link">&para;</a></h3>
+<p>Hamiltonian: <span class="arithmatex">\(H = J \sum_{i=0}^{N-2} \left[ S^z_i S^z_{i+1} + \frac{1}{2}(S^+_i S^-_{i+1} + S^-_i S^+_{i+1}) \right]\)</span></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Python</label><label for="__tabbed_1_2">Julia</label><label for="__tabbed_1_3">C++</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinHalfBasis</span><span class="p">,</span> <span class="n">SpinHalfSite</span><span class="p">,</span> <span class="n">Sector</span><span class="p">,</span> <span class="n">OpSum</span><span class="p">,</span> <span class="n">MatrixFreeHamiltonian</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">qk</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># 10 sites, sz=0 sector</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">basis</span> <span class="o">=</span> <span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">Sector</span><span class="p">(</span><span class="n">use_sz</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sz2</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">site</span> <span class="o">=</span> <span class="n">SpinHalfSite</span><span class="p">()</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">opsum</span> <span class="o">=</span> <span class="n">OpSum</span><span class="p">()</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">J</span> <span class="o">=</span> <span class="mf">1.0</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="c1"># S^z_i S^z_j</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">opsum</span> <span class="o">+=</span> <span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sz</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sz</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="c1"># 0.5 * (S^+_i S^-_j + S^-_i S^+_j)</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">opsum</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">J</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sp</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sm</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">opsum</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">J</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sm</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sp</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">H</span> <span class="o">=</span> <span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">opsum</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># 8 sites, Sz=0 sector</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">sec</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sector</span><span class="p">()</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">sec</span><span class="o">.</span><span class="n">set_sz</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">basis</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">sec</span><span class="p">)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">site</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinHalfSite</span><span class="p">()</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">op</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">J</span> <span class="o">=</span> <span class="mf">1.0</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">):</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">op</span> <span class="o">+=</span> <span class="n">J</span><span class="p">,</span> <span class="s2">"Sz"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"Sz"</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">op</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">J</span><span class="p">,</span> <span class="s2">"Sp"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"Sm"</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">op</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">J</span><span class="p">,</span> <span class="s2">"Sm"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"Sp"</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">H</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">res</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Ground State Energy: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">energy</span><span class="si">:</span><span class="s2">.8f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/models/spin_half.hpp&gt;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/core/opsum.hpp&gt;</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/core/hamiltonian.hpp&gt;</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">qkrylov</span><span class="p">;</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="n">Sector</span><span class="w"> </span><span class="n">sector</span><span class="p">;</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="n">sector</span><span class="p">.</span><span class="n">use_sz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="n">sector</span><span class="p">.</span><span class="n">sz2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="n">SpinHalfBasis</span><span class="w"> </span><span class="n">basis</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="n">sector</span><span class="p">);</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="n">SpinHalfSite</span><span class="w"> </span><span class="n">site</span><span class="p">;</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="n">OpSum</span><span class="w"> </span><span class="n">opsum</span><span class="p">;</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">        </span><span class="n">opsum</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sz</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sz</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">});</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">        </span><span class="n">opsum</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sp</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sm</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">});</span>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">        </span><span class="n">opsum</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sm</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sp</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">});</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">    </span><span class="n">MatrixFreeHamiltonian</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="p">}</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QuantumKrylov</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sector</span><span class="p">()</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">set_sz!</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">J</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="mi">6</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="k">global</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="k">end</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">)</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="n">println</span><span class="p">(</span><span class="s">"Ground State Energy: "</span><span class="p">,</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../">roadmap</a>.</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/qkrylov.hpp&gt;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">qkrylov</span><span class="p">;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">Sector</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="n">sec</span><span class="o">-&gt;</span><span class="n">set_sz</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">SpinHalfBasis</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">sec</span><span class="p">);</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">site</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">SpinHalfSite</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="n">OpSum</span><span class="w"> </span><span class="n">op</span><span class="p">;</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">7</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">        </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">        </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">        </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="n">MatrixFreeHamiltonian</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">);</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">);</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Ground State Energy: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">energy</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="p">}</span>
+</span></code></pre></div>
 </div>
 </div>
 </div>
-</div>
-<h3 id="transverse-field-ising-model">Transverse Field Ising Model<a class="headerlink" href="#transverse-field-ising-model" title="Permanent link">&para;</a></h3>
-<p>Model: <span class="arithmatex">\(H = -J \sum_{\langle i, j \rangle} S^z_i S^z_j - h \sum_i S^x_i\)</span>.
-Note: <span class="arithmatex">\(S^x = \frac{1}{2}(S^+ + S^-)\)</span>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Python</label><label for="__tabbed_2_2">C++</label><label for="__tabbed_2_3">Julia</label></div>
+<hr />
+<h3 id="spin-1-haldane-chain-general-spin-s">Spin-1 Haldane Chain (General Spin-<span class="arithmatex">\(S\)</span>)<a class="headerlink" href="#spin-1-haldane-chain-general-spin-s" title="Permanent link">&para;</a></h3>
+<p>Hamiltonian: <span class="arithmatex">\(H = J \sum_i \vec{S}_i \cdot \vec{S}_{i+1} + D \sum_i (S^z_i)^2\)</span> with <span class="arithmatex">\(S=1\)</span>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Python</label><label for="__tabbed_2_2">Julia</label><label for="__tabbed_2_3">C++</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinHalfBasis</span><span class="p">,</span> <span class="n">SpinHalfSite</span><span class="p">,</span> <span class="n">OpSum</span><span class="p">,</span> <span class="n">MatrixFreeHamiltonian</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">basis</span> <span class="o">=</span> <span class="n">SpinHalfBasis</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># No sz conservation due to Sx</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">site</span> <span class="o">=</span> <span class="n">SpinHalfSite</span><span class="p">()</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">opsum</span> <span class="o">=</span> <span class="n">OpSum</span><span class="p">()</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">J</span> <span class="o">=</span> <span class="mf">1.0</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">h</span> <span class="o">=</span> <span class="mf">0.5</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">opsum</span> <span class="o">+=</span> <span class="p">(</span><span class="o">-</span><span class="n">J</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sz</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sz</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">opsum</span> <span class="o">+=</span> <span class="p">(</span><span class="o">-</span><span class="n">h</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sp</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">opsum</span> <span class="o">+=</span> <span class="p">(</span><span class="o">-</span><span class="n">h</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">site</span><span class="o">.</span><span class="n">Sm</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">H</span> <span class="o">=</span> <span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">opsum</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">qkrylov</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">qk</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># 4 sites, S=1, Sz=0 sector</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">sec</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">Sector</span><span class="p">()</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">sec</span><span class="o">.</span><span class="n">set_sz</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">basis</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinSBasis</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">sec</span><span class="p">)</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">site</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">SpinSSite</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">op</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">J</span> <span class="o">=</span> <span class="mf">1.0</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">op</span> <span class="o">+=</span> <span class="n">J</span><span class="p">,</span> <span class="s2">"Sz"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"Sz"</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">op</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">J</span><span class="p">,</span> <span class="s2">"Sp"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"Sm"</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="n">op</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">J</span><span class="p">,</span> <span class="s2">"Sm"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"Sp"</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="n">H</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Spin-1 Sz=0 Hilbert space dimension: </span><span class="si">{</span><span class="n">H</span><span class="o">.</span><span class="n">dimension</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># 19</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="n">res</span> <span class="o">=</span> <span class="n">qk</span><span class="o">.</span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Ground state energy: </span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">energy</span><span class="si">:</span><span class="s2">.8f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/models/spin_half.hpp&gt;</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/core/opsum.hpp&gt;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/core/hamiltonian.hpp&gt;</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">qkrylov</span><span class="p">;</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="n">SpinHalfBasis</span><span class="w"> </span><span class="n">basis</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="n">SpinHalfSite</span><span class="w"> </span><span class="n">site</span><span class="p">;</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="n">OpSum</span><span class="w"> </span><span class="n">opsum</span><span class="p">;</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="p">;</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">        </span><span class="n">opsum</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="o">-</span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sz</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sz</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">});</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">        </span><span class="n">opsum</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="o">-</span><span class="n">h</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sp</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">});</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">        </span><span class="n">opsum</span><span class="p">.</span><span class="n">add</span><span class="p">({</span><span class="o">-</span><span class="n">h</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">.</span><span class="n">Sm</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">});</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">    </span><span class="n">MatrixFreeHamiltonian</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">opsum</span><span class="p">);</span>
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="p">}</span>
+<div class="language-julia highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">using</span><span class="w"> </span><span class="n">QuantumKrylov</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Sector</span><span class="p">()</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">set_sz!</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinSBasis</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="n">sector</span><span class="o">=</span><span class="n">sec</span><span class="p">)</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">site</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpinSSite</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpSum</span><span class="p">()</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">J</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="mi">2</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="k">global</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sz</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Sm</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Sp</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="k">end</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="n">H</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MatrixFreeHamiltonian</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">)</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="n">println</span><span class="p">(</span><span class="s">"Spin-1 Ground State Energy: "</span><span class="p">,</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="admonition note">
-<p class="admonition-title">Coming Soon</p>
-<p>Julia bindings are planned via <code>extern "C"</code> FFI. See the <a href="../">roadmap</a>.</p>
-</div>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;qkrylov/qkrylov.hpp&gt;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">qkrylov</span><span class="p">;</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">sec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">Sector</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="n">sec</span><span class="o">-&gt;</span><span class="n">set_sz</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">basis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">SpinSBasis</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">sec</span><span class="p">);</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">site</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">SpinSSite</span><span class="o">&gt;</span><span class="p">(</span><span class="mf">1.0</span><span class="p">);</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="n">OpSum</span><span class="w"> </span><span class="n">op</span><span class="p">;</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">        </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sz"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">        </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">        </span><span class="n">op</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="s">"Sm"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="s">"Sp"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}}};</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">    </span><span class="n">MatrixFreeHamiltonian</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="w"> </span><span class="n">site</span><span class="p">,</span><span class="w"> </span><span class="n">op</span><span class="p">);</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lanczos_ground_state</span><span class="p">(</span><span class="n">H</span><span class="p">);</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">"Spin-1 Ground State: "</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">energy</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="p">}</span>
+</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -1251,7 +1311,7 @@ Note: <span class="arithmatex">\(S^x = \frac{1}{2}(S^+ + S^-)\)</span>.</p>
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

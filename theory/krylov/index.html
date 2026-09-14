@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.61">
+      <meta name="generator" content="zensical-0.0.62">
     
     
       
@@ -885,6 +885,11 @@
                       
                     
                     
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
                   
                   <div class="md-sidebar__inner">
                     
@@ -896,6 +901,75 @@
   
     
   
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-the-krylov-subspace" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        1. The Krylov Subspace
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-lanczos-algorithm-tridiagonalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        2. The Lanczos Algorithm &amp; Tridiagonalization
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-rayleigh-ritz-approximation-convergence" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        3. Rayleigh-Ritz Approximation &amp; Convergence
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-finite-precision-orthogonality" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        4. Finite Precision &amp; Orthogonality
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Finite Precision &amp; Orthogonality">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solutions-implemented-in-qkrylov" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Solutions Implemented in <code>qkrylov</code>
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -922,10 +996,49 @@
 
 
 <h1 id="krylov-subspace-methods">Krylov Subspace Methods<a class="headerlink" href="#krylov-subspace-methods" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>Note:</strong> This page is under construction.</p>
-</blockquote>
-<p>This page will outline the math behind Krylov subspace methods. It will explain how iterative algorithms like Lanczos and Davidson construct orthogonal bases by repeated application of the Hamiltonian, efficiently isolating extremal eigenstates without fully diagonalizing the matrix.</p>
+<p>Krylov subspace methods are the gold standard for extracting extremal eigenvalues, dynamical response, and thermodynamic properties of large-scale sparse and matrix-free quantum systems.</p>
+<hr />
+<h2 id="1-the-krylov-subspace">1. The Krylov Subspace<a class="headerlink" href="#1-the-krylov-subspace" title="Permanent link">&para;</a></h2>
+<p>Given a Hamiltonian <span class="arithmatex">\(H\)</span> of dimension <span class="arithmatex">\(D\)</span> and an initial normalized trial vector <span class="arithmatex">\(v_1\)</span>, the <span class="arithmatex">\(m\)</span>-dimensional <strong>Krylov subspace</strong> is defined as:</p>
+<div class="arithmatex">\[\mathcal{K}_m(H, v_1) = \operatorname{span} \{ v_1, H v_1, H^2 v_1, \dots, H^{m-1} v_1 \}\]</div>
+<p>Repeated multiplication by <span class="arithmatex">\(H\)</span> exponentially amplifies the components of <span class="arithmatex">\(v_1\)</span> corresponding to extremal eigenvalues (the ground state <span class="arithmatex">\(E_0\)</span> and highest excited states <span class="arithmatex">\(E_{\max}\)</span>).</p>
+<hr />
+<h2 id="2-the-lanczos-algorithm-tridiagonalization">2. The Lanczos Algorithm &amp; Tridiagonalization<a class="headerlink" href="#2-the-lanczos-algorithm-tridiagonalization" title="Permanent link">&para;</a></h2>
+<p>Because <span class="arithmatex">\(H\)</span> is Hermitian (<span class="arithmatex">\(H = H^\dagger\)</span>), the projection of <span class="arithmatex">\(H\)</span> onto an orthonormal basis <span class="arithmatex">\(V_m = [v_1, v_2, \dots, v_m]\)</span> of <span class="arithmatex">\(\mathcal{K}_m(H, v_1)\)</span> reduces to a symmetric <strong>tridiagonal matrix</strong>:</p>
+<div class="arithmatex">\[T_m = V_m^\dagger H V_m = \begin{pmatrix}
+\alpha_1 &amp; \beta_1 &amp; &amp; &amp; 0 \\
+\beta_1 &amp; \alpha_2 &amp; \beta_2 &amp; &amp; \\
+&amp; \beta_2 &amp; \alpha_3 &amp; \ddots &amp; \\
+&amp; &amp; \ddots &amp; \ddots &amp; \beta_{m-1} \\
+0 &amp; &amp; &amp; \beta_{m-1} &amp; \alpha_m
+\end{pmatrix}\]</div>
+<p>The basis vectors <span class="arithmatex">\(v_j\)</span> satisfy the famous <strong>three-term recurrence</strong>:</p>
+<div class="arithmatex">\[H v_j = \beta_{j-1} v_{j-1} + \alpha_j v_j + \beta_j v_{j+1}\]</div>
+<p>where:
+$<span class="arithmatex">\(\alpha_j = \langle v_j | H | v_j \rangle, \quad w_j = H v_j - \alpha_j v_j - \beta_{j-1} v_{j-1}, \quad \beta_j = \|w_j\|_2, \quad v_{j+1} = \frac{w_j}{\beta_j}\)</span>$</p>
+<p>Because each step only references <span class="arithmatex">\(v_{j-1}\)</span>, <span class="arithmatex">\(v_j\)</span>, and <span class="arithmatex">\(v_{j+1}\)</span>, the ground-state eigenvalue can be computed with only <strong>3 vectors in memory</strong>.</p>
+<hr />
+<h2 id="3-rayleigh-ritz-approximation-convergence">3. Rayleigh-Ritz Approximation &amp; Convergence<a class="headerlink" href="#3-rayleigh-ritz-approximation-convergence" title="Permanent link">&para;</a></h2>
+<p>Diagonalizing the small <span class="arithmatex">\(m \times m\)</span> matrix <span class="arithmatex">\(T_m\)</span>:</p>
+<div class="arithmatex">\[T_m y_k = \theta_k y_k \quad (k = 1, \dots, m)\]</div>
+<p>yields the <strong>Ritz values</strong> <span class="arithmatex">\(\theta_k \approx E_k\)</span> and <strong>Ritz vectors</strong>:</p>
+<div class="arithmatex">\[|u_k\rangle = V_m y_k = \sum_{j=1}^m y_{k, j} |v_j\rangle\]</div>
+<p>By the <strong>Kaniel-Paige-Saad theorem</strong>, the error in the ground-state eigenvalue converges exponentially:</p>
+<div class="arithmatex">\[\theta_1 - E_0 \le (E_{\max} - E_0) \left[ \frac{\tan \angle(v_1, \psi_0)}{T_{m-1}(1 + 2\gamma)} \right]^2 \approx \mathcal{O}\left( e^{-4 m \sqrt{\gamma}} \right)\]</div>
+<p>where <span class="arithmatex">\(\gamma = \frac{E_1 - E_0}{E_{\max} - E_1}\)</span> is the relative spectral gap and <span class="arithmatex">\(T_k\)</span> is the Chebyshev polynomial of degree <span class="arithmatex">\(k\)</span>.</p>
+<hr />
+<h2 id="4-finite-precision-orthogonality">4. Finite Precision &amp; Orthogonality<a class="headerlink" href="#4-finite-precision-orthogonality" title="Permanent link">&para;</a></h2>
+<p>In exact arithmetic, the Lanczos basis vectors <span class="arithmatex">\(v_j\)</span> are mutually orthogonal (<span class="arithmatex">\(\langle v_i | v_j \rangle = \delta_{ij}\)</span>). In finite-precision floating-point arithmetic (IEEE 754), round-off errors accumulate. As soon as a Ritz value converges, orthogonality rapidly degrades, causing duplicate "ghost" eigenvalues to appear in the spectrum.</p>
+<h3 id="solutions-implemented-in-qkrylov">Solutions Implemented in <code>qkrylov</code><a class="headerlink" href="#solutions-implemented-in-qkrylov" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Reorthogonalization Policies</strong>:</li>
+<li><code>OnePass_DKGS</code>: Dynamic Kahan-Gram-Schmidt reorthogonalization prevents loss of orthogonality when computing low-lying excited states.</li>
+<li><code>OnePass_full</code>: Full reorthogonalization against all vectors <span class="arithmatex">\(V_m\)</span>.</li>
+<li><strong>Two-Pass Lanczos (<code>TwoPass</code>)</strong>:</li>
+<li>Computes eigenvalues in pass 1, then regenerates the Ritz vector in pass 2 using only 3 working vectors. Ideal for large ground-state calculations where storing <span class="arithmatex">\(V_m\)</span> exceeds available RAM.</li>
+<li><strong>Davidson Algorithm</strong>:</li>
+<li>Instead of building a Krylov polynomial subspace, Davidson expands the search subspace with preconditioned residual directions <span class="arithmatex">\(q_i = (D - \theta_i I)^{-1} r_i\)</span>, making it the algorithm of choice for multiple excited states.</li>
+</ol>
 
 
 
@@ -994,7 +1107,7 @@
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.footer","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.df5d1f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
       
     
   </body>

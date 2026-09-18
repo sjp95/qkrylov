@@ -5,6 +5,8 @@ authors:
     given-names: "Subhajyoti"
   - family-names: "Mukhopadhyay"
     given-names: "Aritra"
+  - family-names: "Dasbehera"
+    given-names: "Pritipriya"
 title: "qkrylov: Matrix-free Krylov methods for quantum many-body physics"
 version: 0.1.0
 date-released: 2026-06-02

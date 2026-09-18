@@ -1,140 +1,59 @@
-# qkrylov
+# QKrylov: The Polyglot Quantum Engine
 
-**A matrix-free quantum exact diagonalization and dynamics engine in modern C++ and Python.**
+**QKrylov** is a high-performance, matrix-free exact diagonalization engine. At its heart beats a massively parallel C++ Kokkos core that runs on both CPUs and GPUs. But the true power of QKrylov is how it interacts with the world.
 
-## What is qkrylov?
+We do not believe in second-class bindings. QKrylov is built with **three first-class citizens**: Python, Julia, and C++.
 
-`qkrylov` is an open-source library designed for ultra-efficient exact diagonalization (ED) and time-evolution of quantum many-body systems. By operating entirely matrix-free, `qkrylov` enables the simulation of significantly larger quantum systems than traditional sparse-matrix approaches allow. 
+* **Python:** Deeply integrated with PyTorch tensors and object-oriented solver classes.
+* **Julia:** Native integration with the SciML ecosystem using Multiple Dispatch and `solve(prob, alg)`.
+* **C++:** Zero-overhead C++20 template policies and hardware execution tags.
 
-The library provides a high-level, expressive interface in Python and C++ for defining quantum operators, bases, and symmetries, while delegating the heavy lifting to a highly optimized C++ core. It seamlessly handles Spin-1/2, Fermion, Hubbard, and t-J models with robust support for various symmetry sectors (such as fixed magnetization or particle number).
+Write your physics in the language you love. Execute at bare-metal CUDA speeds.
 
-Whether you are computing ground states, low-lying spectra, spectral functions, or finite-temperature properties via Finite-Temperature Lanczos Methods (FTLM), `qkrylov` is built to maximize performance without compromising on user experience.
+## The First-Class Experience
 
-## Why qkrylov?
+No matter which language you choose, the API feels entirely native.
 
-* **Matrix-Free Engine:** Operators are applied to states on-the-fly. The Hamiltonian matrix is *never* constructed or stored in memory.
-* **Zero-Copy Memory Philosophy:** Python `numpy` arrays are passed directly to the C++ backend without any memory copying overhead.
-* **SciPy Integration:** The Hamiltonian can be treated as a SciPy `LinearOperator`, unlocking access to the entire SciPy sparse linear algebra ecosystem.
-* **OpenMP Parallelism:** The C++ core natively utilizes OpenMP for shared-memory parallelism, ensuring rapid operator application.
-* **Comprehensive Model Support:** Built-in primitives for Spin-1/2, Fermion, Hubbard, and t-J models out of the box.
-
-## Philosophy
-
-`qkrylov` was born out of the need for a modern, fast, and memory-efficient quantum many-body solver that doesn't feel like a chore to use. We believe that researchers should spend their time formulating physical models rather than managing memory or writing boilerplate code. 
-
-To this end, the library embraces a "zero-overhead" philosophy where possible, particularly across language boundaries. The Python interface is designed to be idiomatic and expressive, while the C++ backend handles the intense computational demands.
-
-## Installation
-
-=== "Python"
-    ```bash
-    pip install qkrylov
-    ```
-
-=== "C++"
-    ```bash
-    git clone https://github.com/sjp95/qkrylov.git
-    cd qkrylov
-    mkdir build && cd build
-    cmake .. -DCMAKE_BUILD_TYPE=Release
-    make -j4
-    sudo make install
-    ```
-
-=== "Julia"
-    ```bash
-    git clone https://github.com/sjp95/qkrylov.git
-    cd qkrylov
-    cmake -B build -DBUILD_SHARED_LIBS=ON && cmake --build build
-    julia --project=bindings/julia -e 'using Pkg; Pkg.test()'
-    ```
-
-## Quick Example: 2-Site Heisenberg Model
-
-Here is a simple example computing the ground state energy of a 2-site anti-ferromagnetic Heisenberg model.
-
-=== "Python"
+=== "Python (PyTorch Style)"
     ```python
     import qkrylov as qk
-    import numpy as np
 
-    basis = qk.SpinHalfBasis(2, sz=0)  # 2 sites, Sz=0 sector
-    site = qk.SpinHalfSite()
-    ops = qk.OpSum()
-    ops += (0.25, 'Sz', 0, 'Sz', 1)
-    ops += (0.5, 'Sp', 0, 'Sm', 1)
-    ops += (0.5, 'Sm', 0, 'Sp', 1)
+    # Define physics
+    basis = qk.basis.SpinHalf(num_sites=10, sz=0)
+    H = qk.Hamiltonian(basis, opsum).to("cuda")
 
-    H = qk.MatrixFreeHamiltonian(basis, site, ops)
-    energy, state = qk.lanczos_ground_state(H)
-    print(f'Ground state energy: {energy:.6f}')  # -0.75
+    # OOP Solvers
+    solver = qk.solvers.LanczosTwoPass(tol=1e-8)
+    evals, evecs = solver.solve(H)
     ```
 
-=== "C++"
+=== "Julia (SciML Style)"
+    ```julia
+    using QuantumKrylov
+
+    # Define physics
+    basis = Basis(SpinHalf(), 10; Sz = 0)
+    H = MatrixFreeHamiltonian(basis, H_sum; device=CUDADevice())
+
+    # SciML Multiple Dispatch
+    prob = GroundStateProblem(H)
+    sol = solve(prob, Lanczos(variation=TwoPass()))
+    ```
+
+=== "C++ (Template Policies)"
     ```cpp
     #include <qkrylov/qkrylov.hpp>
-    #include <iostream>
 
-    int main() {
-        // 2 sites, Sz=0 sector
-        qk::Sector sector;
-        sector.use_sz = true;
-        sector.sz = 0;
-        qk::SpinHalfBasis basis(2, sector);
-        qk::SpinHalfSite site;
-        
-        qk::OpSum ops;
-        ops.add(0.25, "Sz", 0, "Sz", 1);
-        ops.add(0.5, "Sp", 0, "Sm", 1);
-        ops.add(0.5, "Sm", 0, "Sp", 1);
+    // Strong Types
+    auto basis = basis::SpinHalf(10, basis::sector::Sz{0});
+    Hamiltonian H(basis, H_ops, device::gpu{}); 
 
-        qk::MatrixFreeHamiltonian H(basis, site, ops);
-        
-        auto [energy, state] = qk::lanczos_ground_state(H);
-        std::cout << "Ground state energy: " << energy << std::endl;
-        
-        return 0;
-    }
+    // Compile-time tag dispatch
+    auto [energy, vec] = solvers::lanczos<solvers::policy::TwoPass>(H, config);
     ```
 
-=== "Julia"
-    ```julia
-    using QKrylov
+## Why Matrix-Free?
 
-    sec = Sector()
-    set_sz!(sec, 0)
+Traditional solvers like `scipy.sparse.linalg` force you to build the Hamiltonian matrix in memory. For quantum spin chains, memory grows exponentially ($2^L$). At $L=20$, standard solvers crash your machine.
 
-    basis = SpinHalfBasis(2, sec)
-    site  = SpinHalfSite()
-
-    op = OpSum()
-    add_term!(op, 1.0, "Sz", 0, "Sz", 1)
-    add_term!(op, 0.5, "Sp", 0, "Sm", 1)
-    add_term!(op, 0.5, "Sm", 0, "Sp", 1)
-
-    H = MatrixFreeHamiltonian(basis, site, op)
-    res = lanczos_ground_state(H)
-    println("Ground state energy: ", res.energy)  # -0.75
-    ```
-
-## Performance
-
-The core advantage of `qkrylov` is its **matrix-free** architecture. In traditional sparse exact diagonalization, storing the Hamiltonian matrix requires memory that scales as $\mathcal{O}(\text{dim}^2)$ (or $\mathcal{O}(\text{dim} \times z)$ for sparse matrices, where $z$ is the number of non-zero elements per row). For large systems, this memory footprint becomes the primary bottleneck.
-
-By applying operators directly to the state vectors on-the-fly, `qkrylov`'s memory requirement scales strictly as $\mathcal{O}(\text{dim})$—the size of the vectors themselves. This allows you to simulate systems with significantly larger Hilbert spaces on the same hardware, accelerated by OpenMP parallelism.
-
-## Contributing
-
-We welcome contributions! If you have a feature request, bug report, or want to contribute code, please check out our [GitHub repository](https://github.com/sjp95/qkrylov) and open an issue or pull request. 
-
-## Citation
-
-If you use `qkrylov` in your research, please consider citing it:
-
-```bibtex
-@software{qkrylov,
-  author = {Pal, Subhajyoti and Mukhopadhyay, Aritra},
-  title = {qkrylov: Matrix-free Krylov methods for quantum many-body physics},
-  url = {https://github.com/sjp95/qkrylov}
-}
-```
+QKrylov is **Matrix-Free**. It applies the Hamiltonian operator bitwise directly onto the state vector on the fly. You never run out of RAM, and you harness the extreme memory bandwidth of modern GPUs.

@@ -23,13 +23,29 @@ def test_heisenberg_workflow():
     H = qk.MatrixFreeHamiltonian(basis, site, os)
     assert H.dimension == 6, "Hamiltonian dimension should match Sz=0 sector size"
 
-    # 4. Compute Low-Energy States (Algorithms)
-    res = qk.lanczos_ground_state(H, 200, 1e-12)
+    # 4. Compute Low-Energy States via OOP Lanczos and LanczosTwoPass
+    solver = qk.solvers.Lanczos(maxiter=200, tol=1e-12)
+    res = solver.solve(H)
     
     # Exact energy for 4-site Heisenberg chain OBC
     exact_energy = -1.6160254038
     assert math.isclose(res.energy, exact_energy, abs_tol=1e-5), "Ground state energy should match exact 4-site Heisenberg value"
     assert len(res.eigenvector) == 6, "Eigenvector dimension should match Sz=0 sector size"
 
-if __name__ == "__main__":
-    test_heisenberg_workflow()
+    # Verify tuple unpacking
+    evals, evecs = solver.solve(H)
+    assert math.isclose(evals, exact_energy, abs_tol=1e-5)
+    assert len(evecs) == 6
+
+    # Verify TwoPass solver
+    solver_tp = qk.solvers.LanczosTwoPass(maxiter=200, tol=1e-12)
+    evals_tp, evecs_tp = solver_tp.solve(H)
+    assert math.isclose(evals_tp, exact_energy, abs_tol=1e-5)
+    assert math.isclose(evals, evals_tp, abs_tol=1e-5), "SinglePass and TwoPass energies must match"
+    assert len(evecs_tp) == 6
+
+    # Verify backward compatibility
+    res_proc = qk.lanczos_ground_state(H, 200, 1e-12)
+    assert math.isclose(res_proc.energy, exact_energy, abs_tol=1e-5)
+    evals_proc, evecs_proc = res_proc
+    assert math.isclose(evals_proc, exact_energy, abs_tol=1e-5)

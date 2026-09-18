@@ -6,12 +6,9 @@
 #include "../symmetry/sector.hpp"
 
 #include <vector>
-#include <unordered_map>
 #include <memory>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
 
 class FermionBasis : public Basis
 {
@@ -21,6 +18,16 @@ public:
         int N,
         const Sector& sector = Sector{}
     );
+
+    FermionBasis(
+        int N,
+        const sector::Particles& p
+    ) : FermionBasis(N, Sector(p)) {}
+
+    FermionBasis(
+        int N,
+        const sector::Unconstrained& u
+    ) : FermionBasis(N, Sector(u)) {}
 
     ~FermionBasis() override = default;
 
@@ -55,11 +62,15 @@ private:
     Sector sector_;
 
     std::vector<StateID> states_;
-
-    std::unordered_map<StateID, Index> lookup_;
 };
 
+namespace QKRYLOV_PRECISION_NAMESPACE {
+using qkrylov::FermionBasis;
+}
 
+namespace basis {
+    using Fermion = qkrylov::FermionBasis;
+    namespace sector = qkrylov::sector;
+}
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

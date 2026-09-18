@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Union
+from typing import Union, Optional, Any
 from . import _qkrylov_cpp as _cpp
 from .basis import Basis
 from .site import Site
@@ -16,20 +16,81 @@ class MatrixFreeHamiltonian:
     ----------
     basis : Basis
         The Hilbert space basis.
-    site : Site
-        The local site physics.
-    ops : OpSum
-        The interaction terms.
+    site_or_ops : Site or OpSum
+        The local site physics (Site) or the interaction terms (OpSum) if site is omitted.
+    ops : OpSum, optional
+        The interaction terms (if site is provided as second argument).
+    device : str, optional
+        Target device ("cpu", "gpu", "cuda", etc., default "cpu").
+    dtype : np.dtype, optional
+        Precision (np.float32 or np.float64, default np.float32).
     """
     
-    def __init__(self, basis: Basis, site: Site, ops: OpSum, device: str = "cpu", dtype=np.float32):
+    def __init__(
+        self,
+        basis: Basis,
+        site_or_ops: Union[Site, OpSum],
+        ops: Optional[OpSum] = None,
+        device: str = "cpu",
+        dtype = None
+    ):
+        if dtype is None:
+            if hasattr(basis, "dtype") and basis.dtype is not None:
+                dtype = basis.dtype
+            elif hasattr(basis, "_dtype") and basis._dtype is not None:
+                dtype = basis._dtype
+            elif hasattr(basis, "_cpp_obj") and basis._cpp_obj is not None and "FP64" in type(basis._cpp_obj).__name__:
+                dtype = np.float64
+            else:
+                dtype = np.float32
+        if ops is None:
+            # 2-argument invocation: Hamiltonian(basis, ops) -> infer site from basis
+            self.ops = site_or_ops
+            from .basis import SpinHalfBasis, SpinSBasis, FermionBasis, HubbardBasis, TJBasis
+            from .site import SpinHalfSite, SpinSSite, FermionSite, HubbardSite, TJSite
+            if isinstance(basis, SpinHalfBasis):
+                self.site = SpinHalfSite(dtype=dtype)
+            elif isinstance(basis, SpinSBasis):
+                self.site = SpinSSite(S=basis.spin, dtype=dtype)
+            elif isinstance(basis, FermionBasis):
+                self.site = FermionSite(dtype=dtype)
+            elif isinstance(basis, HubbardBasis):
+                self.site = HubbardSite(dtype=dtype)
+            elif isinstance(basis, TJBasis):
+                self.site = TJSite(dtype=dtype)
+            else:
+                self.site = SpinHalfSite(dtype=dtype)
+        else:
+            self.site = site_or_ops
+            self.ops = ops
+
         self.basis = basis
-        self.site = site
-        self.ops = ops
         self.device = device
         self.dtype = dtype
         s_dtype = "_FP64" if dtype == np.float64 else "_FP32"
-        
+        site = self.site
+        ops = self.ops
+
+        # Ensure site matches precision
+        if getattr(site, "dtype", None) is not None and site.dtype != dtype:
+            site_cls = site.__class__
+            if hasattr(site, "spin"):
+                self.site = site_cls(S=site.spin, dtype=dtype)
+            else:
+                self.site = site_cls(dtype=dtype)
+            site = self.site
+
+        # Ensure ops matches precision
+        if getattr(ops, "dtype", None) is not None and ops.dtype != dtype:
+            converted_ops = OpSum(dtype=dtype)
+            for t in ops._cpp_obj.terms():
+                items = [t.coeff]
+                for f in t.factors:
+                    items.extend([f.op, f.site])
+                converted_ops._cpp_obj.__iadd__(tuple(items))
+            self.ops = converted_ops
+            ops = self.ops
+
         dev_obj = getattr(_cpp, f"Device{s_dtype}")(device)
         d_lower = device.lower()
         if "cuda" in d_lower:
@@ -114,8 +175,24 @@ class MatrixFreeHamiltonian:
         new_dtype = dtype if dtype is not None else self.dtype
         return MatrixFreeHamiltonian(self.basis, self.site, self.ops, device=new_device, dtype=new_dtype)
 
-    def __matmul__(self, x: np.ndarray) -> np.ndarray:
-        return self.apply(x)
+    def __matmul__(self, x: Union[np.ndarray, Any]) -> Any:
+        """Matrix-free matrix-vector multiplication `y = H @ x`."""
+        is_torch = False
+        if hasattr(x, "__class__") and x.__class__.__name__ == "Tensor" and hasattr(x, "numpy"):
+            is_torch = True
+            dev = getattr(x, "device", None)
+            x_arr = x.detach().cpu().numpy()
+        else:
+            x_arr = x
+        y = self.apply(x_arr)
+        if is_torch:
+            try:
+                import torch
+                t = torch.from_numpy(y)
+                return t.to(dev) if dev is not None else t
+            except ImportError:
+                pass
+        return y
 
     def aslinearoperator(self):
         """Convert this Hamiltonian into a SciPy LinearOperator.
@@ -175,3 +252,7 @@ class MatrixFreeHamiltonian:
                 data.extend(y[non_zeros])
                 
         return sp.csr_matrix((data, (rows, cols)), shape=(dim, dim), dtype=np.complex128 if self.dtype == np.float64 else np.complex64)
+
+
+# Alias conforming to API blueprint
+Hamiltonian = MatrixFreeHamiltonian

@@ -6,12 +6,9 @@
 #include "../symmetry/sector.hpp"
 
 #include <vector>
-#include <unordered_map>
 #include <memory>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
 
 class TJBasis : public Basis
 {
@@ -21,6 +18,16 @@ public:
         int N,
         const Sector& sector = Sector{}
     );
+
+    TJBasis(
+        int N,
+        const sector::Hubbard& h
+    ) : TJBasis(N, Sector(h)) {}
+
+    TJBasis(
+        int N,
+        const sector::Unconstrained& u
+    ) : TJBasis(N, Sector(u)) {}
 
     ~TJBasis() override = default;
 
@@ -53,11 +60,15 @@ private:
     Sector sector_;
 
     std::vector<StateID> states_;
-
-    std::unordered_map<StateID, Index> lookup_;
 };
 
+namespace QKRYLOV_PRECISION_NAMESPACE {
+using qkrylov::TJBasis;
+}
 
+namespace basis {
+    using TJ = qkrylov::TJBasis;
+    namespace sector = qkrylov::sector;
+}
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

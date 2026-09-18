@@ -35,6 +35,17 @@ int main() {
     assert(res.partition_function > 0);
     assert(std::abs(res.internal_energy) < 1.0);
 
+    // Test low-temperature stability at beta = 50.0 (where exp(-beta * E0) without shift would overflow float)
+    Real beta_low = 50.0;
+    auto res_low = ftlm<Kokkos::DefaultExecutionSpace>(H, beta_low, 50, 10);
+    std::cout << "Low-T FTLM (beta=50) Internal Energy E: " << res_low.internal_energy << "\n";
+    std::cout << "Low-T FTLM (beta=50) Specific Heat Cv: " << res_low.specific_heat << "\n";
+
+    assert(!std::isnan(res_low.internal_energy));
+    assert(!std::isnan(res_low.specific_heat));
+    assert(std::abs(res_low.internal_energy - (-0.25)) < 0.1);
+    assert(res_low.specific_heat >= 0.0);
+
     std::cout << "FTLM test passed!\n";
     return 0;
 }

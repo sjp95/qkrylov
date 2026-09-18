@@ -40,17 +40,17 @@ int main() {
     }
 
     MatrixFreeHamiltonian<Kokkos::DefaultExecutionSpace> H(basis, site, os);
-    auto res = lanczos_ground_state<Kokkos::DefaultExecutionSpace>(H);
+    auto [res_energy, res_eigenvector] = solvers::lanczos<solvers::policy::OnePass_DKGS>(H);
 
-    std::cout << "Lanczos Energy: " << res.energy << " (Expected -0.75)\n";
-    assert(std::abs(res.energy + 0.75) < 1e-5);
+    std::cout << "Lanczos Energy: " << res_energy << " (Expected -0.75)\n";
+    assert(std::abs(res_energy + 0.75) < 1e-5);
 
     // Verify Ritz vector: H * v should be energy * v
     HostVector Hv(H.dimension());
-    H.apply(res.eigenvector.data(), Hv.data());
+    H.apply(res_eigenvector.data(), Hv.data());
 
     for (Index i = 0; i < H.dimension(); ++i) {
-        Complex diff = Hv[i] - Complex(res.energy * res.eigenvector[i].real(), res.energy * res.eigenvector[i].imag());
+        Complex diff = Hv[i] - Complex(res_energy * res_eigenvector[i].real(), res_energy * res_eigenvector[i].imag());
         assert(std::abs(diff) < 1e-5);
     }
 

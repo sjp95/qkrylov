@@ -38,7 +38,7 @@ The Python bindings expose all core qkrylov functionality with zero-copy memory 
 
 ## Language Interfaces & C API Reference
 
-- **Julia API**: See [Julia API Reference](julia_api.md) or [`bindings/julia/README.md`](../../bindings/julia/README.md).
+- **Julia API**: See [Julia API Reference](julia_api.md) or [`bindings/julia/README.md`](https://github.com/sjp95/qkrylov/blob/main/bindings/julia/README.md).
 - **C API (`extern "C"`)**: See [C API Reference](c_api.md).
 
 

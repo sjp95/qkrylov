@@ -28,7 +28,44 @@ mutable struct OpSum
 end
 
 Base.length(op::OpSum) = length(op.terms)
+Base.size(op::OpSum) = (length(op.terms),)
 Base.isempty(op::OpSum) = isempty(op.terms)
+Base.getindex(op::OpSum, i::Integer) = op.terms[i]
+
+function opsum_size(op::OpSum)::Int
+    n = Ref{Cint}(0)
+    status = ccall((:qkrylov_opsum_size, libqkrylov), Cint, (Ptr{Cvoid}, Ref{Cint}), op.ptr, n)
+    _check_status(status, "Failed to query OpSum size")
+    return Int(n[])
+end
+
+function opsum_get_term_info(op::OpSum, term_idx::Integer)
+    re = Ref{Cdouble}(0.0)
+    im = Ref{Cdouble}(0.0)
+    n_fac = Ref{Cint}(0)
+    status = ccall(
+        (:qkrylov_opsum_get_term_info, libqkrylov),
+        Cint,
+        (Ptr{Cvoid}, Cint, Ref{Cdouble}, Ref{Cdouble}, Ref{Cint}),
+        op.ptr, Cint(term_idx), re, im, n_fac
+    )
+    _check_status(status, "Failed to query OpSum term info")
+    return (ComplexF64(re[], im[]), Int(n_fac[]))
+end
+
+function opsum_get_factor(op::OpSum, term_idx::Integer, factor_idx::Integer)
+    buf = Vector{UInt8}(undef, 32)
+    site = Ref{Cint}(0)
+    status = ccall(
+        (:qkrylov_opsum_get_factor, libqkrylov),
+        Cint,
+        (Ptr{Cvoid}, Cint, Cint, Ptr{Cchar}, Cint, Ref{Cint}),
+        op.ptr, Cint(term_idx), Cint(factor_idx), pointer(buf), Cint(length(buf)), site
+    )
+    _check_status(status, "Failed to query OpSum factor")
+    op_name = unsafe_string(pointer(buf))
+    return (op_name, Int(site[]))
+end
 
 function clear!(op::OpSum)
     status = ccall((:qkrylov_opsum_clear, libqkrylov), Cint, (Ptr{Cvoid},), op.ptr)
@@ -40,10 +77,10 @@ end
 function add_term!(op::OpSum, coeff::Number, op1::AbstractString, site1::Integer)
     c = ComplexF64(coeff)
     status = ccall(
-        (:qkrylov_opsum_add_term_1body, libqkrylov),
+        (:qkrylov_opsum_add_term_1body_fp64, libqkrylov),
         Cint,
-        (Ptr{Cvoid}, Cfloat, Cfloat, Cstring, Cint),
-        op.ptr, Cfloat(real(c)), Cfloat(imag(c)), string(op1), Cint(site1)
+        (Ptr{Cvoid}, Cdouble, Cdouble, Cstring, Cint),
+        op.ptr, Cdouble(real(c)), Cdouble(imag(c)), string(op1), Cint(site1)
     )
     status != QKRYLOV_SUCCESS && error("Failed to add 1-body term to OpSum (status code $status)")
     push!(op.terms, OpTerm(c, [(string(op1), Int(site1))]))
@@ -53,10 +90,10 @@ end
 function add_term!(op::OpSum, coeff::Number, op1::AbstractString, site1::Integer, op2::AbstractString, site2::Integer)
     c = ComplexF64(coeff)
     status = ccall(
-        (:qkrylov_opsum_add_term_2body, libqkrylov),
+        (:qkrylov_opsum_add_term_2body_fp64, libqkrylov),
         Cint,
-        (Ptr{Cvoid}, Cfloat, Cfloat, Cstring, Cint, Cstring, Cint),
-        op.ptr, Cfloat(real(c)), Cfloat(imag(c)), string(op1), Cint(site1), string(op2), Cint(site2)
+        (Ptr{Cvoid}, Cdouble, Cdouble, Cstring, Cint, Cstring, Cint),
+        op.ptr, Cdouble(real(c)), Cdouble(imag(c)), string(op1), Cint(site1), string(op2), Cint(site2)
     )
     status != QKRYLOV_SUCCESS && error("Failed to add 2-body term to OpSum (status code $status)")
     push!(op.terms, OpTerm(c, [(string(op1), Int(site1)), (string(op2), Int(site2))]))
@@ -79,10 +116,10 @@ function add_term!(op::OpSum, coeff::Number, ops::AbstractVector{<:AbstractStrin
 
     GC.@preserve c_ops c_sites ops_ptrs begin
         status = ccall(
-            (:qkrylov_opsum_add_term_nbody, libqkrylov),
+            (:qkrylov_opsum_add_term_nbody_fp64, libqkrylov),
             Cint,
-            (Ptr{Cvoid}, Cfloat, Cfloat, Cint, Ptr{Ptr{Cchar}}, Ptr{Cint}),
-            op.ptr, Cfloat(real(c)), Cfloat(imag(c)), Cint(n_factors), ops_ptrs, c_sites
+            (Ptr{Cvoid}, Cdouble, Cdouble, Cint, Ptr{Ptr{Cchar}}, Ptr{Cint}),
+            op.ptr, Cdouble(real(c)), Cdouble(imag(c)), Cint(n_factors), ops_ptrs, c_sites
         )
     end
     status != QKRYLOV_SUCCESS && error("Failed to add $n_factors-body term to OpSum (status code $status)")

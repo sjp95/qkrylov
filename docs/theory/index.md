@@ -1,11 +1,11 @@
-# Theory
+# Theoretical Foundations
 
-This section details the theoretical foundations behind `qkrylov`. These pages provide mathematical background and explain the algorithms used under the hood.
+This section details the theoretical physics and numerical analysis foundations underpinning `qkrylov`.
 
-- **[Exact Diagonalization](exact_diag.md)**: Discusses what ED is, the exponential scaling of Hilbert spaces, and its limits.
-- **[Krylov Subspace Methods](krylov.md)**: Explains the Lanczos and Davidson algorithms for finding extremal eigenvalues in sparse systems.
-- **[Matrix-Free Methods](#)**: Why no matrix is explicitly stored in memory, relying instead on fast action of the Hamiltonian.
-- **[Spectral Functions](spectral.md)**: Details the continued fraction expansion approach for dynamical responses.
-- **[Finite Temperature Lanczos Method (FTLM)](#)**: Describes how thermal averages are approximated using Krylov subspaces.
+---
 
-*Note: Most of these pages are currently under construction.*
+- **[Exact Diagonalization](exact_diag.md)**: Exponential scaling of Hilbert spaces, quantum symmetry reduction, Hamiltonian sparsity, and the matrix-free paradigm.
+- **[Krylov Subspace Methods](krylov.md)**: Mathematical derivation of the Lanczos three-term recurrence, Rayleigh-Ritz projections, Kaniel-Paige-Saad convergence bounds, and finite-precision reorthogonalization strategies.
+- **[Performance & Matrix-Free Scaling](../performance.md)**: Concrete comparison of dense, CSR sparse, and matrix-free memory consumption across lattice sizes $N=12 \dots 32$, two-pass algorithms, and multi-threaded scaling.
+- **[Spectral Functions & Dynamics](spectral.md)**: Zero-temperature Green's functions, continued fraction expansion, and the correction vector shifted-linear solve alternative.
+- **[Finite Temperature Lanczos Method (FTLM)](../solvers/ftlm.md)**: High-temperature random trace estimation, decoupled multi-temperature sweeps, and arbitrary observable projections with error bars.

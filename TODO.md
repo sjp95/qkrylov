@@ -8,20 +8,28 @@
 ## 2. Documentation System (Zensical)
 - [x] Set up `zensical.toml` configuration and install `zensical` in `.venv`.
 - [x] Configure `.github/workflows/docs.yml` for automated deployment to GitHub Pages using Zensical.
-- [ ] Populate `docs/` with quickstart guide, API references, and zero-copy performance tips.
+- [x] Populate `docs/` with quickstart guide, API references, solver guides (Lanczos, Davidson, Dynamics, FTLM), and zero-copy performance tips.
 
-## 3. Complete GitHub Actions & `.github` Setup
+## 3. Modernized Solvers & Decoupled FTLM Architecture
+- [x] Unified C++20 Lanczos compile-time policies (`OnePass`, `OnePass_DKGS`, `OnePass_full`, `TwoPass`) with structured bindings and `LanczosConfig`.
+- [x] Decoupled FTLM into sample collection (`ftlm_sample`) and multi-temperature sweep evaluation (`ftlm_evaluate_sweep`) with arbitrary physical observable projection $\mathcal{O}_{jk} = \langle v_j | \hat{O} | v_k \rangle$ and full thermodynamic equations of state ($Z, F, E, C_v, S$).
+- [x] Flat C ABI endpoints for two-pass Lanczos, lowest-$k$ Lanczos, and FTLM sweeps (`qkrylov_ftlm_sweep_fp64`/`_fp32`).
+- [x] Julia SciML `CommonSolve` interface (`solve(prob, alg)`) with `GroundStateProblem`, `ExcitedStatesProblem`, `ThermalProblem`, `DynamicalProblem`, `CorrectionVectorProblem`.
+- [x] Nanobind Python bindings with SciPy `LinearOperator` interoperability, dual-precision dispatch (FP64/FP32), OOP solvers (`Lanczos`, `Davidson`, `FTLM`, `ContinuedFraction`, `CorrectionVector`), and comprehensive test suite (134 tests).
+- [x] Numerical stability fixes: energy variance clamp $\ge 0$ for high-$\beta$ low-temperature FTLM sweeps in single-precision (FP32).
+
+## 4. Complete GitHub Actions & `.github` Setup
 - [x] Finalize `.github/workflows/pypi_publish.yaml` for PyPI wheel release builds (Linux x86_64, Linux ARM64, Windows, Mac Intel, Mac Apple Silicon).
 - [x] Configure PyPI index publishing & GitHub Pages redirect index generation (`--extra-index-url` PyTorch-style setup).
 - [x] Add `.github/workflows/tests.yaml` for fast CI test suite execution on push/PR.
 - [x] Add Issue Templates and Pull Request Templates under `.github/`.
 
-## 4. Universal `extern "C"` API Layer for Julia and even more languages
-- [x] Create `include/qkrylov/c_api.h` exposing flat `extern "C"` functions for Basis, Site, OpSum, and MatrixFreeHamiltonian.
+## 5. Universal `extern "C"` API Layer for Julia and even more languages
+- [x] Create `include/qkrylov/c_api.h` exposing flat `extern "C"` functions for Basis, Site, OpSum, MatrixFreeHamiltonian, Solvers, BLAS-1 kernels, and Device Vectors.
 - [x] Implement `src/c_api.cpp` to bridge C calls to internal C++ classes without copying array buffers.
 - [x] Support seamless zero-copy interoperability for Julia (`ccall`), Rust (`bindgen`), C, and Go.
 
-## 5. Multi-Hardware Distribution & Shipping Strategy (Target Architecture)
+## 6. Multi-Hardware Distribution & Shipping Strategy (Target Architecture)
 *(Note for C++ engineers: This is the final shipping structure. Ensure the Kokkos integration and CMake configuration natively support this CI/CD matrix).*
 
 ### A. The Pre-Compiled Binaries Matrix

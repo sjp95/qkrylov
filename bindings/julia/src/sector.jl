@@ -16,6 +16,18 @@ mutable struct Sector
         end
         return obj
     end
+
+    function Sector(ptr::Ptr{Cvoid})
+        ptr == C_NULL && error("Invalid null Sector pointer")
+        obj = new(ptr)
+        finalizer(obj) do o
+            if o.ptr != C_NULL
+                ccall((:qkrylov_sector_destroy, libqkrylov), Cvoid, (Ptr{Cvoid},), o.ptr)
+                o.ptr = C_NULL
+            end
+        end
+        return obj
+    end
 end
 
 function set_sz!(sec::Sector, sz2::Integer)

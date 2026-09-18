@@ -27,6 +27,39 @@ Base.size(b::AbstractBasis) = (Int(dimension(b)), Int(dimension(b)))
 Base.length(b::AbstractBasis) = Int(dimension(b))
 Base.getindex(b::AbstractBasis, i::Integer) = state(b, i - 1)
 
+function spin(b::AbstractBasis)::Float64
+    spin_out = Ref{Cdouble}(0.0)
+    status = ccall((:qkrylov_basis_get_spin, libqkrylov), Cint, (Ptr{Cvoid}, Ref{Cdouble}), b.ptr, spin_out)
+    _check_status(status, "Failed to query basis spin")
+    return spin_out[]
+end
+
+function dimension_per_site(b::AbstractBasis)::Int
+    d_out = Ref{Cint}(0)
+    status = ccall((:qkrylov_basis_get_dimension_per_site, libqkrylov), Cint, (Ptr{Cvoid}, Ref{Cint}), b.ptr, d_out)
+    _check_status(status, "Failed to query basis dimension per site")
+    return Int(d_out[])
+end
+
+function basis_type(b::AbstractBasis)::Symbol
+    t_out = Ref{Cint}(0)
+    status = ccall((:qkrylov_basis_get_type, libqkrylov), Cint, (Ptr{Cvoid}, Ref{Cint}), b.ptr, t_out)
+    _check_status(status, "Failed to query basis type")
+    t = t_out[]
+    t == 0 && return :SpinHalf
+    t == 1 && return :SpinS
+    t == 2 && return :Fermion
+    t == 3 && return :Hubbard
+    t == 4 && return :TJ
+    return :Unknown
+end
+
+function sector(b::AbstractBasis)::Union{Sector, Nothing}
+    sec_ptr = ccall((:qkrylov_basis_get_sector, libqkrylov), Ptr{Cvoid}, (Ptr{Cvoid},), b.ptr)
+    sec_ptr == C_NULL && return nothing
+    return Sector(sec_ptr)
+end
+
 mutable struct SpinHalfBasis <: AbstractBasis
     ptr::Ptr{Cvoid}
     sector::Union{Sector, Nothing}
@@ -41,6 +74,36 @@ mutable struct SpinHalfBasis <: AbstractBasis
         ptr = ccall((:qkrylov_spinhalf_basis_create, libqkrylov), Ptr{Cvoid}, (Cint, Ptr{Cvoid}), Cint(num_sites), sec_ptr)
         ptr == C_NULL && error("Failed to create SpinHalfBasis")
         obj = new(ptr, effective_sec)
+        finalizer(obj) do o
+            if o.ptr != C_NULL
+                ccall((:qkrylov_basis_destroy, libqkrylov), Cvoid, (Ptr{Cvoid},), o.ptr)
+                o.ptr = C_NULL
+            end
+        end
+        return obj
+    end
+end
+
+mutable struct SpinSBasis <: AbstractBasis
+    ptr::Ptr{Cvoid}
+    spin_s::Float64
+    sector::Union{Sector, Nothing}
+
+    function SpinSBasis(num_sites::Integer, S::Real, sector::Union{Sector, Nothing}=nothing; sz::Union{Real, Nothing}=nothing)
+        effective_sec = sector
+        if effective_sec === nothing && sz !== nothing
+            effective_sec = Sector()
+            set_sz!(effective_sec, round(Int, 2 * sz))
+        end
+        sec_ptr = effective_sec === nothing ? C_NULL : effective_sec.ptr
+        ptr = ccall(
+            (:qkrylov_basis_create_spin_s, libqkrylov),
+            Ptr{Cvoid},
+            (Cint, Cdouble, Ptr{Cvoid}),
+            Cint(num_sites), Cdouble(S), sec_ptr
+        )
+        ptr == C_NULL && error("Failed to create SpinSBasis for N=$num_sites, S=$S")
+        obj = new(ptr, Float64(S), effective_sec)
         finalizer(obj) do o
             if o.ptr != C_NULL
                 ccall((:qkrylov_basis_destroy, libqkrylov), Cvoid, (Ptr{Cvoid},), o.ptr)

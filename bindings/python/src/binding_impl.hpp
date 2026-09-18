@@ -21,9 +21,13 @@
 #include "qkrylov/hamiltonian/matrix_free_hamiltonian.hpp"
 #include "qkrylov/core/device.hpp"
 #include "qkrylov/solvers/lanczos.hpp"
+#include "qkrylov/solvers/policy.hpp"
 #include "qkrylov/solvers/davidson.hpp"
 #include "qkrylov/solvers/dynamics.hpp"
 #include "qkrylov/solvers/ftlm.hpp"
+#include "qkrylov/basis/spin_s_basis.hpp"
+#include "qkrylov/sites/spin_s_site.hpp"
+#include "qkrylov/solvers/correction_vector.hpp"
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -68,6 +72,19 @@ dvec_to_numpy(std::vector<Real>&& v)
     );
 }
 
+namespace qkrylov {
+namespace QKRYLOV_PRECISION_NAMESPACE {
+
+struct FTLMSamplesHolder {
+    std::vector<FTLMKrylovSample> samples;
+    size_t size() const { return samples.size(); }
+};
+
+} // namespace QKRYLOV_PRECISION_NAMESPACE
+} // namespace qkrylov
+
+
+
 
 template <typename ExecSpace>
 static void bind_backend(nb::module_& m, const std::string& suffix, const std::string& type_suffix) {
@@ -93,8 +110,22 @@ static void bind_backend(nb::module_& m, const std::string& suffix, const std::s
 
     std::string lgs_name = "lanczos_ground_state_" + suffix + type_suffix;
     m.def(lgs_name.c_str(),
-        [](const HType& H, int maxiter, Real tol) {
-            auto res = lanczos_ground_state<ExecSpace>(H, maxiter, tol);
+        [](const HType& H, int maxiter, Real tol) -> nb::tuple {
+            LanczosConfig cfg;
+            cfg.maxiter = maxiter;
+            cfg.tol = tol;
+            auto res = solvers::lanczos<solvers::policy::OnePass_full>(H, cfg);
+            return nb::make_tuple(res.energy, vec_to_numpy(std::move(res.eigenvector)));
+        },
+        "H"_a, "maxiter"_a = 200, "tol"_a = 1e-12);
+
+    std::string ltp_name = "lanczos_two_pass_" + suffix + type_suffix;
+    m.def(ltp_name.c_str(),
+        [](const HType& H, int maxiter, Real tol) -> nb::tuple {
+            LanczosConfig cfg;
+            cfg.maxiter = maxiter;
+            cfg.tol = tol;
+            auto res = solvers::lanczos<solvers::policy::TwoPass>(H, cfg);
             return nb::make_tuple(res.energy, vec_to_numpy(std::move(res.eigenvector)));
         },
         "H"_a, "maxiter"_a = 200, "tol"_a = 1e-12);
@@ -120,33 +151,87 @@ static void bind_backend(nb::module_& m, const std::string& suffix, const std::s
         "H"_a, "phi0"_a, "n_iter"_a = 100);
 
     std::string ftlm_name = "ftlm_" + suffix + type_suffix;
-    m.def(ftlm_name.c_str(), &ftlm<ExecSpace>,
-          "H"_a, "beta"_a, "n_random"_a = 50, "n_steps"_a = 100);
+    m.def(ftlm_name.c_str(), [](const HType& H, Real beta, int n_random, int n_steps) {
+        return ftlm<ExecSpace>(H, beta, n_random, n_steps);
+    }, "H"_a, "beta"_a, "n_random"_a = 50, "n_steps"_a = 100);
+
+    std::string ftlm_sweep_name = "ftlm_sweep_" + suffix + type_suffix;
+    m.def(ftlm_sweep_name.c_str(),
+        [](const HType& H, const std::vector<Real>& beta_grid,
+           const std::vector<HType>& observables,
+           int n_random, int n_steps, uint64_t seed) {
+            return ftlm_sweep<ExecSpace>(H, beta_grid, observables, n_random, n_steps, seed);
+        },
+        "H"_a, "beta_grid"_a, "observables"_a = std::vector<HType>{},
+        "n_random"_a = 50, "n_steps"_a = 100, "seed"_a = 42);
+
+    std::string ftlm_sample_name = "ftlm_sample_" + suffix + type_suffix;
+    m.def(ftlm_sample_name.c_str(),
+        [](const HType& H, const std::vector<HType>& observables,
+           int n_random, int n_steps, uint64_t seed) {
+            auto samples = ftlm_sample<ExecSpace>(H, observables, n_random, n_steps, seed);
+            return FTLMSamplesHolder{std::move(samples)};
+        },
+        "H"_a, "observables"_a = std::vector<HType>{},
+        "n_random"_a = 50, "n_steps"_a = 100, "seed"_a = 42);
+
+    std::string ftlm_eval_name = "ftlm_evaluate_sweep_" + suffix + type_suffix;
+    m.def(ftlm_eval_name.c_str(),
+        [](const FTLMSamplesHolder& holder, const std::vector<Real>& beta_grid) {
+            return ftlm_evaluate_sweep(holder.samples, beta_grid);
+        },
+        "samples"_a, "beta_grid"_a);
+
+    std::string ftlm_streamed_name = "ftlm_sweep_streamed_" + suffix + type_suffix;
+    m.def(ftlm_streamed_name.c_str(),
+        [](const HType& H, const std::vector<Real>& beta_grid,
+           const std::vector<HType>& observables,
+           int n_random, int n_steps, uint64_t seed) {
+            return ftlm_sweep_streamed<ExecSpace>(H, beta_grid, observables, n_random, n_steps, seed);
+        },
+        "H"_a, "beta_grid"_a, "observables"_a = std::vector<HType>{},
+        "n_random"_a = 50, "n_steps"_a = 100, "seed"_a = 42);
+
+    std::string time_evolve_name = "time_evolve_" + suffix + type_suffix;
+    m.def(time_evolve_name.c_str(),
+        [](const HType& H, CxArray psi0, const std::vector<Real>& time_grid,
+           const std::vector<HType>& observables, int n_steps) {
+            if (psi0.shape(0) != static_cast<size_t>(H.dimension())) {
+                throw std::invalid_argument("psi0 vector size does not match Hamiltonian dimension");
+            }
+            const HostVector psi0_vec(psi0.data(), psi0.data() + psi0.shape(0));
+            return time_evolve<ExecSpace>(H, psi0_vec, time_grid, observables, n_steps);
+        },
+        "H"_a, "psi0"_a, "time_grid"_a, "observables"_a = std::vector<HType>{}, "n_steps"_a = 30);
+
+    std::string ftlm_dynamics_name = "ftlm_dynamics_" + suffix + type_suffix;
+    m.def(ftlm_dynamics_name.c_str(),
+        [](const HType& H, Real beta, const HType& A, const HType& B,
+           const std::vector<Real>& time_grid, int n_random, int n_steps, uint64_t seed) {
+            return ftlm_dynamics<ExecSpace>(H, beta, A, B, time_grid, n_random, n_steps, seed);
+        },
+        "H"_a, "beta"_a, "A"_a, "B"_a, "time_grid"_a, "n_random"_a = 50, "n_steps"_a = 100, "seed"_a = 42);
+
+
+    std::string cv_name = "correction_vector_spectral_" + suffix + type_suffix;
+    m.def(cv_name.c_str(),
+        [](const HType& H, CxArray op_psi0, Real E0, Real omega, Real eta, int max_iter, Real tol) {
+            if (op_psi0.shape(0) != static_cast<size_t>(H.dimension())) {
+                throw std::invalid_argument("op_psi0 vector size does not match Hamiltonian dimension");
+            }
+            const HostVector op_psi0_vec(op_psi0.data(), op_psi0.data() + op_psi0.shape(0));
+            auto res = correction_vector_spectral<ExecSpace>(H, op_psi0_vec, E0, omega, eta, max_iter, tol);
+            return nb::make_tuple(
+                vec_to_numpy(std::move(res.correction_vector)),
+                res.spectral_function,
+                res.iterations,
+                res.converged
+            );
+        },
+        "H"_a, "op_psi0"_a, "E0"_a, "omega"_a, "eta"_a = static_cast<Real>(0.1), "max_iter"_a = 500, "tol"_a = static_cast<Real>(1e-8));
 }
 
 static void bind_impl(nb::module_& m, const std::string& type_suffix) {
-    nb::class_<Sector>(m, ("Sector" + type_suffix).c_str())
-        .def(nb::init<>())
-        .def_rw("use_sz", &Sector::use_sz)
-        .def_rw("sz2", &Sector::sz2)
-        .def_rw("use_nup", &Sector::use_nup)
-        .def_rw("use_ndn", &Sector::use_ndn)
-        .def_rw("nup", &Sector::nup)
-        .def_rw("ndn", &Sector::ndn)
-        .def_rw("use_n", &Sector::use_n)
-        .def_rw("n", &Sector::n)
-        .def_rw("use_nb", &Sector::use_nb)
-        .def_rw("nb", &Sector::nb);
-
-    nb::class_<Device>(m, ("Device" + type_suffix).c_str())
-        .def(nb::init<>())
-        .def(nb::init<const std::string&>(), "device_string"_a)
-        .def(nb::init<int>(), "device_id"_a)
-        .def_ro("id", &Device::id)
-        .def_static("is_gpu_build", &Device::is_gpu_build)
-        .def_static("backend_name", &Device::backend_name)
-        .def_static("gpu_count", &Device::gpu_count);
-
     nb::class_<OperatorFactor>(m, ("OperatorFactor" + type_suffix).c_str())
         .def(nb::init<std::string, int>(), "op"_a, "site"_a)
         .def_rw("op", &OperatorFactor::op)
@@ -176,44 +261,15 @@ static void bind_impl(nb::module_& m, const std::string& type_suffix) {
         .def("size", &OpSum::size)
         .def("terms", &OpSum::terms);
 
-    nb::class_<Basis>(m, ("Basis" + type_suffix).c_str());
-
-    nb::class_<SpinHalfBasis, Basis>(m, ("SpinHalfBasis" + type_suffix).c_str())
-        .def(nb::init<int, const Sector&>(), "N"_a, "sector"_a = Sector())
-        .def("size", &SpinHalfBasis::size)
-        .def("state", &SpinHalfBasis::state)
-        .def("index", &SpinHalfBasis::index)
-        .def("contains", &SpinHalfBasis::contains)
-        .def("nsites", &SpinHalfBasis::nsites);
-
-    nb::class_<FermionBasis, Basis>(m, ("FermionBasis" + type_suffix).c_str())
-        .def(nb::init<int, const Sector&>(), "N"_a, "sector"_a = Sector())
-        .def("size", &FermionBasis::size)
-        .def("state", &FermionBasis::state)
-        .def("index", &FermionBasis::index)
-        .def("contains", &FermionBasis::contains)
-        .def("nsites", &FermionBasis::nsites);
-
-    nb::class_<HubbardBasis, Basis>(m, ("HubbardBasis" + type_suffix).c_str())
-        .def(nb::init<int, const Sector&>(), "N"_a, "sector"_a = Sector())
-        .def("size", &HubbardBasis::size)
-        .def("state", &HubbardBasis::state)
-        .def("index", &HubbardBasis::index)
-        .def("contains", &HubbardBasis::contains)
-        .def("nsites", &HubbardBasis::nsites);
-
-    nb::class_<TJBasis, Basis>(m, ("TJBasis" + type_suffix).c_str())
-        .def(nb::init<int, const Sector&>(), "N"_a, "sector"_a = Sector())
-        .def("size", &TJBasis::size)
-        .def("state", &TJBasis::state)
-        .def("index", &TJBasis::index)
-        .def("contains", &TJBasis::contains)
-        .def("nsites", &TJBasis::nsites);
-
     nb::class_<Site>(m, ("Site" + type_suffix).c_str());
 
     nb::class_<SpinHalfSite, Site>(m, ("SpinHalfSite" + type_suffix).c_str())
         .def(nb::init<>());
+
+    nb::class_<SpinSSite, Site>(m, ("SpinSSite" + type_suffix).c_str())
+        .def(nb::init<double>(), "S"_a = 0.5)
+        .def_prop_ro("spin", &SpinSSite::spin)
+        .def_prop_ro("dimension_per_site", &SpinSSite::dimension_per_site);
 
     nb::class_<FermionSite, Site>(m, ("FermionSite" + type_suffix).c_str())
         .def(nb::init<>());
@@ -224,16 +280,59 @@ static void bind_impl(nb::module_& m, const std::string& type_suffix) {
     nb::class_<TJSite, Site>(m, ("TJSite" + type_suffix).c_str())
         .def(nb::init<>());
 
-    
+    nb::class_<CorrectionVectorResult>(m, ("CorrectionVectorResult" + type_suffix).c_str())
+        .def(nb::init<>())
+        .def_ro("spectral_function", &CorrectionVectorResult::spectral_function)
+        .def_ro("iterations", &CorrectionVectorResult::iterations)
+        .def_ro("converged", &CorrectionVectorResult::converged)
+        .def_prop_ro("correction_vector", [](const CorrectionVectorResult& self) {
+            std::vector<Complex> copy = self.correction_vector;
+            return vec_to_numpy(std::move(copy));
+        });
+
     nb::class_<DavidsonResult>(m, ("DavidsonResult" + type_suffix).c_str())
         .def_rw("eigenvalues", &DavidsonResult::eigenvalues)
         .def_rw("eigenvectors", &DavidsonResult::eigenvectors);
 
+    nb::class_<RealTimeResult>(m, ("RealTimeResult" + type_suffix).c_str())
+        .def_rw("time_grid", &RealTimeResult::time_grid)
+        .def_rw("survival_probabilities", &RealTimeResult::survival_probabilities)
+        .def_rw("observable_expectations", &RealTimeResult::observable_expectations);
+
+    nb::class_<FTLMDynamicsResult>(m, ("FTLMDynamicsResult" + type_suffix).c_str())
+        .def_rw("beta", &FTLMDynamicsResult::beta)
+        .def_rw("time_grid", &FTLMDynamicsResult::time_grid)
+        .def_rw("correlations", &FTLMDynamicsResult::correlations)
+        .def_rw("correlation_errors", &FTLMDynamicsResult::correlation_errors);
+
     nb::class_<FTLMResult>(m, ("FTLMResult" + type_suffix).c_str())
         .def_rw("beta", &FTLMResult::beta)
         .def_rw("partition_function", &FTLMResult::partition_function)
+        .def_rw("free_energy", &FTLMResult::free_energy)
         .def_rw("internal_energy", &FTLMResult::internal_energy)
-        .def_rw("specific_heat", &FTLMResult::specific_heat);
+        .def_rw("specific_heat", &FTLMResult::specific_heat)
+        .def_rw("entropy", &FTLMResult::entropy)
+        .def_rw("observable_expectations", &FTLMResult::observable_expectations)
+        .def_rw("observable_errors", &FTLMResult::observable_errors)
+        .def_rw("dimension", &FTLMResult::dimension)
+        .def_rw("effective_samples", &FTLMResult::effective_samples);
+
+    nb::class_<FTLMSweepResult>(m, ("FTLMSweepResult" + type_suffix).c_str())
+        .def_rw("beta_grid", &FTLMSweepResult::beta_grid)
+        .def_rw("partition_functions", &FTLMSweepResult::partition_functions)
+        .def_rw("free_energies", &FTLMSweepResult::free_energies)
+        .def_rw("internal_energies", &FTLMSweepResult::internal_energies)
+        .def_rw("specific_heats", &FTLMSweepResult::specific_heats)
+        .def_rw("entropies", &FTLMSweepResult::entropies)
+        .def_rw("observable_expectations", &FTLMSweepResult::observable_expectations)
+        .def_rw("observable_errors", &FTLMSweepResult::observable_errors)
+        .def_rw("dimension", &FTLMSweepResult::dimension)
+        .def_rw("effective_samples", &FTLMSweepResult::effective_samples);
+
+    nb::class_<FTLMSamplesHolder>(m, ("FTLMSamples" + type_suffix).c_str())
+        .def("__len__", &FTLMSamplesHolder::size)
+        .def_prop_ro("num_samples", &FTLMSamplesHolder::size);
+
 
     using DblArray = nb::ndarray<const Real, nb::shape<-1>, nb::c_contig, nb::device::cpu>;
     m.def(("evaluate_spectral_function" + type_suffix).c_str(),

@@ -25,6 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
@@ -41,13 +42,16 @@ cuda = [
     "nvidia-cuda-runtime-cu12",
     "nvidia-cublas-cu12",
 ]
+docs = [
+    "zensical",
+]
 
 [project.urls]
 Homepage = "https://github.com/sjp95/qkrylov"
 Documentation = "https://sjp95.github.io/qkrylov/"
 Issues = "https://github.com/sjp95/qkrylov/issues"
 
-# ── scikit-build-core config ─────────────────────────────────────────────────
+# -- scikit-build-core config -------------------------------------------------
 [tool.scikit-build]
 # CMakeLists.txt is two levels up from bindings/python/
 cmake.source-dir = "."
@@ -62,11 +66,11 @@ metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 QKRYLOV_BUILD_TESTS = "OFF"
 QKRYLOV_BUILD_PYTHON = "ON"
 
-# ── setuptools_scm config ─────────────────────────────────────────────────────
+# -- setuptools_scm config -----------------------------------------------------
 [tool.setuptools_scm]
 # Root is the repo root, two levels up from bindings/python/
 
-# Strip the leading 'v' from tags (e.g. v0.1.0 → 0.1.0)
+# Strip the leading 'v' from tags (e.g. v0.1.0 -> 0.1.0)
 tag_regex = "^(?:v)?(?P<version>[0-9]+(?:\\.[0-9]+)*)$"
 # On a clean tagged commit, produce "0.1.0" with no dev suffix
 version_scheme = "no-guess-dev"
@@ -74,4 +78,4 @@ version_scheme = "no-guess-dev"
 fallback_version = "0.0.0.dev0"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "bindings/python/tests"]

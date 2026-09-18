@@ -21,8 +21,8 @@ inline KComplex dot(
     KComplex result(0.0, 0.0);
 
     Kokkos::parallel_reduce("qkrylov::dot",
-        Kokkos::RangePolicy<ExecSpace>(0, x.extent(0)),
-        KOKKOS_LAMBDA(const int i, KComplex& sum) {
+        Kokkos::RangePolicy<ExecSpace, Index>(0, x.extent(0)),
+        KOKKOS_LAMBDA(const Index i, KComplex& sum) {
             sum += Kokkos::conj(x(i)) * y(i);
         },
         result
@@ -51,8 +51,8 @@ inline void scal(
 {
     using ExecSpace = typename ViewType::execution_space;
     Kokkos::parallel_for("qkrylov::scal",
-        Kokkos::RangePolicy<ExecSpace>(0, x.extent(0)),
-        KOKKOS_LAMBDA(const int i) {
+        Kokkos::RangePolicy<ExecSpace, Index>(0, x.extent(0)),
+        KOKKOS_LAMBDA(const Index i) {
             x(i) *= a;
         }
     );
@@ -78,8 +78,8 @@ inline void axpy(
 {
     using ExecSpace = typename ViewType::execution_space;
     Kokkos::parallel_for("qkrylov::axpy",
-        Kokkos::RangePolicy<ExecSpace>(0, x.extent(0)),
-        KOKKOS_LAMBDA(const int i) {
+        Kokkos::RangePolicy<ExecSpace, Index>(0, x.extent(0)),
+        KOKKOS_LAMBDA(const Index i) {
             y(i) += a * x(i);
         }
     );

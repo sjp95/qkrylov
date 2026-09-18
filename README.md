@@ -17,11 +17,11 @@ A modern C++20 framework for matrix-free Krylov methods in quantum many-body phy
     - **t-J Models**: Doped antiferromagnets with no-double-occupancy constraint.
 - **Matrix-Free Hamiltonian**: Efficient application of operator sums (`OpSum`) to state vectors.
 - **Advanced Solvers**:
-    - **Lanczos**: Accurate ground-state energy, iterations/convergence tracking, and Ritz vector calculation.
-    - **Davidson**: Iterative solver for the lowest $k$ eigenpairs with convergence diagnostics.
-    - **Dynamics**: Continued Fraction Lanczos for dynamical structure factor $S(\omega)$ calculations.
-    - **Finite Temperature**: Finite Temperature Lanczos Method (FTLM) for thermodynamic quantities ($Z, E, C_v$).
-- **Multi-Language Support**: Robust Python interface via `nanobind` and native Julia package [`QuantumKrylov.jl`](bindings/julia/README.md) backed by C ABI (`c_api.h`) and prebuilt `qkrylov_jll` binary artifacts.
+    - **Lanczos**: Accurate ground-state energy, lowest-$k$ eigenpairs, iterations/convergence tracking, and single-pass or memory-frugal two-pass Ritz vector reconstruction.
+    - **Davidson**: Iterative subspace solver with diagonal preconditioning for lowest-$k$ eigenpairs simultaneously.
+    - **Dynamics**: Continued Fraction Lanczos and Correction Vector linear solves for dynamical structure factor $S(\omega)$ and Green's function calculations.
+    - **Finite Temperature**: Decoupled Finite Temperature Lanczos Method (FTLM) for multi-temperature sweeps of thermodynamic equations of state ($Z, F, E, C_v, S$) and arbitrary physical observables with error bars.
+- **Multi-Language Support**: Robust Python interface via `nanobind` with SciPy `LinearOperator` interoperability, native Julia package [`QuantumKrylov.jl`](bindings/julia/README.md) supporting the SciML `solve(prob, alg)` dispatch interface, and binary-stable dual-precision C ABI ([`docs/api/c_api.md`](docs/api/c_api.md)).
 
 ## Build Requirements
 
@@ -37,7 +37,7 @@ A modern C++20 framework for matrix-free Krylov methods in quantum many-body phy
 Automatically downloads and configures the latest native prebuilt binaries (`libqkrylov.so`, `libqkrylov.dylib`, or `qkrylov.dll`). On Linux systems with an NVIDIA GPU and driver 12+, it automatically downloads the **CUDA 12 accelerated** binary with zero manual compilation:
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="julia-release", subdir="bindings/julia")
+Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="julia-latest", subdir="bindings/julia")
 ```
 
 #### Option 2: Pin to a specific historical build

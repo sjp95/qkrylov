@@ -18,12 +18,10 @@ using namespace qkrylov::QKRYLOV_PRECISION_NAMESPACE;
 
 int main()
 {
-    Sector sec;
-
     auto basis =
-        std::make_shared<SpinHalfBasis>(
+        std::make_shared<basis::SpinHalf>(
             2,
-            sec
+            basis::sector::Unconstrained{}
         );
 
     auto site =
@@ -85,17 +83,43 @@ int main()
         os
     );
 
-    auto res =
-        lanczos_ground_state<Kokkos::DefaultExecutionSpace>(
-            H,
-            200,
-            1e-12
-        );
+    LanczosConfig config;
+    config.maxiter = 200;
+    config.tol = (sizeof(Real) == 4) ? Real(1e-6) : Real(1e-12);
 
-    std::cout
-        << "Energy = "
-        << res.energy
-        << "\n";
+    auto res_op = solvers::lanczos<solvers::policy::OnePass>(H, config);
+    auto res_dkgs = solvers::lanczos<solvers::policy::OnePass_DKGS>(H, config);
+    auto res_full = solvers::lanczos<solvers::policy::OnePass_full>(H, config);
+    auto res_tp = solvers::lanczos<solvers::policy::TwoPass>(H, config);
+
+    // Verify OnePass: energy only, eigenvector is empty
+    assert(res_op.eigenvector.empty());
+
+    // Verify structured binding unpack
+    const Real bind_tol = (sizeof(Real) == 4) ? Real(1e-5) : Real(1e-10);
+    auto [e, v] = solvers::lanczos<solvers::policy::TwoPass>(H, config);
+    if (std::abs(e - res_tp.energy) > bind_tol) {
+        std::cerr << "Structured binding energy mismatch!\n";
+        return 1;
+    }
+    if (v.size() != res_tp.eigenvector.size()) {
+        std::cerr << "Structured binding eigenvector size mismatch!\n";
+        return 1;
+    }
+
+    std::cout << "Energy (OnePass)     = " << res_op.energy << "\n";
+    std::cout << "Energy (OnePass_DKGS)= " << res_dkgs.energy << "\n";
+    std::cout << "Energy (OnePass_full)= " << res_full.energy << "\n";
+    std::cout << "Energy (TwoPass)     = " << res_tp.energy << "\n";
+    std::cout << "Energy (structured)  = " << e << "\n";
+
+    const Real comp_tol = (sizeof(Real) == 4) ? Real(1e-4) : Real(1e-10);
+    if (std::abs(res_dkgs.energy - res_tp.energy) > comp_tol ||
+        std::abs(res_op.energy - res_tp.energy) > comp_tol ||
+        std::abs(res_full.energy - res_tp.energy) > comp_tol) {
+        std::cerr << "Mismatch between Lanczos policy energies!\n";
+        return 1;
+    }
 
     return 0;
 }

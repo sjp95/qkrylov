@@ -6,12 +6,9 @@
 #include "../symmetry/sector.hpp"
 
 #include <vector>
-#include <unordered_map>
 #include <memory>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
 
 class SpinHalfBasis : public Basis
 {
@@ -21,6 +18,16 @@ public:
         int N,
         const Sector& sector = Sector{}
     );
+
+    SpinHalfBasis(
+        int N,
+        const sector::Sz& sz
+    ) : SpinHalfBasis(N, Sector(sz)) {}
+
+    SpinHalfBasis(
+        int N,
+        const sector::Unconstrained& u
+    ) : SpinHalfBasis(N, Sector(u)) {}
 
     ~SpinHalfBasis() override = default;
 
@@ -60,11 +67,15 @@ private:
     Sector sector_;
 
     std::vector<StateID> states_;
-
-    std::unordered_map<StateID, Index> lookup_;
 };
 
+namespace QKRYLOV_PRECISION_NAMESPACE {
+using qkrylov::SpinHalfBasis;
+}
 
+namespace basis {
+    using SpinHalf = qkrylov::SpinHalfBasis;
+    namespace sector = qkrylov::sector;
+}
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

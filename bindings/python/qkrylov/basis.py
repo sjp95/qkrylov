@@ -86,6 +86,77 @@ class SpinHalfBasis(Basis):
         return f"SpinHalfBasis(N={self.nsites}, dim={self.size}{sec_str})"
 
 
+class SpinSBasis(Basis):
+    """Basis for arbitrary spin S systems.
+    
+    Parameters
+    ----------
+    N : int
+        Number of spin sites.
+    S : float, optional
+        Spin quantum number S (default 0.5).
+    conserve_sz : bool, optional
+        Whether to conserve total Sz. If True, only states with the specified `sz` are kept.
+    sz : float or int, optional
+        The target total Sz sector (default 0). Note: The underlying C++ code uses 2*Sz, 
+        so integer or half-integer values are allowed.
+    dtype : np.dtype, optional
+        Precision type (np.float32 or np.float64, default np.float32).
+    """
+    
+    def __init__(
+        self,
+        N: int,
+        S: float = 0.5,
+        conserve_sz: bool = False,
+        sz: Optional[float] = None,
+        dtype=np.float32
+    ):
+        if sz is not None:
+            conserve_sz = True
+        elif conserve_sz and sz is None:
+            sz = 0
+        else:
+            sz = 0
+
+        suffix = "_FP64" if dtype == np.float64 else "_FP32"
+        sec = getattr(_cpp, f"Sector{suffix}")()
+        if conserve_sz:
+            sec.use_sz = True
+            sec.sz2 = int(round(2 * sz))
+
+        self._cpp_obj = getattr(_cpp, f"SpinSBasis{suffix}")(N, float(S), sec)
+        self._S = float(S)
+        self._conserve_sz = conserve_sz
+        self._sz = sz
+
+    @property
+    def spin(self) -> float:
+        """The spin quantum number S."""
+        return self._cpp_obj.spin
+
+    @property
+    def dimension_per_site(self) -> int:
+        """The local Hilbert space dimension 2S + 1."""
+        return self._cpp_obj.dimension_per_site
+
+    def state(self, i: int) -> int:
+        """Get the basis state at index i."""
+        return self._cpp_obj.state(i)
+
+    def index(self, s: int) -> int:
+        """Find the index of basis state s."""
+        return self._cpp_obj.index(s)
+
+    def contains(self, s: int) -> bool:
+        """Check if basis state s is in this basis."""
+        return self._cpp_obj.contains(s)
+
+    def __repr__(self) -> str:
+        sec_str = f", sz={self._sz}" if self._conserve_sz else ""
+        return f"SpinSBasis(N={self.nsites}, S={self._S}, dim={self.size}{sec_str})"
+
+
 class FermionBasis(Basis):
     """Basis for spinless fermions.
     
@@ -189,3 +260,11 @@ class TJBasis(Basis):
         if self._conserve_ndn: sec_strs.append(f"ndn={self._ndn}")
         sec_str = ", " + ", ".join(sec_strs) if sec_strs else ""
         return f"TJBasis(N={self.nsites}, dim={self.size}{sec_str})"
+
+
+# Aliases conforming to API blueprint
+SpinHalf = SpinHalfBasis
+SpinS = SpinSBasis
+Fermion = FermionBasis
+Hubbard = HubbardBasis
+TJ = TJBasis

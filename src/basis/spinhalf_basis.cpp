@@ -3,9 +3,9 @@
 
 #include <stdexcept>
 #include <bit>
+#include <algorithm>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
 
 
 
@@ -31,42 +31,53 @@ SpinHalfBasis::SpinHalfBasis(
 
 Index SpinHalfBasis::size() const
 {
+    if (!sector_.use_sz) {
+        return Index(1) << N_;
+    }
     return states_.size();
 }
 
 StateID SpinHalfBasis::state(Index i) const
 {
+    if (!sector_.use_sz) {
+        const Index dim = Index(1) << N_;
+        if (i >= dim) {
+            throw std::out_of_range("SpinHalfBasis::state: index out of range");
+        }
+        return static_cast<StateID>(i);
+    }
     return states_.at(i);
 }
 
 Index SpinHalfBasis::index(StateID s) const
 {
-    auto it = lookup_.find(s);
+    if (!sector_.use_sz) {
+        const StateID dim = StateID(1) << N_;
+        if (s < dim) {
+            return static_cast<Index>(s);
+        }
+        throw std::runtime_error("State not present in basis");
+    }
 
-    if(it == lookup_.end())
-        throw std::runtime_error(
-            "State not present in basis"
-        );
-
-    return it->second;
+    auto it = std::lower_bound(states_.begin(), states_.end(), s);
+    if (it == states_.end() || *it != s) {
+        throw std::runtime_error("State not present in basis");
+    }
+    return static_cast<Index>(std::distance(states_.begin(), it));
 }
 
 bool SpinHalfBasis::contains(StateID s) const
 {
-    return lookup_.find(s) != lookup_.end();
+    if (!sector_.use_sz) {
+        const StateID dim = StateID(1) << N_;
+        return s < dim;
+    }
+    return std::binary_search(states_.begin(), states_.end(), s);
 }
 
 void SpinHalfBasis::build_full_basis()
 {
-    const StateID dim = StateID(1) << N_;
-
-    states_.reserve(dim);
-
-    for(StateID s = 0; s < dim; ++s)
-    {
-        lookup_[s] = states_.size();
-        states_.push_back(s);
-    }
+    // Implicit indexing: states_ remains empty, zero RAM allocated.
 }
 
 int SpinHalfBasis::compute_sz2(
@@ -88,22 +99,19 @@ void SpinHalfBasis::build_sz_basis()
     const StateID dim =
         StateID(1) << N_;
 
-    states_.reserve(dim);
+    states_.reserve(dim / 2);
 
     for(StateID s = 0; s < dim; ++s)
     {
         if(compute_sz2(s, N_) ==
            sector_.sz2)
         {
-            lookup_[s] =
-                states_.size();
-
             states_.push_back(s);
         }
     }
+    states_.shrink_to_fit();
 }
 
 
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

@@ -77,6 +77,10 @@ println(site_fermion) # Outputs: FermionSite(dim = 2, states = [0, 1])
 site_hubbard = HubbardSite()
 println(site_hubbard) # Outputs: HubbardSite(dim = 4, states = [0, ↑, ↓, ↑↓])
 
+# General Spin-S site (e.g. S=1, dimension 2S+1 = 3)
+site_spin1 = SpinSSite(1.0)
+println(site_spin1) # Outputs: SpinSSite(S = 1.0, dim = 3)
+
 # t-J model site with constrained double-occupancy (dimension 3)
 site_tj = TJSite()
 println(site_tj) # Outputs: TJSite(dim = 3, states = [0, ↑, ↓])
@@ -87,6 +91,7 @@ println(site_tj) # Outputs: TJSite(dim = 3, states = [0, ↑, ↓])
 | Site Type | Local Dimension | Local Physical Basis States | Arguments & Default Values |
 | :--- | :--- | :--- | :--- |
 | `SpinHalfSite()` | 2 | $|\uparrow\rangle, |\downarrow\rangle$ | No arguments required. |
+| `SpinSSite(S)` | $2S + 1$ | $|S, m\rangle$ for $m = -S, \dots, +S$ | `S::Real` (e.g. `0.5`, `1.0`, `1.5`, `2.0`). |
 | `FermionSite()` | 2 | $|0\rangle, |1\rangle$ (empty, occupied) | No arguments required. |
 | `HubbardSite()` | 4 | $|0\rangle, |\uparrow\rangle, |\downarrow\rangle, |\uparrow\downarrow\rangle$ | No arguments required. |
 | `TJSite()` | 3 | $|0\rangle, |\uparrow\rangle, |\downarrow\rangle$ (no double occupancy) | No arguments required. |
@@ -131,6 +136,7 @@ is_present = st0 in basis_sec # Returns true
 | Basis Constructor | Parameters | Default Values | Description |
 | :--- | :--- | :--- | :--- |
 | `SpinHalfBasis(num_sites, sector=nothing; sz=nothing)` | `num_sites::Integer`<br>`sector::Union{Sector, Nothing}`<br>`sz::Union{Real, Nothing}` | `num_sites`: Required<br>`sector`: `nothing`<br>`sz`: `nothing` | Spin-1/2 basis on `num_sites` sites. Passing `sz=0` automatically builds total $S_z=0$ sector. |
+| `SpinSBasis(num_sites, S; sector=nothing)` | `num_sites::Integer`<br>`S::Real`<br>`sector::Union{Sector, Nothing}` | `num_sites`: Required<br>`S`: Required<br>`sector`: `nothing` | General spin-$S$ basis (e.g. $S=1.0, 1.5, \dots$) on `num_sites` sites with optional $S_z$ sector conservation. |
 | `FermionBasis(num_sites, sector=nothing; n=nothing)` | `num_sites::Integer`<br>`sector::Union{Sector, Nothing}`<br>`n::Union{Integer, Nothing}` | `num_sites`: Required<br>`sector`: `nothing`<br>`n`: `nothing` | Spinless fermion basis on `num_sites` sites. Passing `n=2` restricts to 2-particle sector. |
 | `HubbardBasis(num_sites, sector=nothing; nup=nothing, ndn=nothing)` | `num_sites::Integer`<br>`sector::Union{Sector, Nothing}`<br>`nup, ndn::Union{Integer, Nothing}` | `num_sites`: Required<br>`sector`: `nothing`<br>`nup, ndn`: `nothing` | Fermi-Hubbard basis on `num_sites` sites with optional electron number conservation. |
 | `TJBasis(num_sites, sector=nothing; nup=nothing, ndn=nothing)` | `num_sites::Integer`<br>`sector::Union{Sector, Nothing}`<br>`nup, ndn::Union{Integer, Nothing}` | `num_sites`: Required<br>`sector`: `nothing`<br>`nup, ndn`: `nothing` | $t$-$J$ model basis on `num_sites` sites with optional electron number conservation. |
@@ -299,7 +305,10 @@ println(res)            # Outputs: LanczosResult(energy = -2.0, iterations = 14,
 psi0 = res.state         # Vector{ComplexF64} of length dimension(H)
 psi0_vec = res.eigenvector # Alternative alias for wavefunction
 
-# 3. Tuple Destructuring Support
+# 3. Memory-Frugal Two-Pass Lanczos (saves only 3 working vectors in RAM)
+res_tp = lanczos_ground_state(H, return_state=true, two_pass=true)
+
+# 4. Tuple Destructuring Support
 E0, psi0 = lanczos_ground_state(H, return_state=true)
 ```
 
@@ -310,6 +319,7 @@ E0, psi0 = lanczos_ground_state(H, return_state=true)
 | `maxiter` | `Integer` | `100` | Maximum Lanczos iterations. |
 | `tol` | `Real` | `1e-12` | Energy convergence tolerance. |
 | `return_state` | `Bool` | `false` | When `true`, computes and stores ground state wavefunction. |
+| `two_pass` | `Bool` | `false` | When `true`, uses a memory-frugal two-pass Lanczos algorithm that requires only 3 working vectors in RAM, reconstructing the Ritz eigenvector on-the-fly in a second pass. |
 | `res.energy` | `Float64` | - | Ground state energy eigenvalue. |
 | `res.iterations` | `Int` | - | Total number of Lanczos iterations executed. |
 | `res.converged` | `Bool` | - | `true` if tolerance `tol` was achieved, `false` if `maxiter` was hit. |
@@ -376,31 +386,131 @@ I_omega = evaluate_spectral_function(cfr, omega, E0, eta)
 
 ---
 
-### 5.4 Finite Temperature Lanczos (`ftlm`)
+### 5.4 Correction Vector Method (`solver_correction_vector`)
 
-#### How to use `ftlm`
+The **correction vector method** directly solves the complex shifted linear system:
+
+$$(H - E_0 - \omega - i\eta) |x\rangle = \hat{O} |\psi_0\rangle$$
+
+providing high-resolution spectral response at target frequency $\omega$ without Krylov truncation error.
+
+#### How to use `solver_correction_vector`
 
 ```julia
-# Compute thermodynamic properties at inverse temperature beta = 1/T
-ftlm_res = ftlm(H, beta=2.0, n_random=20, n_steps=50)
-println(ftlm_res)
-# Outputs: FTLMResult(beta = 2.0, Z = ..., E = ..., Cv = ...)
+# Solve linear system for target frequency omega = 1.0
+cv_res = solver_correction_vector(
+    H, v0;
+    e0 = E0,
+    omega = 1.0,
+    eta = 0.05,
+    maxiter = 500,
+    tol = 1e-8,
+    return_vector = true
+)
 
-Z  = ftlm_res.partition_function # Partition function Z(beta)
-E  = ftlm_res.internal_energy     # Internal energy E(beta)
-Cv = ftlm_res.specific_heat      # Specific heat Cv(beta)
+println("Spectral weight: ", cv_res.spectral_function)
+println("Iterations:      ", cv_res.iterations)
+println("Converged:       ", cv_res.converged)
+x_vec = cv_res.vector # Vector{ComplexF64} correction vector
 ```
 
-#### `ftlm` Parameters & Result API
+#### Parameters & Result API
 
 | Parameter / Property | Type | Default Value | Description |
 | :--- | :--- | :--- | :--- |
-| `beta` | `Real` | `1.0` | Target inverse temperature $\beta = 1 / (k_B T)$. |
+| `e0` | `Real` | None (required) | Ground-state reference energy $E_0$. |
+| `omega` | `Real` | None (required) | Target excitation frequency $\omega$. |
+| `eta` | `Real` | `0.1` | Imaginary broadening parameter $\eta > 0$. |
+| `maxiter` | `Integer` | `500` | Maximum linear solver iterations. |
+| `tol` | `Real` | `1e-8` | Residual convergence tolerance. |
+| `return_vector` | `Bool` | `false` | When `true`, returns the correction vector state. |
+| `res.spectral_function` | `Float64` | - | Spectral weight $I(\omega) = \frac{\eta}{\pi} \langle x | x \rangle$. |
+| `res.iterations` | `Int` | - | Number of linear solver iterations executed. |
+| `res.converged` | `Bool` | - | `true` if residual tolerance was satisfied. |
+| `res.vector` | `Vector{ComplexF64}` | - | Correction vector state (error if `return_vector=false`). |
+
+---
+
+### 5.5 Finite Temperature Lanczos (`ftlm` & `ftlm_sweep`)
+
+`qkrylov` supports both single-temperature calculations and decoupled multi-temperature sweeps with arbitrary physical observables.
+
+#### 1. Single Temperature (`ftlm`)
+
+```julia
+ftlm_res = ftlm(H, beta=2.0, n_random=20, n_steps=50)
+println("Partition function Z: ", ftlm_res.partition_function)
+println("Internal energy E:    ", ftlm_res.internal_energy)
+println("Specific heat Cv:     ", ftlm_res.specific_heat)
+```
+
+#### 2. Multi-Temperature Sweeps & Observables (`ftlm_sweep`)
+
+Performs Krylov sampling once, projecting arbitrary user observables $\hat{O}$ onto the Krylov subspace. Thermodynamic quantities and observables are then evaluated across the entire $\beta$ grid in a single pass:
+
+```julia
+# Temperature grid and observable operators
+betas = [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
+sweep_res = ftlm_sweep(
+    H, betas;
+    observables = [H], # Arbitrary MatrixFreeHamiltonian operators
+    n_random = 20,
+    n_steps = 50,
+    seed = 42
+)
+
+println("Free energies:    ", sweep_res.free_energies)
+println("Specific heats:   ", sweep_res.specific_heats)
+println("Entropies:        ", sweep_res.entropies)
+println("Energy <H>:       ", sweep_res.observable_expectations[1, :])
+println("Sampling errors:  ", sweep_res.observable_errors[1, :])
+```
+
+#### `ftlm_sweep` Parameters & Result API
+
+| Parameter / Property | Type | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `beta_grid` | `AbstractVector{<:Real}` | None (required) | Grid of inverse temperatures $\beta = 1 / (k_B T)$. |
+| `observables` | `Vector{<:MatrixFreeHamiltonian}` | `[]` | List of observable operators to measure. |
 | `n_random` | `Integer` | `10` | Number of random sampling vectors. |
-| `n_steps` | `Integer` | `50` | Number of Lanczos expansion steps per sample. |
-| `res.partition_function` | `Float64` | - | Partition function $Z(\beta)$. |
-| `res.internal_energy` | `Float64` | - | Internal energy $E(\beta)$. |
-| `res.specific_heat` | `Float64` | - | Specific heat $C_v(\beta)$. |
+| `n_steps` | `Integer` | `50` | Lanczos expansion steps per sample. |
+| `seed` | `Integer` | `0` | PRNG seed (0 for non-deterministic). |
+| `res.beta_grid` | `Vector{Float64}` | - | Inverse temperature grid. |
+| `res.partition_functions` | `Vector{Float64}` | - | Partition functions $Z(\beta)$. |
+| `res.free_energies` | `Vector{Float64}` | - | Helmholtz free energies $F(\beta) = -\frac{1}{\beta} \ln Z$. |
+| `res.internal_energies` | `Vector{Float64}` | - | Internal energies $\langle E \rangle_\beta$. |
+| `res.specific_heats` | `Vector{Float64}` | - | Specific heats $C_v(\beta) = \beta^2 (\langle E^2 \rangle - \langle E \rangle^2)$. |
+| `res.entropies` | `Vector{Float64}` | - | Thermal entropies $S(\beta) = \beta (E - F)$. |
+| `res.observable_expectations` | `Matrix{Float64}` | - | Matrix of shape `(n_obs, n_betas)` of expectation values. |
+| `res.observable_errors` | `Matrix{Float64}` | - | Matrix of shape `(n_obs, n_betas)` of sampling standard errors. |
+
+---
+
+### 5.6 SciML CommonSolve Interface (`solve(prob, alg)`)
+
+`QuantumKrylov.jl` implements standard problem and algorithm dispatches following the Julia SciML `CommonSolve` pattern:
+
+```julia
+# 1. Ground state calculation
+prob_gs = GroundStateProblem(H)
+sol_gs  = solve(prob_gs, Lanczos(maxiter=100, tol=1e-12, compute_eigenvector=true))
+
+# 2. Excited states calculation
+prob_es = ExcitedStatesProblem(H, 3)
+sol_es  = solve(prob_es, Davidson(n_eig=3, max_subspace=20, tol=1e-8))
+
+# 3. Thermal sweeps
+prob_th = ThermalProblem(H, [0.1, 0.5, 1.0, 2.0]; observables=[H])
+sol_th  = solve(prob_th, FTLM(n_random=20, n_steps=50))
+
+# 4. Dynamical response
+prob_dyn = DynamicalProblem(H, v0; e0=E0)
+sol_dyn  = solve(prob_dyn, ContinuedFraction(n_iter=100))
+
+# 5. Correction vector shifted linear solve
+prob_cv = CorrectionVectorProblem(H, v0; e0=E0, omega=1.0, eta=0.05)
+sol_cv  = solve(prob_cv, CorrectionVector(maxiter=500, tol=1e-8, return_vector=true))
+```
 
 ---
 

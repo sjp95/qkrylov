@@ -52,6 +52,57 @@ int main() {
     std::cout << "S(0.5) = " << val << "\n";
     assert(val >= 0.0);
 
-    std::cout << "Dynamics test passed!\n";
+    // Test Real-Time Pure-State Evolution
+    OpSum os_sz0;
+    {
+        OperatorTerm t; t.coeff = 1.0;
+        t.factors.push_back({"Sz", 0});
+        os_sz0.add_term(t);
+    }
+    MatrixFreeHamiltonian<Kokkos::DefaultExecutionSpace> Sz0(basis, site, os_sz0);
+
+    OpSum os_sz1;
+    {
+        OperatorTerm t; t.coeff = 1.0;
+        t.factors.push_back({"Sz", 1});
+        os_sz1.add_term(t);
+    }
+    MatrixFreeHamiltonian<Kokkos::DefaultExecutionSpace> Sz1(basis, site, os_sz1);
+
+    // Prepare |up, down> state
+    auto d0 = Sz0.diagonal();
+    auto d1 = Sz1.diagonal();
+    HostVector psi0_complex(H.dimension(), Complex(0.0, 0.0));
+    for (size_t i = 0; i < H.dimension(); ++i) {
+        if (std::abs(d0[i].real() - Real(0.5)) < 1e-5 && std::abs(d1[i].real() - Real(-0.5)) < 1e-5) {
+            psi0_complex[i] = Complex(1.0, 0.0);
+            break;
+        }
+    }
+
+    std::vector<Real> time_grid = {0.0, 0.5, 1.0, 1.5, 2.0, 3.141592653589793};
+    auto rt_res = time_evolve<Kokkos::DefaultExecutionSpace>(H, psi0_complex, time_grid, {Sz0}, 10);
+    assert(rt_res.time_grid.size() == time_grid.size());
+    assert(rt_res.observable_expectations.size() == 1);
+    for (size_t ti = 0; ti < time_grid.size(); ++ti) {
+        Real t = time_grid[ti];
+        Real expected_sz = 0.5 * std::cos(1.0 * t); // Delta E = 1.0
+        Real computed_sz = rt_res.observable_expectations[0][ti].real();
+        std::cout << "t=" << t << " | computed <Sz0>=" << computed_sz << " | expected=" << expected_sz << "\n";
+        assert(std::abs(computed_sz - expected_sz) < 1e-3);
+    }
+
+    // Test FTLM Dynamics C_AB(t) with A = Sz0, B = Sz0
+    std::cout << "Testing ftlm_dynamics...\n";
+    auto dyn_ftlm = ftlm_dynamics<Kokkos::DefaultExecutionSpace>(H, 1.0, Sz0, Sz0, time_grid, 60, 10, 12345ULL);
+    assert(dyn_ftlm.time_grid.size() == time_grid.size());
+    assert(dyn_ftlm.correlations.size() == time_grid.size());
+    assert(dyn_ftlm.correlation_errors.size() == time_grid.size());
+    // At t=0, C_AB(0) = <Sz0 * Sz0> = 0.25 (since Sz0^2 = 1/4 * I)
+    std::cout << "C(0) = " << dyn_ftlm.correlations[0] << " +/- " << dyn_ftlm.correlation_errors[0] << "\n";
+    assert(std::abs(dyn_ftlm.correlations[0].real() - 0.25) < 0.05);
+    assert(std::abs(dyn_ftlm.correlations[0].imag()) < 0.05);
+
+    std::cout << "All dynamics tests passed!\n";
     return 0;
 }

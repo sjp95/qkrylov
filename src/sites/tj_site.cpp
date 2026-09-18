@@ -82,7 +82,7 @@ LocalAction TJSite::apply(
 
     if(op == "CdagUp")
     {
-        if(up || dn) return a; // Forbidden if already occupied (no Real occupancy in t-J)
+        if(up || dn) return a; // Forbidden if already occupied (no double occupancy in t-J)
         a.valid = true;
         a.new_state = state | (1ULL << (2 * site));
         a.matrix_element = phase_up(state, site);

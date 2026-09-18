@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, 'feature/**' ]
     paths:
       - 'src/**'
       - 'include/**'
@@ -11,7 +11,7 @@ on:
       - 'CMakeLists.txt'
       - '.github/workflows/tests.yaml'
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, 'feature/**' ]
   workflow_dispatch:
 
 jobs:
@@ -67,8 +67,9 @@ jobs:
 
     - name: Build C++ library
       run: |
-        cmake -B build -S . -DQKRYLOV_BUILD_TESTS=OFF -DQKRYLOV_BUILD_PYTHON=OFF
+        cmake -B build -S . -DQKRYLOV_BUILD_TESTS=OFF -DQKRYLOV_BUILD_PYTHON=OFF -DBUILD_SHARED_LIBS=ON
         cmake --build build --config Release
+
 
     - name: Set up Julia ${{ matrix.julia-version }}
       uses: julia-actions/setup-julia@v2

@@ -2,11 +2,7 @@
 
 #include "qkrylov/core/types.hpp"
 
-#include "../core/types.hpp"
-
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
 
 class Basis
 {
@@ -23,5 +19,8 @@ public:
     virtual bool contains(StateID s) const = 0;
 };
 
+namespace QKRYLOV_PRECISION_NAMESPACE {
+using qkrylov::Basis;
 }
-}
+
+} // namespace qkrylov

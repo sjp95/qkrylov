@@ -6,12 +6,9 @@
 #include "../symmetry/sector.hpp"
 
 #include <vector>
-#include <unordered_map>
 #include <memory>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
-
 
 class HubbardBasis : public Basis
 {
@@ -21,6 +18,16 @@ public:
         int N,
         const Sector& sector = Sector{}
     );
+
+    HubbardBasis(
+        int N,
+        const sector::Hubbard& h
+    ) : HubbardBasis(N, Sector(h)) {}
+
+    HubbardBasis(
+        int N,
+        const sector::Unconstrained& u
+    ) : HubbardBasis(N, Sector(u)) {}
 
     ~HubbardBasis() override = default;
 
@@ -55,11 +62,15 @@ private:
     Sector sector_;
 
     std::vector<StateID> states_;
-
-    std::unordered_map<StateID, Index> lookup_;
 };
 
+namespace QKRYLOV_PRECISION_NAMESPACE {
+using qkrylov::HubbardBasis;
+}
 
+namespace basis {
+    using Hubbard = qkrylov::HubbardBasis;
+    namespace sector = qkrylov::sector;
+}
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

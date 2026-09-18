@@ -2,23 +2,49 @@
 
 Welcome to **qkrylov**! In this guide, we'll walk you through solving the quantum Heisenberg model step-by-step. By the end of this tutorial, you'll know how to define a Hilbert space, build operators, construct a matrix-free Hamiltonian, and find its ground state.
 
-## Prerequisites
+## Installation
 
-Before we begin, ensure you have installed the library:
+Before we begin, ensure you have installed the library for your preferred environment:
 
-=== "Python"
-    ```bash
-    pip install qkrylov
-    ```
-=== "C++"
-    ```bash
-    # Ensure you have a modern C++ compiler (C++17+) and OpenMP installed.
-    # Clone the repository and include the headers in your project.
-    git clone https://github.com/sjp95/qkrylov
-    ```
-=== "Julia"
-    !!! note "Coming Soon"
-        Julia bindings are planned via `extern "C"` FFI. See the [roadmap](#).
+=== "🐍 Python (Pip)"
+
+    === "CPU Only"
+        ```bash
+        pip install qkrylov
+        ```
+    === "CUDA 12 (Linux)"
+        ```bash
+        pip install qkrylov[cuda] --extra-index-url https://sjp95.github.io/qkrylov/whl/cu12
+        ```
+
+=== "🔴 Julia (Pkg)"
+
+    === "CPU Only"
+        ```julia
+        using Pkg
+        Pkg.add(url="https://github.com/sjp95/qkrylov.git", subdir="bindings/julia")
+        ```
+    === "CUDA 12 (Linux)"
+        ```julia
+        using Pkg
+        # Julia automatically detects CUDA on Linux and downloads the GPU binary
+        Pkg.add(url="https://github.com/sjp95/qkrylov.git", subdir="bindings/julia")
+        ```
+
+=== "⚙️ C++ (Source)"
+
+    === "CPU Only"
+        ```bash
+        mkdir build && cd build
+        cmake .. -DKokkos_ENABLE_OPENMP=ON
+        make -j4
+        ```
+    === "CUDA 12 (Linux)"
+        ```bash
+        mkdir build && cd build
+        cmake .. -DKokkos_ENABLE_CUDA=ON -DCMAKE_CUDA_COMPILER=$(which nvcc)
+        make -j4
+        ```
 
 ## Step 1: Define the Hilbert Space (Basis)
 
@@ -50,8 +76,13 @@ We can restrict our Hilbert space to a specific quantum number sector. For the H
     qk::SpinHalfBasis basis(N, sector);
     ```
 === "Julia"
-    !!! note "Coming Soon"
-        Julia bindings are planned via `extern "C"` FFI. See the [roadmap](#).
+    ```julia
+    using QuantumKrylov
+    N = 4
+    # Create a sector for Sz = 0
+    basis = SpinHalfBasis(N, Sector(0))
+    ```
+
 
 ## Step 2: Define the Local Physics (Site)
 
@@ -66,8 +97,11 @@ Next, we define the local physical degrees of freedom. A `Site` object defines w
     qk::SpinHalfSite site;
     ```
 === "Julia"
-    !!! note "Coming Soon"
-        Julia bindings are planned via `extern "C"` FFI. See the [roadmap](#).
+    ```julia
+    # Note: Site definition is handled implicitly in the new Julia API.
+    # The basis object inherently knows the local degrees of freedom.
+    ```
+
 
 ## Step 3: Build the Hamiltonian (OpSum)
 
@@ -101,8 +135,17 @@ In qkrylov, we build this up by appending tuples to our `OpSum` object. The tupl
     }
     ```
 === "Julia"
-    !!! note "Coming Soon"
-        Julia bindings are planned via `extern "C"` FFI. See the [roadmap](#).
+    ```julia
+    ops = OpSum()
+    J = 1.0
+
+    for i in 0:(N-2)
+        add_term!(ops, J, "Sz", i, "Sz", i+1)
+        add_term!(ops, J * 0.5, "Sp", i, "Sm", i+1)
+        add_term!(ops, J * 0.5, "Sm", i, "Sp", i+1)
+    end
+    ```
+
 
 ## Step 4: Build the MatrixFreeHamiltonian
 
@@ -134,8 +177,12 @@ With the basis, site, and operators defined, we can construct the `MatrixFreeHam
     // std::vector<double> y = H.apply(x);
     ```
 === "Julia"
-    !!! note "Coming Soon"
-        Julia bindings are planned via `extern "C"` FFI. See the [roadmap](#).
+    ```julia
+    H = MatrixFreeHamiltonian(basis, ops)
+
+    # println("Hilbert space dimension: ", dimension(H))
+    ```
+
 
 ## Step 5: Solve for Ground State Energy (Lanczos)
 
@@ -152,8 +199,11 @@ To find the ground state, we use the Lanczos algorithm. `lanczos_ground_state` r
     std::cout << "Ground State Energy: " << energy << std::endl;
     ```
 === "Julia"
-    !!! note "Coming Soon"
-        Julia bindings are planned via `extern "C"` FFI. See the [roadmap](#).
+    ```julia
+    res = lanczos_ground_state(H)
+    println("Ground State Energy: ", res.energy)
+    ```
+
 
 ## Step 6: SciPy Integration (Python Only)
 
@@ -177,8 +227,10 @@ While qkrylov's matrix-free engine provides built-in solvers like Lanczos and Da
     !!! note "Python Only Feature"
         SciPy integration is only available in the Python interface.
 === "Julia"
-    !!! note "Coming Soon"
-        Julia bindings are planned via `extern "C"` FFI. See the [roadmap](#).
+    !!! tip "SciML Ecosystem"
+        Instead of SciPy, Julia integrates natively with the SciML ecosystem. 
+        See [SciML Integration](getting_started/sciml_julia.md) for how to use `solve(prob, Lanczos())`.
+    
 
 ## Next Steps
 

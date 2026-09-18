@@ -19,7 +19,9 @@ The Julia interface is constructed directly on top of the binary-stable C ABI ex
     - [Lanczos Ground State (`lanczos_ground_state`)](#lanczos-ground-state-lanczos_ground_state)
     - [Davidson Eigensolver (`davidson_lowest`)](#davidson-eigensolver-davidson_lowest)
     - [Continued-Fraction Dynamics & Spectral Functions](#continued-fraction-dynamics--spectral-functions)
-    - [Finite Temperature Lanczos (`ftlm`)](#finite-temperature-lanczos-ftlm)
+    - [Correction Vector Method (`solver_correction_vector`)](#correction-vector-method-solver_correction_vector)
+    - [Finite Temperature Lanczos (`ftlm` & `ftlm_sweep`)](#finite-temperature-lanczos-ftlm--ftlm_sweep)
+    - [SciML CommonSolve Interface (`solve(prob, alg)`)](#sciml-commonsolve-interface-solveprob-alg)
 - [Multithreading & CPU Core Management](#multithreading--cpu-core-management)
 - [Memory Safety & Architecture](#memory-safety--architecture)
 - [Running Unit Tests](#running-unit-tests)
@@ -30,17 +32,17 @@ The Julia interface is constructed directly on top of the binary-stable C ABI ex
 
 ### Option 1: Direct GitHub Installation for latest release (Prebuilt Binaries)
 
-You can install `QuantumKrylov.jl` directly from the `julia-release` branch. Julia's built-in **Artifacts** system automatically downloads and configures the native prebuilt binary (`libqkrylov.so`, `libqkrylov.dylib`, or `qkrylov.dll`) for your operating system and CPU architecture. On Linux systems with an NVIDIA GPU and driver 12+, it automatically downloads the **CUDA 12 accelerated** binary:
+You can install `QuantumKrylov.jl` directly from the `julia-latest` release tag. Julia's built-in **Artifacts** system automatically downloads and configures the native prebuilt binary (`libqkrylov.so`, `libqkrylov.dylib`, or `qkrylov.dll`) for your operating system and CPU architecture. On Linux systems with an NVIDIA GPU and driver 12+, it automatically downloads the **CUDA 12 accelerated** binary:
 
 In the Julia REPL (press `]` to open Pkg mode):
 ```julia
-pkg> add https://github.com/sjp95/qkrylov.git#julia-release:bindings/julia
+pkg> add https://github.com/sjp95/qkrylov.git#julia-latest:bindings/julia
 ```
 
 Or programmatically in Julia scripts:
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="julia-release", subdir="bindings/julia")
+Pkg.add(url="https://github.com/sjp95/qkrylov.git", rev="julia-latest", subdir="bindings/julia")
 ```
 
 *(No C++ compiler, CMake, or extra build tools required!)*
@@ -176,6 +178,8 @@ Basis objects construct quantum many-body state representations across lattice s
 #### Constructors
 - **`SpinHalfBasis(num_sites::Integer, sector=nothing; sz=nothing)`**:
   Constructs a spin-1/2 basis. Accepts optional `sector::Sector` or direct keyword `sz=0` (automatically builds $S_z$ sector).
+- **`SpinSBasis(num_sites::Integer, S::Real; sector=nothing)`**:
+  Constructs a general spin-$S$ basis (e.g. $S = 1.0, 1.5, \dots$). Accepts optional `sector::Sector`.
 - **`FermionBasis(num_sites::Integer, sector=nothing; n=nothing)`**:
   Constructs a spinless fermion basis. Accepts optional keyword `n=2` to conserve particle count.
 - **`HubbardBasis(num_sites::Integer, sector=nothing; nup=nothing, ndn=nothing)`**:
@@ -252,7 +256,8 @@ lanczos_ground_state(
     H::MatrixFreeHamiltonian;
     maxiter::Integer=100,
     tol::Real=1e-12,
-    return_state::Bool=false
+    return_state::Bool=false,
+    two_pass::Bool=false
 )::LanczosResult
 ```
 
@@ -261,6 +266,7 @@ lanczos_ground_state(
   - `maxiter`: Maximum Lanczos iterations (default: `100`).
   - `tol`: Convergence tolerance for residual norm (default: `1e-12`).
   - `return_state`: If `true`, computes and stores the ground-state wavefunction (default: `false`).
+  - `two_pass`: If `true`, uses a memory-frugal two-pass Lanczos algorithm that requires only 3 working vectors during the iteration, reconstructing the Ritz eigenvector in a second pass (default: `false`).
 - **Return**: `LanczosResult` struct:
   - `.energy`: Ground state energy (`Float64`).
   - `.state` or `.eigenvector`: Wavefunction vector (`Vector{ComplexF64}`). *Note*: Raises an explicit `ErrorException` if accessed when `return_state=false`.
@@ -280,7 +286,7 @@ davidson_lowest(
 )::DavidsonResult
 ```
 
-- **Description**: Computes the lowest $M$ eigenvalues and eigenvectors using subspace expansion.
+- **Description**: Computes the lowest $M$ eigenvalues and eigenvectors using subspace expansion with diagonal preconditioning.
 - **Return**: `DavidsonResult` struct:
   - `.eigenvalues`: `Vector{Float64}` of $M$ lowest eigenvalues.
   - `.eigenvectors`: `Vector{Vector{ComplexF64}}` of $M$ eigenvectors (or `nothing` if `compute_eigenvectors=false`).
@@ -311,8 +317,28 @@ evaluate_spectral_function(
 
 ---
 
-#### Finite Temperature Lanczos (`ftlm`)
+#### Correction Vector Method (`solver_correction_vector`)
 
+```julia
+solver_correction_vector(
+    H::MatrixFreeHamiltonian,
+    op_psi0::AbstractVector{<:Number};
+    e0::Real,
+    omega::Real,
+    eta::Real=0.1,
+    maxiter::Integer=500,
+    tol::Real=1e-8,
+    return_vector::Bool=false
+)::CorrectionVectorResult
+```
+- **Description**: Solves the complex-shifted linear system $(H - E_0 - \omega - i\eta) |x\rangle = \hat{O} |\psi_0\rangle$ directly for high-resolution spectral response at target frequency $\omega$.
+- **Return**: `CorrectionVectorResult` struct with `.spectral_function`, `.iterations`, `.converged`, and optional `.vector`.
+
+---
+
+#### Finite Temperature Lanczos (`ftlm` & `ftlm_sweep`)
+
+##### Single-Temperature FTLM:
 ```julia
 ftlm(
     H::MatrixFreeHamiltonian;
@@ -322,12 +348,46 @@ ftlm(
 )::FTLMResult
 ```
 
-- **Description**: Calculates thermodynamic properties at inverse temperature $\beta = 1 / k_B T$ using random sampling vectors.
-- **Return**: `FTLMResult` struct containing:
-  - `.beta`: Inverse temperature $\beta$.
-  - `.partition_function`: Thermal partition function $Z(\beta)$.
-  - `.internal_energy`: Internal energy $E(\beta)$.
-  - `.specific_heat`: Specific heat capacity $C_v(\beta)$.
+##### Multi-Temperature Sweeps & Arbitrary Observables (`ftlm_sweep`):
+```julia
+ftlm_sweep(
+    H::MatrixFreeHamiltonian,
+    beta_grid::AbstractVector{<:Real};
+    observables::Vector{<:MatrixFreeHamiltonian}=MatrixFreeHamiltonian[],
+    n_random::Integer=10,
+    n_steps::Integer=50,
+    seed::Integer=0
+)::FTLMSweepResult
+```
+- **Description**: Performs a single Lanczos sampling pass and evaluates the complete thermodynamic equations of state ($Z, F, E, C_v, S$) and physical observables across the entire temperature grid.
+- **Return**: `FTLMSweepResult` struct containing:
+  - `.beta_grid`: Temperature grid vector.
+  - `.partition_functions`, `.free_energies`, `.internal_energies`, `.specific_heats`, `.entropies`: Thermodynamic vectors.
+  - `.observable_expectations`: Matrix of shape `(n_obs, n_betas)` of thermal expectation values $\langle \hat{O}_m \rangle$.
+  - `.observable_errors`: Matrix of shape `(n_obs, n_betas)` of sampling standard errors.
+
+---
+
+#### SciML CommonSolve Interface (`solve(prob, alg)`)
+
+`QuantumKrylov.jl` implements the SciML `solve` dispatch pattern:
+
+```julia
+# Ground State
+sol_gs = solve(GroundStateProblem(H), Lanczos(maxiter=100, tol=1e-12, compute_eigenvector=true))
+
+# Low-Lying Excited States
+sol_dav = solve(ExcitedStatesProblem(H, 3), Davidson(n_eig=3, max_subspace=20))
+
+# Thermodynamics & Sweeps
+sol_th = solve(ThermalProblem(H, [0.1, 0.5, 1.0, 2.0]; observables=[H]), FTLM(n_random=20, n_steps=50))
+
+# Continued Fraction Dynamics
+sol_dyn = solve(DynamicalProblem(H, phi0; e0=E0), ContinuedFraction(n_iter=100))
+
+# Correction Vector Dynamics
+sol_cv = solve(CorrectionVectorProblem(H, phi0; e0=E0, omega=1.0, eta=0.05), CorrectionVector(maxiter=500))
+```
 
 ---
 

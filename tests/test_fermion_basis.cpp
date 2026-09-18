@@ -7,15 +7,12 @@ using namespace qkrylov::QKRYLOV_PRECISION_NAMESPACE;
 
 int main() {
     // Test full basis
-    FermionBasis b1(4);
+    basis::Fermion b1(4, basis::sector::Unconstrained{});
     std::cout << "Full basis size: " << b1.size() << " (Expected 16)\n";
     assert(b1.size() == 16);
 
     // Test n-conserved basis
-    Sector sec;
-    sec.use_n = true;
-    sec.n = 2;
-    FermionBasis b2(4, sec);
+    basis::Fermion b2(4, basis::sector::Particles{2});
     std::cout << "N=2 basis size: " << b2.size() << " (Expected 6)\n";
     assert(b2.size() == 6);
 

@@ -1,1 +1,4 @@
-#pragma once\n#include "local_op.hpp"\n#include "operator_term.hpp"
+#pragma once
+
+#include "local_op.hpp"
+#include "operator_term.hpp"

@@ -26,6 +26,7 @@ __pycache__/
 *.egg-info/
 .venv/
 .pytest_cache/
+uv.lock
 
 # OS specific
 .DS_Store
@@ -56,5 +57,11 @@ whl_out/
 
 # private work
 private/
+.agents/
 bindings/julia/manual/
 external/
+
+# getting_started/tutorial_hamiltonian
+docs/getting_started/tutorial_hamiltonian/index.md
+docs/getting_started/tutorial_hamiltonian/tutorial_hamiltonian.*
+docs/getting_started/tutorial_hamiltonian/images/

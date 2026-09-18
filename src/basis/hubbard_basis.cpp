@@ -3,9 +3,9 @@
 
 #include <stdexcept>
 #include <bit>
+#include <algorithm>
 
 namespace qkrylov {
-namespace QKRYLOV_PRECISION_NAMESPACE {
 
 
 
@@ -41,19 +41,26 @@ StateID HubbardBasis::state(Index i) const
 
 Index HubbardBasis::index(StateID s) const
 {
-    auto it = lookup_.find(s);
+    if (!sector_.use_nup && !sector_.use_ndn) {
+        if (s < static_cast<StateID>(states_.size())) {
+            return static_cast<Index>(s);
+        }
+        throw std::runtime_error("State not present in basis");
+    }
 
-    if(it == lookup_.end())
-        throw std::runtime_error(
-            "State not present in basis"
-        );
-
-    return it->second;
+    auto it = std::lower_bound(states_.begin(), states_.end(), s);
+    if (it == states_.end() || *it != s) {
+        throw std::runtime_error("State not present in basis");
+    }
+    return static_cast<Index>(std::distance(states_.begin(), it));
 }
 
 bool HubbardBasis::contains(StateID s) const
 {
-    return lookup_.find(s) != lookup_.end();
+    if (!sector_.use_nup && !sector_.use_ndn) {
+        return s < static_cast<StateID>(states_.size());
+    }
+    return std::binary_search(states_.begin(), states_.end(), s);
 }
 
 void HubbardBasis::build_full_basis()
@@ -64,7 +71,6 @@ void HubbardBasis::build_full_basis()
 
     for(StateID s = 0; s < dim; ++s)
     {
-        lookup_[s] = states_.size();
         states_.push_back(s);
     }
 }
@@ -74,32 +80,29 @@ void HubbardBasis::build_nup_ndn_basis()
     const StateID dim =
         StateID(1) << (2 * N_);
 
-    states_.reserve(dim);
+    states_.reserve(dim / 2);
+
+    StateID up_mask = 0;
+    StateID dn_mask = 0;
+    for(int i = 0; i < N_; ++i)
+    {
+        up_mask |= (1ULL << (2 * i));
+        dn_mask |= (1ULL << (2 * i + 1));
+    }
 
     for(StateID s = 0; s < dim; ++s)
     {
-        StateID up_mask = 0;
-        StateID dn_mask = 0;
-        for(int i=0; i<N_; ++i)
-        {
-            up_mask |= (1ULL << (2*i));
-            dn_mask |= (1ULL << (2*i + 1));
-        }
-
         bool match_up = !sector_.use_nup || (popcount(s & up_mask) == sector_.nup);
         bool match_dn = !sector_.use_ndn || (popcount(s & dn_mask) == sector_.ndn);
 
         if(match_up && match_dn)
         {
-            lookup_[s] =
-                states_.size();
-
             states_.push_back(s);
         }
     }
+    states_.shrink_to_fit();
 }
 
 
 
-} // namespace QKRYLOV_PRECISION_NAMESPACE
 } // namespace qkrylov

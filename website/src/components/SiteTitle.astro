@@ -25,6 +25,8 @@ const sortedVersions = versions.sort((a, b) => {
   const bNum = parseFloat(b.replace('v', ''));
   return bNum - aNum; 
 });
+
+const latestRelease = sortedVersions.find(v => v !== 'dev');
 ---
 
 <div class="versioned-title">
@@ -32,9 +34,13 @@ const sortedVersions = versions.sort((a, b) => {
   
   <div class="version-picker">
     <select id="docs-version-select" aria-label="Select Documentation Version">
-      {sortedVersions.map(v => (
-        <option value={v} selected={v === currentVersion}>{v === 'dev' ? 'dev (main)' : v}</option>
-      ))}
+      {sortedVersions.map(v => {
+        let label = v;
+        if (v === 'dev') label = 'nightly';
+        else if (v === latestRelease) label = `${v} (latest)`;
+        
+        return <option value={v} selected={v === currentVersion}>{label}</option>
+      })}
     </select>
   </div>
 </div>

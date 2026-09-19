@@ -12,9 +12,9 @@ if (match) {
   currentVersion = match[1];
 }
 
-// In a real environment, you might generate this JSON during the build.
-// For now, hardcoded known versions to demonstrate the dropdown.
-const versions = ['dev', 'v1.6', 'v1.5', 'v1.4'];
+// In a purely static architecture, this array is manually bumped during a new release, 
+// or fetched via client-side JSON. For now, here are your actual live versions:
+const versions = ['dev', 'v0.1.4'];
 
 // Ensure SemVer sorting: dev always first, then vX.Y descending
 const sortedVersions = versions.sort((a, b) => {

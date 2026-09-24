@@ -12,20 +12,15 @@ if (match) {
   currentVersion = match[1];
 }
 
-// In a purely static architecture, this array is manually bumped during a new release, 
-// or fetched via client-side JSON. For now, here are your actual live versions:
+// Fallback initial render (prevents layout shift before JS loads)
 const versions = ['dev', 'v0.1.4'];
-
-// Ensure SemVer sorting: dev always first, then vX.Y descending
 const sortedVersions = versions.sort((a, b) => {
   if (a === 'dev') return -1;
   if (b === 'dev') return 1;
-  // Basic semver sort (e.g. v1.5 vs v1.4)
   const aNum = parseFloat(a.replace('v', ''));
   const bNum = parseFloat(b.replace('v', ''));
   return bNum - aNum; 
 });
-
 const latestRelease = sortedVersions.find(v => v !== 'dev');
 ---
 
@@ -46,28 +41,75 @@ const latestRelease = sortedVersions.find(v => v !== 'dev');
 </div>
 
 <script>
-  const select = document.getElementById('docs-version-select');
-  if (select) {
+  async function initVersionDropdown() {
+    const select = document.getElementById('docs-version-select');
+    if (!select) return;
+
+    // Determine base path dynamically
+    const isGhPages = window.location.pathname.startsWith('/qkrylov');
+    const basePath = isGhPages ? '/qkrylov' : '';
+    
+    try {
+      // Fetch dynamic versions list
+      const res = await fetch(`${basePath}/versions.json`);
+      if (res.ok) {
+        const versions = await res.json();
+        
+        const sortedVersions = versions.sort((a, b) => {
+          if (a === 'dev') return -1;
+          if (b === 'dev') return 1;
+          const aNum = parseFloat(a.replace('v', ''));
+          const bNum = parseFloat(b.replace('v', ''));
+          return bNum - aNum; 
+        });
+
+        const latestRelease = sortedVersions.find(v => v !== 'dev');
+        
+        // Infer current version
+        const currentPath = window.location.pathname;
+        let currentVersion = 'dev';
+        const match = currentPath.match(/^\/qkrylov\/(dev|v\d+\.\d+)/);
+        if (match) {
+          currentVersion = match[1];
+        } else {
+           const localMatch = currentPath.match(/^\/(dev|v\d+\.\d+)/);
+           if (localMatch) currentVersion = localMatch[1];
+        }
+
+        // Re-populate select
+        select.innerHTML = '';
+        sortedVersions.forEach(v => {
+          let label = v;
+          if (v === 'dev') label = 'nightly';
+          else if (v === latestRelease) label = `${v} (latest)`;
+          
+          const opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = label;
+          if (v === currentVersion) opt.selected = true;
+          select.appendChild(opt);
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to load dynamic versions.json, keeping fallback.", e);
+    }
+
+    // Handle navigation
     select.addEventListener('change', (e) => {
       const targetVersion = (e.target as HTMLSelectElement).value;
       const currentUrl = new URL(window.location.href);
-      
-      // We expect the path to be like /qkrylov/dev/quickstart or /qkrylov/v1.4/quickstart
-      // If someone visits /qkrylov/quickstart locally without subfolders, we handle that gracefully.
       const pathParts = currentUrl.pathname.split('/').filter(Boolean);
       
-      // Ensure 'qkrylov' is first (GitHub pages base)
       let newPath = '';
       if (pathParts[0] === 'qkrylov') {
         const hasVersion = pathParts.length > 1 && (pathParts[1] === 'dev' || pathParts[1].match(/^v\d+\.\d+/));
         if (hasVersion) {
-          pathParts[1] = targetVersion; // replace existing version
+          pathParts[1] = targetVersion;
         } else {
-          pathParts.splice(1, 0, targetVersion); // inject version
+          pathParts.splice(1, 0, targetVersion);
         }
         newPath = '/' + pathParts.join('/') + '/';
       } else {
-        // Localhost without /qkrylov base
         const hasVersion = pathParts.length > 0 && (pathParts[0] === 'dev' || pathParts[0].match(/^v\d+\.\d+/));
         if (hasVersion) {
           pathParts[0] = targetVersion;
@@ -80,6 +122,9 @@ const latestRelease = sortedVersions.find(v => v !== 'dev');
       window.location.pathname = newPath;
     });
   }
+
+  // Run on load
+  initVersionDropdown();
 </script>
 
 <style>

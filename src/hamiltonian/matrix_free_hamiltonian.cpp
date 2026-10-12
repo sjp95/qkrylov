@@ -77,6 +77,15 @@ MatrixFreeHamiltonian<ExecSpace>::MatrixFreeHamiltonian(
             }
         }
     }
+
+    // Sort instructions by bit-flip distance (popcount of flip_mask) to group local interaction terms
+    std::sort(host_insts.begin(), host_insts.end(), [](const Instruction& a, const Instruction& b) {
+        int pop_a = std::popcount(a.flip_mask);
+        int pop_b = std::popcount(b.flip_mask);
+        if (pop_a != pop_b) return pop_a < pop_b;
+        return a.flip_mask < b.flip_mask;
+    });
+
     num_instructions_ = host_insts.size();
     if (num_instructions_ > 0) {
         instructions_ = Kokkos::View<Instruction*, ExecSpace>("qkrylov::instructions", num_instructions_);

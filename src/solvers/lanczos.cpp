@@ -113,12 +113,17 @@ QKRYLOV_PRECISION_NAMESPACE::LanczosResult lanczos(
             axpy(KComplex(-betas.back(), 0.0), v_prev, w);
         }
 
-        // DGKS Full Reorthogonalization (Twice-is-enough)
+        // DGKS Full Reorthogonalization (Twice-is-enough with block-tiling optimization)
         if constexpr (Traits::uses_dgks) {
+            const size_t num_basis = basis_vectors.size();
+            constexpr size_t BLOCK_SIZE = 16;
             for (int pass = 0; pass < 2; ++pass) {
-                for (const auto& bv : basis_vectors) {
-                    KComplex proj = dot(bv, w);
-                    axpy(-proj, bv, w);
+                for (size_t b_start = 0; b_start < num_basis; b_start += BLOCK_SIZE) {
+                    size_t b_end = std::min(b_start + BLOCK_SIZE, num_basis);
+                    for (size_t k = b_start; k < b_end; ++k) {
+                        KComplex proj = dot(basis_vectors[k], w);
+                        axpy(-proj, basis_vectors[k], w);
+                    }
                 }
             }
         }

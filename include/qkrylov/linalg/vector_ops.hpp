@@ -58,6 +58,48 @@ inline void scal(
     );
 }
 
+/// Fused Lanczos step: w = w - alpha * v_curr - beta * v_prev, computing norm(w) in a single pass.
+template <typename ViewType>
+inline Real fused_lanczos_update_and_norm(
+    Real alpha,
+    Real beta,
+    bool has_prev,
+    const ViewType& v_curr,
+    const ViewType& v_prev,
+    ViewType& w
+)
+{
+    using ExecSpace = typename ViewType::execution_space;
+    Real sum_sq = 0.0;
+
+    KComplex neg_alpha(-alpha, 0.0);
+    KComplex neg_beta(-beta, 0.0);
+
+    if (has_prev) {
+        Kokkos::parallel_reduce("qkrylov::fused_lanczos_step",
+            Kokkos::RangePolicy<ExecSpace, Index>(0, w.extent(0)),
+            KOKKOS_LAMBDA(const Index i, Real& lsum) {
+                KComplex val = w(i) + neg_alpha * v_curr(i) + neg_beta * v_prev(i);
+                w(i) = val;
+                lsum += Kokkos::real(val * Kokkos::conj(val));
+            },
+            sum_sq
+        );
+    } else {
+        Kokkos::parallel_reduce("qkrylov::fused_lanczos_step_noprev",
+            Kokkos::RangePolicy<ExecSpace, Index>(0, w.extent(0)),
+            KOKKOS_LAMBDA(const Index i, Real& lsum) {
+                KComplex val = w(i) + neg_alpha * v_curr(i);
+                w(i) = val;
+                lsum += Kokkos::real(val * Kokkos::conj(val));
+            },
+            sum_sq
+        );
+    }
+
+    return std::sqrt(sum_sq);
+}
+
 /// Scale: x = a * x  (real scalar convenience overload)
 template <typename ViewType>
 inline void scal(
